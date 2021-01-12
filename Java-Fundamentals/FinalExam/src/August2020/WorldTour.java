@@ -23,19 +23,20 @@ public class WorldTour {
                     }
                     break;
                 case "Remove Stop":
-                    int startIndex = Integer.parseInt(data[1]);
-                    int endIndex = Integer.parseInt(data[2]);
+                    int fromIndex = Integer.parseInt(data[1]);
+                    int toIndex = Integer.parseInt(data[2]);
 
-                    if (isValidIndex(allStops, startIndex) && isValidIndex(allStops, endIndex)) {
-                        allStops.replace(startIndex, endIndex + 1, "");
+                    if (isValidIndex(allStops, fromIndex) && isValidIndex(allStops, toIndex)) {
+                        allStops.replace(fromIndex, toIndex + 1, "");
                     }
                     break;
                 case "Switch":
                     String oldString = data[1];
                     String newString = data[2];
 
-                    allStops = new StringBuilder(allStops.toString().replace(oldString, newString));
-                    //replaceOldStringWithNew(allStops, oldString, newString);
+                    replaceOldStringWithNew(allStops, oldString, newString);
+                    //Option 2: allStops.replace(allStops.indexOf(oldString),allStops.indexOf(oldString) + oldString.length(), newString);
+                    //Option 3: allStops = new StringBuilder(allStops.toString().replace(oldString, newString));
                     break;
                 default:
                     return;
@@ -52,12 +53,12 @@ public class WorldTour {
     }
 
     private static void replaceOldStringWithNew(StringBuilder stops, String oldString, String newString) {
-        int startIndex = stops.indexOf(oldString);
-        while (startIndex != -1) {
-            int endIndex = startIndex + oldString.length();
-            stops.replace(startIndex, endIndex, newString);
+        int fromIndex = stops.indexOf(oldString);
+        while (fromIndex != -1) {
+            int toIndex = fromIndex + oldString.length();
+            stops.replace(fromIndex, toIndex, newString);
 
-            startIndex = stops.indexOf(oldString, endIndex);
+            fromIndex = stops.indexOf(oldString, fromIndex + newString.length());
         }
     }
 }
