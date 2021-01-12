@@ -6,64 +6,57 @@ import java.util.regex.Pattern;
 
 public class PostOffice {
     public static void main(String[] args) {
-        Map<Character, Integer> capitalLettersAndTheirLength = new LinkedHashMap<>();
-        Pattern firstPattern = Pattern.compile("([#$%*&])(?<word>[A-Z]+)\\1");
-        Pattern secondPattern = Pattern.compile("(?<number>[0-9]{2}):(?<length>[0-9]{2})");
-        Pattern thirdPattern = Pattern.compile("[A-Z].*");
+        Scanner scanner = new Scanner(System.in);
+        Map<Character, Integer> capitalLetterAndLength = new LinkedHashMap<>();
 
-        String[] input = new Scanner(System.in).nextLine().split("\\|");
+        String[] parts = scanner.nextLine().split("\\|");
 
-        Matcher firstMatcher = firstPattern.matcher(input[0]);
-        while (firstMatcher.find()) {
-            collectCapitalLetters(capitalLettersAndTheirLength, firstMatcher.group("word"));
-        }
+        String letters = firstPart(parts[0]);
+        secondPart(letters, parts[1], capitalLetterAndLength);
+        thirdPart(letters, parts[2], capitalLetterAndLength);
+    }
 
-        Matcher secondMatcher = secondPattern.matcher(input[1]);
-        while (secondMatcher.find()) {
-            int asciCode = Integer.parseInt(secondMatcher.group("number"));
-            int length = Integer.parseInt(secondMatcher.group("length"));
-            if (0 < length && length <= 20) {
-                recordTheLengthOFTheWord(capitalLettersAndTheirLength, asciCode, length);
-            }
-        }
+    private static void thirdPart(String letters, String part, Map<Character, Integer> capitalLetterAndLength) {
+        String[] words = part.split("\\s+");
+        for (int i = 0; i < letters.length(); i++) {
+            char firstLetter = letters.charAt(i);
+            int length = capitalLetterAndLength.get(firstLetter);
 
-        String[] words = input[2].split("\\s+");
-        for (Map.Entry<Character, Integer> entry : capitalLettersAndTheirLength.entrySet()) {
             for (String word : words) {
-                Matcher thirdMatcher = thirdPattern.matcher(word);
-                if (thirdMatcher.find()) {
-                    if (entry.getKey() == thirdMatcher.group().charAt(0)
-                            && entry.getValue() == thirdMatcher.group().length()) {
-                        System.out.println(thirdMatcher.group());
-                    }
+                int lengthWord = word.length();
+                char firstChar = word.charAt(0);
+
+                if (lengthWord == length && firstLetter == firstChar) {
+                    System.out.println(word);
+                }
+            }
+
+        }
+    }
+
+    private static void secondPart(String letters, String part, Map<Character, Integer> capitalLetterAndLength) {
+        Pattern pattern = Pattern.compile("(?<ascii>[0-9]{2}):(?<length>[0-9]{2})");
+        for (int i = 0; i < letters.length(); i++) {
+            char letter = letters.charAt(i);
+            Matcher matcher = pattern.matcher(part);
+            while (matcher.find()) {
+                char ascii = (char) Integer.parseInt(matcher.group("ascii"));
+                int length = Integer.parseInt(matcher.group("length"));
+                if (ascii == letter && !capitalLetterAndLength.containsKey(ascii)) {
+                    capitalLetterAndLength.put(ascii, length + 1);
                 }
             }
         }
     }
-    // TODO: методът не е в употреба
-    private static Boolean chekIfTheWordIsCorrect(Map<Character, Integer> capitalLettersAndTheirLength, String word) {
-        char firstLetter = word.charAt(0);
-        if (capitalLettersAndTheirLength.containsKey(firstLetter)) {
-            if (word.length() == capitalLettersAndTheirLength.get(firstLetter)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    private static void recordTheLengthOFTheWord(Map<Character, Integer> capitalLettersAndTheirLength, int asciCode, int length) {
-        char letter = (char) asciCode;
-        if (capitalLettersAndTheirLength.containsKey(letter)) {
-            if (capitalLettersAndTheirLength.get(letter) == 0) {
-                capitalLettersAndTheirLength.put(letter, length + 1);
-            }
+    private static String firstPart(String part) {
+        String letters = "";
+        Pattern pattern = Pattern.compile("([#$%*&])(?<word>[A-Z]+)\\1");
+        Matcher matcher = pattern.matcher(part);
+        while (matcher.find()) {
+            String word = matcher.group("word");
+            letters += word;
         }
-    }
-
-    private static void collectCapitalLetters(Map<Character, Integer> capitalLetters, String word) {
-        for (int i = 0; i < word.length(); i++) {
-            char currentLetter = word.charAt(i);
-            capitalLetters.put(currentLetter, 0);
-        }
+        return letters;
     }
 }
