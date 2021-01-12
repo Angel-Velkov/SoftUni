@@ -77,6 +77,9 @@ public class HeroesOfCodeAndLogicVII {
                     increasingHeroesMP(heroesByName, heroName, addsMP);
                     break;
                 case "Heal":
+                    int addsHP = Integer.parseInt(data[2]);
+
+                    increasingHeroesHP(heroesByName, heroName, addsHP);
                     break;
                 default:
                     System.out.println("Invalid command!!!");
@@ -87,19 +90,41 @@ public class HeroesOfCodeAndLogicVII {
 
         heroesByName
                 .values()
+                .stream()
+                .sorted((h1, h2) -> {
+                    int result = h2.getHP() - h1.getHP();
+                    if (result == 0) {
+                        result = h1.getName().compareTo(h2.getName());
+                    }
+                    return result;
+                })
                 .forEach(h -> {
                     System.out.println(h.getName());
-                    System.out.println(" HP: " + h.getHP());
-                    System.out.println(" MP: " + h.getMP());
+                    System.out.println("  HP: " + h.getHP());
+                    System.out.println("  MP: " + h.getMP());
                 });
+    }
+
+    private static void increasingHeroesHP(Map<String, Hero> heroesByName, String heroName, int addsHP) {
+        Hero hero = heroesByName.get(heroName);
+        int currentHP = hero.getHP();
+        if (currentHP + addsHP > 100) {
+            addsHP = 100 - currentHP;
+        }
+        hero.setHP(currentHP + addsHP);
+
+        System.out.printf("%s healed for %d HP!%n", heroName, addsHP);
     }
 
     private static void increasingHeroesMP(Map<String, Hero> heroesByName, String heroName, int addsMP) {
         Hero hero = heroesByName.get(heroName);
         int currentMP = hero.getMP();
-        
+        if (currentMP + addsMP > 200) {
+            addsMP = 200 - currentMP;
+        }
+        hero.setMP(currentMP + addsMP);
 
-        System.out.printf("%s recharges for %d MP!%n", heroName, addsMP);
+        System.out.printf("%s recharged for %d MP!%n", heroName, addsMP);
     }
 
     private static void takingDamage(Map<String, Hero> heroesByName, String heroName, int damage, String attackerName) {
