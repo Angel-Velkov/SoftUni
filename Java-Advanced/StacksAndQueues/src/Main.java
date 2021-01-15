@@ -1,18 +1,24 @@
-import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        ArrayDeque<Integer> stack = new ArrayDeque<>();
-                Arrays.stream(scanner.nextLine()
-                .split("\\s+"))
-                .map(Integer::parseInt)
-                .forEach(stack::push);
+        int n = scanner.nextInt();
+        if (isPrime(n)) {
+            System.out.println("Yes");
+        } else {
+            System.out.println("No");
+        }
+    }
 
-        System.out.println(stack);
+    private static boolean isPrime(int n) {
+
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
