@@ -3,6 +3,7 @@ package Exercise;
 import java.util.Scanner;
 
 public class RecursiveFibonacci {
+    //collect all new fibonacci numbers
     private static long[] memorization;
 
     public static void main(String[] args) {
