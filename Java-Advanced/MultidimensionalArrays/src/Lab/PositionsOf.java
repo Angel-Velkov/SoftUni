@@ -14,9 +14,9 @@ public class PositionsOf {
         List<int[]> coordinates = new ArrayList<>();
 
         for (int row = 0; row < matrix.length; row++) {
-            for (int colon = 0; colon < matrix[row].length; colon++) {
-                if (matrix[row][colon] == num) {
-                    int[] indexes = {row, colon};
+            for (int column = 0; column < matrix[row].length; column++) {
+                if (matrix[row][column] == num) {
+                    int[] indexes = {row, column};
                     coordinates.add(indexes);
                 }
             }
@@ -32,12 +32,12 @@ public class PositionsOf {
     }
 
     private static int[][] readMatrix(Scanner scanner) {
-        int[] rowsAndColons = readArray(scanner);
+        int[] rowsAndColumns = readArray(scanner);
 
-        int rows = rowsAndColons[0];
-        int colons = rowsAndColons[1];
+        int rows = rowsAndColumns[0];
+        int column = rowsAndColumns[1];
 
-        int[][] matrix = new int[rows][colons];
+        int[][] matrix = new int[rows][column];
         for (int row = 0; row < matrix.length; row++) {
             matrix[row] = readArray(scanner);
         }

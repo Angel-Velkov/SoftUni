@@ -18,9 +18,9 @@ public class CompareMatrices {
                 int[] secondArr = secondMatrix[row];
                 isEqual = firstArr.length == secondArr.length;
                 if (isEqual) {
-                    for (int colon = 0; colon < firstArr.length; colon++) {
-                        int firstElement = firstArr[colon];
-                        int secondElement = secondArr[colon];
+                    for (int column = 0; column < firstArr.length; column++) {
+                        int firstElement = firstArr[column];
+                        int secondElement = secondArr[column];
                         if (firstElement != secondElement) {
                             isEqual = false;
                             break;
@@ -38,12 +38,12 @@ public class CompareMatrices {
     }
 
     private static int[][] readMatrix(Scanner scanner) {
-        int[] rowsAndColons = readArray(scanner);
+        int[] rowsAndColumns = readArray(scanner);
 
-        int rows = rowsAndColons[0];
-        int colons = rowsAndColons[1];
+        int rows = rowsAndColumns[0];
+        int columns = rowsAndColumns[1];
 
-        int[][] matrix = new int[rows][colons];
+        int[][] matrix = new int[rows][columns];
 
         for (int row = 0; row < matrix.length; row++) {
             matrix[row] = readArray(scanner);

@@ -7,30 +7,30 @@ public class IntersectionOfTwoMatrices {
         Scanner scanner = new Scanner(System.in);
 
         int rows = Integer.parseInt(scanner.nextLine());
-        int colons = Integer.parseInt(scanner.nextLine());
+        int columns = Integer.parseInt(scanner.nextLine());
 
-        char[][] firstMatrix = readMatrix(scanner, rows, colons);
-        char[][] secondMatrix = readMatrix(scanner, rows, colons);
+        char[][] firstMatrix = readMatrix(scanner, rows, columns);
+        char[][] secondMatrix = readMatrix(scanner, rows, columns);
 
-        char[][] finalMatrix = new char[rows][colons];
+        char[][] finalMatrix = new char[rows][columns];
         for (int row = 0; row < rows; row++) {
-            for (int colon = 0; colon < colons; colon++) {
-                char firstSymbol = firstMatrix[row][colon];
-                char secondSymbol = secondMatrix[row][colon];
+            for (int column = 0; column < columns; column++) {
+                char firstSymbol = firstMatrix[row][column];
+                char secondSymbol = secondMatrix[row][column];
 
-                finalMatrix[row][colon] = firstSymbol == secondSymbol ? firstSymbol : '*';
+                finalMatrix[row][column] = firstSymbol == secondSymbol ? firstSymbol : '*';
             }
         }
 
         printMatrix(finalMatrix);
     }
 
-    private static char[][] readMatrix(Scanner scanner, int rows, int colons) {
-        char[][] matrix = new char[rows][colons];
+    private static char[][] readMatrix(Scanner scanner, int rows, int columns) {
+        char[][] matrix = new char[rows][columns];
         for (int row = 0; row < matrix.length; row++) {
             String[] line = scanner.nextLine().split("\\s+");
-            for (int colon = 0; colon < line.length; colon++) {
-                matrix[row][colon] = line[colon].charAt(0);
+            for (int column = 0; column < line.length; column++) {
+                matrix[row][column] = line[column].charAt(0);
             }
         }
         return matrix;
@@ -38,8 +38,8 @@ public class IntersectionOfTwoMatrices {
 
     private static void printMatrix(char[][] matrix) {
         for (int row = 0; row < matrix.length; row++) {
-            for (int colon = 0; colon < matrix[row].length; colon++) {
-                System.out.print(matrix[row][colon] + " ");
+            for (int column = 0; column < matrix[row].length; column++) {
+                System.out.print(matrix[row][column] + " ");
             }
             System.out.println();
         }
