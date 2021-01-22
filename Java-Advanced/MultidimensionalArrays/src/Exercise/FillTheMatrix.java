@@ -21,6 +21,11 @@ public class FillTheMatrix {
         printMatrix(matrix);
     }
 
+    /**
+     * print n/n matrix
+     *
+     * @param matrix matrix to print
+     */
     private static void printMatrix(int[][] matrix) {
         for (int[] array : matrix) {
             Arrays.stream(array).forEach(n -> System.out.print(n + " "));
