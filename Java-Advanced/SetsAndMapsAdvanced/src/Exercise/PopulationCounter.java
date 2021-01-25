@@ -44,7 +44,8 @@ public class PopulationCounter {
             countryPopulation.putIfAbsent(country, cityPopulation);
         }
 
-        countryPopulation.entrySet()
+        countryPopulation
+                .entrySet()
                 .stream()
                 .sorted((c1, c2) -> Long.compare(c2.getValue().stream().mapToLong(City::getPopulation).sum(), c1.getValue().stream().mapToLong(City::getPopulation).sum()))
                 .forEach(c -> {
