@@ -35,40 +35,40 @@ public class RadioactiveMutantVampireBunnies {
             char command = commands.charAt(i);
 
             matrix[playerRow][playerColumn] = '.';
-            int playerState = 0;
+            int playerLocation = 0;
             switch (command) {
                 case 'U':
-                    playerState = playerMovements(matrix, playerRow - 1, playerColumn);
-                    if (playerState != 1) {
+                    playerLocation = playerMovements(matrix, playerRow - 1, playerColumn);
+                    if (playerLocation != 1) {
                         playerRow--;
                     }
                     break;
                 case 'D':
-                    playerState = playerMovements(matrix, playerRow + 1, playerColumn);
-                    if (playerState != 1) {
+                    playerLocation = playerMovements(matrix, playerRow + 1, playerColumn);
+                    if (playerLocation != 1) {
                         playerRow++;
                     }
                     break;
                 case 'R':
-                    playerState = playerMovements(matrix, playerRow, playerColumn + 1);
-                    if (playerState != 1) {
+                    playerLocation = playerMovements(matrix, playerRow, playerColumn + 1);
+                    if (playerLocation != 1) {
                         playerColumn++;
                     }
                     break;
                 case 'L':
-                    playerState = playerMovements(matrix, playerRow, playerColumn - 1);
-                    if (playerState != 1) {
+                    playerLocation = playerMovements(matrix, playerRow, playerColumn - 1);
+                    if (playerLocation != 1) {
                         playerColumn--;
                     }
                     break;
             }
-            int bunniesState = bunniesMovements(matrix, bunniesPositions);
+            int bunniesLocation = bunniesMovements(matrix, bunniesPositions);
 
-            if (playerState == -1 || bunniesState == -1) {
+            if (playerLocation == -1 || bunniesLocation == -1) {
                 printMatrix(matrix);
                 System.out.println("dead: " + playerRow + " " + playerColumn);
                 break;
-            } else if (playerState == 1) {
+            } else if (playerLocation == 1) {
                 printMatrix(matrix);
                 System.out.println("won: " + playerRow + " " + playerColumn);
                 break;
