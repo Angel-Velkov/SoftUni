@@ -1,8 +1,10 @@
 package Lab;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FindEvensOrOdds {
     public static void main(String[] args) {
@@ -12,10 +14,10 @@ public class FindEvensOrOdds {
         int end = scanner.nextInt();
         scanner.nextLine();
 
-        List<Integer> numbers = new ArrayList<>();
-        for (int i = start; i <= end; i++) {
-            numbers.add(i);
-        }
+        List<Integer> numbers = IntStream
+                .range(start, end + 1)
+                .boxed()
+                .collect(Collectors.toList());
 
         String type = scanner.nextLine();
         numbers = type.equals("even")

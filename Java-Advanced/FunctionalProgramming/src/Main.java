@@ -14,8 +14,10 @@ public class Main {
                 .findFirst()
                 .orElseGet(() -> new Random().nextInt());
 
-
-
         System.out.println(integer);
+
+        int a = -1111252323;
+        int b = 1;
+        System.out.println(a & b);
     }
 }
