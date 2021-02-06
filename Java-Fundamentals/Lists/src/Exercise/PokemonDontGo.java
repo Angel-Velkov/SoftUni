@@ -13,8 +13,6 @@ public class PokemonDontGo {
 
         // TODO: Всеки елемент който махаме трябва да бъде причисляван в ELSE-а.
         // TODO: Първите две проверки махат елементи (първата маха числото на първия индекс а втората числото на последния.
-        // TODO: опитай с метод
-
 
         while (!distanceFromPokemons.isEmpty()) {
             int index = Integer.parseInt(scanner.nextLine());
@@ -27,13 +25,10 @@ public class PokemonDontGo {
                 distanceFromPokemons.set(distanceFromPokemons.size() - 1, distanceFromPokemons.get(0));
 
             } else {
-
                 int removedElement = distanceFromPokemons.remove(index);
                 sumOfRemovedNumbers += removedElement;
                 for (int i = 0; i < distanceFromPokemons.size(); i++) {
-
                     int currentElement = distanceFromPokemons.get(i);
-
 
                     if (removedElement >= currentElement) {
                         distanceFromPokemons.set(i, currentElement + removedElement);
