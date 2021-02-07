@@ -3,6 +3,8 @@ package Lab;
 import java.util.function.Consumer;
 
 public class SmartStack {
+
+
     private static class Node {
         int element;
         Node previous;
@@ -28,12 +30,12 @@ public class SmartStack {
     }
 
     public int peek() {
-        ensureNutEmpty("peek");
+        ensureNotEmpty("peek");
         return this.top.element;
     }
 
     public int pop() {
-        ensureNutEmpty("pop");
+        ensureNotEmpty("pop");
         int element = this.top.element;
 
         this.top = this.top.previous;
@@ -41,7 +43,7 @@ public class SmartStack {
         return element;
     }
 
-    private void ensureNutEmpty(String operation) {
+    private void ensureNotEmpty(String operation) {
         if (isEmpty()) {
             throw new IllegalStateException("Cannot " + operation
                     + " on empty stack");
