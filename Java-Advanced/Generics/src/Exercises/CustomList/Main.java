@@ -48,7 +48,10 @@ public class Main {
                 }
                 break;
                 case "Print": {
-                    System.out.println(list);
+                    for (String s : list) {
+                        System.out.println(s);
+                    }
+
                 }
                 case "Sort": {
                     Sorter.sort(list);

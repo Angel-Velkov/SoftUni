@@ -1,9 +1,25 @@
 package Exercises.CustomList;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class CustomList<T extends Comparable<T>> {
+public class CustomList<T extends Comparable<T>> implements Iterable<T> {
+
+    private class elementsIterator implements Iterator<T> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < elements.size();
+        }
+
+        @Override
+        public T next() {
+            return elements.get(index++);
+        }
+
+    }
 
     private final List<T> elements;
 
@@ -27,7 +43,7 @@ public class CustomList<T extends Comparable<T>> {
         return this.elements.contains(element);
     }
 
-    public int size(){
+    public int size() {
         return this.elements.size();
     }
 
@@ -67,6 +83,11 @@ public class CustomList<T extends Comparable<T>> {
             sb.append(element).append(System.lineSeparator());
         }
         return sb.toString().trim();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new elementsIterator();
     }
 }
 
