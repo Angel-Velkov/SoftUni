@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ListyIterator {
 
-    private List<String> elements;
+    private final List<String> elements;
     private int index = 0;
 
     public ListyIterator(List<String> elements) {

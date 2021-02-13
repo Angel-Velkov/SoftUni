@@ -8,24 +8,26 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-
-        ListyIterator listyIterator = new ListyIterator(
-                Arrays.stream(scanner.nextLine().split("\\s+"))
-                        .skip(1)
-                        .collect(Collectors.toList()));
+        ListyIterator listyIterator = null;
 
         String input;
         while (!"END".equals(input = scanner.nextLine())) {
             String[] tokens = input.split("\\s+");
             String command = tokens[0];
             switch (command) {
+                case "Create":
+                    listyIterator = new ListyIterator(
+                            Arrays.stream(tokens)
+                                    .skip(1)
+                                    .collect(Collectors.toList()));
+                    break;
                 case "Move":
                     System.out.println(listyIterator.move());
                     break;
                 case "Print":
                     try {
                         listyIterator.print();
-                    } catch (IllegalStateException exception){
+                    } catch (IllegalArgumentException exception) {
                         System.out.println(exception.getMessage());
                     }
                     break;

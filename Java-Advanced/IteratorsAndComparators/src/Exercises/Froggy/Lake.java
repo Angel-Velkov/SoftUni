@@ -27,7 +27,7 @@ public class Lake implements Iterable<Integer> {
 
     private final int[] stones;
 
-    public Lake(int... stones) {
+    public Lake(int[] stones) {
         this.stones = stones;
     }
 
