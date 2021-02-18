@@ -22,7 +22,7 @@ public class TheMatrix {
         int startingCol = scanner.nextInt();
         char startChar = matrix[startingRow][startingCol];
 
-        characterDistribution(matrix, startingRow, startingCol, startChar, replacement);
+        characterSpread(matrix, startingRow, startingCol, startChar, replacement);
 
         printMatrix(matrix);
     }
@@ -46,30 +46,30 @@ public class TheMatrix {
      * @param startChar - the character that we replace
      * @param replacement - the replacement of the char
      */
-    private static void characterDistribution(char[][] matrix, int row, int col, char startChar, char replacement) {
-        if (matrix[row][col] != startChar) {
+    private static void characterSpread(char[][] matrix, int row, int col, char startChar, char replacement) {
+        if (matrix[row][col] != startChar || replacement == startChar) {
             return;
         }
         matrix[row][col] = replacement;
 
         //UP
         if (0 <= row - 1) {
-            characterDistribution(matrix, row - 1, col, startChar, replacement);
+            characterSpread(matrix, row - 1, col, startChar, replacement);
         }
 
         //DOWN
         if (row + 1 < matrix.length) {
-            characterDistribution(matrix, row + 1, col, startChar, replacement);
+            characterSpread(matrix, row + 1, col, startChar, replacement);
         }
 
         //LEFT
         if (0 <= col - 1) {
-            characterDistribution(matrix, row, col -1, startChar, replacement);
+            characterSpread(matrix, row, col -1, startChar, replacement);
         }
 
         //RIGHT
         if (col + 1 < matrix[row].length){
-            characterDistribution(matrix, row, col + 1, startChar, replacement);
+            characterSpread(matrix, row, col + 1, startChar, replacement);
         }
     }
 }
