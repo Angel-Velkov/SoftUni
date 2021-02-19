@@ -5,11 +5,11 @@ public class RecursiveFactorial {
 
         int num = new Scanner(System.in).nextInt();
 
-        int factorial = factorial(num);
-        System.out.println(factorial);
+        long result = factorial(num);
+        System.out.println(result);
     }
 
-    private static int factorial(int num) {
+    private static long factorial(int num) {
         if (num == 1) {
             return 1;
         }
