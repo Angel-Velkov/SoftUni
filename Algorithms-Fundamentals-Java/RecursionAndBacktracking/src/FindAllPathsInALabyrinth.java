@@ -11,7 +11,6 @@ public class FindAllPathsInALabyrinth {
 
         int rows = Integer.parseInt(scanner.nextLine());
         int cols = Integer.parseInt(scanner.nextLine());
-
         char[][] labyrinth = readMatrix(rows, cols, scanner);
 
         findPaths(labyrinth, 0, 0, ' ');
@@ -24,24 +23,23 @@ public class FindAllPathsInALabyrinth {
         if (direction != ' ') {
             path.push(direction);
         }
-
         if (labyrinth[row][col] == 'e') {
             printDirection();
         } else if (labyrinth[row][col] != 'V' && labyrinth[row][col] != '*') {
+            //Mark
             labyrinth[row][col] = 'V';
 
-            findPaths(labyrinth, row - 1, col, 'U');
             findPaths(labyrinth, row + 1, col, 'D');
-            findPaths(labyrinth, row, col - 1, 'L');
             findPaths(labyrinth, row, col + 1, 'R');
+            findPaths(labyrinth, row - 1, col, 'U');
+            findPaths(labyrinth, row, col - 1, 'L');
 
+            //unMark
             labyrinth[row][col] = '-';
         }
-
         if (!path.isEmpty())
             path.pop();
     }
-
     private static void printDirection() {
         Iterator<Character> iterator = path.descendingIterator();
         while (iterator.hasNext()) {

@@ -18,6 +18,6 @@ public class RecursiveArraySum {
             return 0;
         }
 
-        return array[index] + sum(array, index - 1 );
+        return array[index] + sum(array, index - 1);
     }
 }
