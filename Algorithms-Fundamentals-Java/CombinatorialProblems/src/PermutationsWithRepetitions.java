@@ -10,7 +10,6 @@ public class PermutationsWithRepetitions {
         permuteWithRepetitions(0);
     }
 
-
     private static void permuteWithRepetitions(int index) {
         if (index >= elements.length) {
             print(elements);
