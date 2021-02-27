@@ -13,7 +13,7 @@ public class GeometricFactory {
     public static Point2D createPoint2D(int[] pointInfo) {
         if (pointInfo.length != 2) {
             throw new IllegalStateException("Point can be created only by X and Y. " +
-                    "There should be only two Coordinates.");
+                    "There should be only two coordinates.");
         }
         return new Point2D(pointInfo[0], pointInfo[1]);
     }

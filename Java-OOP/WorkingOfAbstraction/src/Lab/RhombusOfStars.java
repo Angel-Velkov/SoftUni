@@ -1,4 +1,5 @@
 package Lab;
+
 import java.util.Scanner;
 
 public class RhombusOfStars {
@@ -12,9 +13,8 @@ public class RhombusOfStars {
     }
 
     /**
-     *
-     * @param size  size of the triangle
-     * @param direction  "up" or "down"
+     * @param size      length of the sides of the triangle
+     * @param direction "up" or "down"
      * @return triangle from "* " as String
      */
     private static String getTriangleOfStars(int size, String direction) {
@@ -40,4 +40,3 @@ public class RhombusOfStars {
         return out.toString();
     }
 }
-
