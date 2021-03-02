@@ -11,7 +11,7 @@ public class TowersOfHanoi {
     private static final ArrayDeque<Integer> destination = new ArrayDeque<>();
     private static final ArrayDeque<Integer> spare = new ArrayDeque<>();
 
-    private static final StringBuilder out = new StringBuilder();
+    private static final StringBuilder output = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -21,20 +21,19 @@ public class TowersOfHanoi {
         for (int i = disk; i >= 1; i--) {
             source.push(i);
         }
-        out.append(rodsInfo())
+        output.append(rodsInfo())
                 .append(System.lineSeparator());
         solve(disk, source, destination, spare);
 
-        System.out.println(out);
+        System.out.println(output);
     }
 
     private static void solve(int disk, ArrayDeque<Integer> source, ArrayDeque<Integer> destination, ArrayDeque<Integer> spare) {
-
         if (disk == 1) {
             destination.push(source.pop());
-            out.append("Step #").append(++step).append(": Moved disk")
+            output.append("Step #").append(++step).append(": Moved disk")
                     .append(System.lineSeparator());
-            out.append(rodsInfo())
+            output.append(rodsInfo())
                     .append(System.lineSeparator());
         } else {
             solve(disk - 1, source, spare, destination);
@@ -44,7 +43,9 @@ public class TowersOfHanoi {
     }
 
     private static String rodsInfo() {
-        return String.format("Source: %s%nDestination: %s%nSpare: %s%n"
+        return String.format("Source: %s%n" +
+                        "Destination: %s%n" +
+                        "Spare: %s%n"
                 , stackFormat(source, ", ")
                 , stackFormat(destination, ", ")
                 , stackFormat(spare, ", "));
