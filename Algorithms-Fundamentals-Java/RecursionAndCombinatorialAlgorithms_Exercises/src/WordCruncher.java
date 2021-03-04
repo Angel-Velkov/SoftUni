@@ -26,7 +26,6 @@ public class WordCruncher {
 
             int index = target.indexOf(substr);
             while (index > -1) {
-
                 syllablesOnIndex.putIfAbsent(index, new ArrayList<>());
                 syllablesOnIndex.get(index).add(substr);
                 index = target.indexOf(substr, index + 1);
@@ -43,8 +42,8 @@ public class WordCruncher {
         if (index == target.length()) {
             output.add(parseString(wordCombinations, " "));
         } else if (syllablesOnIndex.containsKey(index)) {
-            List<String> syllable = syllablesOnIndex.get(index);
-            for (String str : syllable) {
+            List<String> syllables = syllablesOnIndex.get(index);
+            for (String str : syllables) {
                 if (occurrences.get(str) > 0) {
                     occurrences.put(str, occurrences.get(str) - 1);
                     wordCombinations.add(str);
