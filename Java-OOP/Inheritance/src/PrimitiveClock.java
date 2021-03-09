@@ -1,4 +1,4 @@
-public class Main {
+public class PrimitiveClock {
     public static void main(String[] args) {
 
         Thread thread = new Thread(() -> printTime());
