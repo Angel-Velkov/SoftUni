@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+
     //Runtime errors in judge - I don't know why
 
     public static void main(String[] args) {
