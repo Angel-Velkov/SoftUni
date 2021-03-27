@@ -43,9 +43,10 @@ public class Main {
             String methodName = tokens[0];
             int parameter = Integer.parseInt(tokens[1]);
 
-            methodsByName.get(methodName).invoke(blackBoxInt, parameter);
+            methodsByName.get(methodName)
+                    .invoke(blackBoxInt, parameter);
 
-            output.append((int) innerValue.get(blackBoxInt))
+            output.append(innerValue.getInt(blackBoxInt))
                     .append(System.lineSeparator());
         }
 
