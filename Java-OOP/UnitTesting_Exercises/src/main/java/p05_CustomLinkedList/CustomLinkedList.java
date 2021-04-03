@@ -52,12 +52,13 @@ public class CustomLinkedList<T> {
 
     /**
      * Gets element at the specified position
+     *
      * @param index The position of the element [0 � count-1]
      * @return The item at the specified index
-     * @exception IllegalArgumentException When an invalid index is specified
+     * @throws IllegalArgumentException When an invalid index is specified
      */
     public T get(int index) {
-        if (index >= this.count || index < 0) {
+        if (0 > index || index >= this.count) {
             throw new IllegalArgumentException("Invalid index: " + index);
         }
 
@@ -70,10 +71,11 @@ public class CustomLinkedList<T> {
 
     /**
      * Sets element at the specified position
-     * @param index The position of the element [0 � count-1]
+     *
+     * @param index   The position of the element [0 � count-1]
      * @param element The element which should be set on the given position
      * @return The item at the specified index
-     * @exception IllegalArgumentException When an invalid index is specified
+     * @throws IllegalArgumentException When an invalid index is specified
      */
     public void set(int index, T element) {
         if (index >= this.count || index < 0) {
@@ -90,6 +92,7 @@ public class CustomLinkedList<T> {
 
     /**
      * Add element at the end of the list
+     *
      * @param item The element to be added
      */
     public void add(T item) {
@@ -97,8 +100,7 @@ public class CustomLinkedList<T> {
             // We have an empty list -> create a new head and tail
             this.head = new ListNode(item);
             this.tail = this.head;
-        }
-        else {
+        } else {
             // We have a non-empty list -> append the item after tail
             ListNode newNode = new ListNode(item, this.tail);
             this.tail = newNode;
@@ -109,9 +111,10 @@ public class CustomLinkedList<T> {
 
     /**
      * Removes and returns element on the specified index
+     *
      * @param index The index of the element to be removed
      * @return The removed element
-     * @exception IllegalArgumentException if the index is invalid
+     * @throws IllegalArgumentException if the index is invalid
      */
     public T removeAt(int index) {
         if (index >= this.count || index < 0) {
@@ -137,6 +140,7 @@ public class CustomLinkedList<T> {
 
     /**
      * Removes the specified item and return its index.
+     *
      * @param item The item for removal
      * @return The index of the element or -1 if it does not exist
      */
@@ -167,6 +171,7 @@ public class CustomLinkedList<T> {
 
     /**
      * Searches for given element in the list
+     *
      * @param item The item to be searched
      * @return The index of the first occurrence of the element in the list or -1 when it is not found
      */
@@ -187,6 +192,7 @@ public class CustomLinkedList<T> {
 
     /**
      * Checks if the specified element exists in the list
+     *
      * @param item The item to be checked
      * @return True if the element exists or false otherwise
      */
@@ -198,7 +204,8 @@ public class CustomLinkedList<T> {
 
     /**
      * Remove the specified node from the list of nodes
-     * @param node the node for removal
+     *
+     * @param node     the node for removal
      * @param prevNode the predecessor of node
      */
     private void removeListNode(ListNode node, ListNode prevNode) {
@@ -207,12 +214,10 @@ public class CustomLinkedList<T> {
             // The list becomes empty -> remove head and tail
             this.head = null;
             this.tail = null;
-        }
-        else if (prevNode == null) {
+        } else if (prevNode == null) {
             // The head node was removed --> update the head
             this.head = node.getNextNode();
-        }
-        else {
+        } else {
             // Redirect the pointers to skip the removed node
             prevNode.setNextNode(node.getNextNode());
         }
