@@ -14,8 +14,6 @@ public class ChainblockImplTest {
     private ChainblockImpl chainblock;
     private Transaction transaction;
 
-    private static final int ID = 1;
-
     @Before
     public void setChainblock() {
         this.chainblock = new ChainblockImpl();
@@ -47,6 +45,8 @@ public class ChainblockImplTest {
 
     @Test
     public void Add_TwoTransactionsWithTheSameId_IncreaseCountOfTransactionsByOne() {
+        final int ID = 1;
+
         createAndAddTransaction(ID, TransactionStatus.SUCCESSFUL, "Angel", "Peter", 10.00);
         createAndAddTransaction(ID, TransactionStatus.FAILED, "Daniel", "James", 11.00);
 
@@ -57,6 +57,8 @@ public class ChainblockImplTest {
 
     @Test
     public void Add_TwoTransactionsWithTheSameId_ReturnsOnlyTheFirstOne() {
+        final int ID = 1;
+
         Transaction firstTransaction = createAndAddTransaction
                 (ID, TransactionStatus.SUCCESSFUL, "Angel", "Peter", 10.00);
 
@@ -100,11 +102,13 @@ public class ChainblockImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void ChangeTransactionStatus_NonExistentTransaction_ThrowsException() {
-        this.chainblock.changeTransactionStatus(ID, TransactionStatus.FAILED);
+        this.chainblock.changeTransactionStatus(1, TransactionStatus.FAILED);
     }
 
     @Test
     public void ChangeTransactionStatus_SingleTransaction_CorrectStatusChange() {
+        final int ID = 1;
+
         this.chainblock.add(this.transaction);
 
         final TransactionStatus NEW_STATUS = TransactionStatus.FAILED;
@@ -117,7 +121,7 @@ public class ChainblockImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void RemoveTransactionById_NonExistentTransaction_ThrowsException() {
-        this.chainblock.removeTransactionById(ID);
+        this.chainblock.removeTransactionById(1);
     }
 
     @Test
@@ -126,10 +130,13 @@ public class ChainblockImplTest {
                 (1, TransactionStatus.SUCCESSFUL, "Angel", "Peter", 10.00);
 
         Transaction secondTransaction = createAndAddTransaction
-                (ID, TransactionStatus.FAILED, "Daniel", "James", 11.00);
+                (2, TransactionStatus.FAILED, "Daniel", "James", 11.00);
+
+        this.chainblock.removeTransactionById(1);
 
         assertEquals(1, this.chainblock.getCount());
         assertTrue(this.chainblock.contains(secondTransaction));
+        assertFalse(this.chainblock.contains(firstTransaction));
     }
 
     @Test
@@ -144,11 +151,12 @@ public class ChainblockImplTest {
 
         assertEquals(1, this.chainblock.getCount());
         assertTrue(this.chainblock.contains(firstTransaction));
+        assertFalse(this.chainblock.contains(secondTransaction));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void GetById_NonExistentTransaction_ThrowsException() {
-        this.chainblock.getById(ID);
+        this.chainblock.getById(1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -514,11 +522,28 @@ public class ChainblockImplTest {
     }
 
     @Test
-    public void GetByTransactionStatusAndMaximumAmount_ReceiversOtherStatusThanTheRequestedOne_ReturnsEmptyCollection() {
-        createAndAddTransaction(ID, TransactionStatus.UNAUTHORIZED, "From", "To", 999.99);
+    public void GetByTransactionStatusAndMaximumAmount_StatusesOtherThanTheRequestedOne_ReturnsEmptyCollection() {
+        final double CURRENT_AMOUNT = 1.00;
 
+        createAndAddTransaction(1, TransactionStatus.UNAUTHORIZED, "From", "To", CURRENT_AMOUNT);
+
+        final TransactionStatus REQUIRED_STATUS = TransactionStatus.SUCCESSFUL;
+        final double MAXIMUM_AMOUNT = 999.99;
+
+        Iterable<Transaction> transactionIterable = this.chainblock.getByTransactionStatusAndMaximumAmount(REQUIRED_STATUS, MAXIMUM_AMOUNT);
+        assertNotNull(transactionIterable);
+
+        List<Transaction> transactionList = convertIntoAList(transactionIterable);
+
+        assertTrue(transactionList.isEmpty());
+    }
+
+    @Test
+    public void GetByTransactionStatusAndMaximumAmount_AmountsGreaterThanTheMaximum_ReturnsEmptyCollection() {
         final TransactionStatus STATUS = TransactionStatus.SUCCESSFUL;
-        final double MAXIMUM_AMOUNT = 1.00;
+        final double MAXIMUM_AMOUNT = 999.99;
+
+        createAndAddTransaction(1, STATUS, "From", "To", 1000.00);
 
         Iterable<Transaction> transactionIterable = this.chainblock.getByTransactionStatusAndMaximumAmount(STATUS, MAXIMUM_AMOUNT);
         assertNotNull(transactionIterable);
@@ -528,6 +553,202 @@ public class ChainblockImplTest {
         assertTrue(transactionList.isEmpty());
     }
 
+    @Test
+    public void GetByTransactionStatusAndMaximumAmount_WithTheRequiredData_ReturnsSortedByAmountTransactions() {
+        final TransactionStatus STATUS = TransactionStatus.FAILED;
+        final double MAXIMUM_AMOUNT = 999.99;
+
+        Transaction firstTransaction = createAndAddTransaction(1, STATUS, "Emilia", "Donatello", 999.99);
+        Transaction secondTransaction = createAndAddTransaction(2, STATUS, "Milen", "Angelina", 998.99);
+        Transaction thirdTransaction = createAndAddTransaction(3, STATUS, "Emil", "Alan", 999.00);
+        Transaction fourthTransaction = createAndAddTransaction(4, STATUS, "Stan", "Robert", 998.00);
+        Transaction fifthTransaction = createAndAddTransaction(5, STATUS, "Austin", "Samuel", 999.98);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(firstTransaction, fifthTransaction, thirdTransaction, secondTransaction, fourthTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getByTransactionStatusAndMaximumAmount(STATUS, MAXIMUM_AMOUNT);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test
+    public void GetByTransactionStatusAndMaximumAmount_WithRequiredData_ReturnsSortedByIdTransactions() {
+        final TransactionStatus STATUS = TransactionStatus.FAILED;
+        final double MAXIMUM_AMOUNT = 999.99;
+
+        Transaction firstTransaction = createAndAddTransaction(4, STATUS, "Emilia", "Donatello", MAXIMUM_AMOUNT);
+        Transaction secondTransaction = createAndAddTransaction(1, STATUS, "Milen", "Angelina", MAXIMUM_AMOUNT);
+        Transaction thirdTransaction = createAndAddTransaction(5, STATUS, "Emil", "Alan", MAXIMUM_AMOUNT);
+        Transaction fourthTransaction = createAndAddTransaction(2, STATUS, "Stan", "Robert", MAXIMUM_AMOUNT);
+        Transaction fifthTransaction = createAndAddTransaction(3, STATUS, "Austin", "Samuel", MAXIMUM_AMOUNT);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(secondTransaction, fourthTransaction, fifthTransaction, firstTransaction, thirdTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getByTransactionStatusAndMaximumAmount(STATUS, MAXIMUM_AMOUNT);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void GetBySenderAndMinimumAmountDescending_SenderOtherThanTheRequiredOne_ThrowsException() {
+        final String REQUIRED_SENDER = "Gary";
+        final double MINIMUM_AMOUNT = 1.00;
+
+        createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, "Michael", "Robin", 999.99);
+
+        this.chainblock.getBySenderAndMinimumAmountDescending(REQUIRED_SENDER, MINIMUM_AMOUNT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void GetBySenderAndMinimumAmountDescending_AmountLessThanOrEqualToRequiredAmount_ThrowsException() {
+        final String REQUIRED_SENDER = "Steve";
+        final double MINIMUM_AMOUNT = 999.99;
+
+        createAndAddTransaction(1, TransactionStatus.FAILED, REQUIRED_SENDER, "Philip", 1.00);
+        createAndAddTransaction(2, TransactionStatus.ABORTED, REQUIRED_SENDER, "Ian", MINIMUM_AMOUNT - 0.01);
+        createAndAddTransaction(3, TransactionStatus.SUCCESSFUL, REQUIRED_SENDER, "Robin", MINIMUM_AMOUNT);
+
+        this.chainblock.getBySenderAndMinimumAmountDescending(REQUIRED_SENDER, MINIMUM_AMOUNT);
+    }
+
+    @Test
+    public void GetBySenderAndMinimumAmountDescending_WithTheRequiredData_ReturnsSortedByAmountTransactions() {
+        final String SENDER = "Brad";
+        final double MINIMUM_AMOUNT = 0.99;
+
+        Transaction firstTransaction = createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, SENDER, "Donatello", 1.00);
+        Transaction secondTransaction = createAndAddTransaction(2, TransactionStatus.SUCCESSFUL, SENDER, "Angelina", 9.99);
+        Transaction thirdTransaction = createAndAddTransaction(3, TransactionStatus.ABORTED, SENDER, "Alan", 1.99);
+        Transaction fourthTransaction = createAndAddTransaction(4, TransactionStatus.UNAUTHORIZED, SENDER, "Robert", 10.00);
+        Transaction fifthTransaction = createAndAddTransaction(5, TransactionStatus.FAILED, SENDER, "Samuel", 1.01);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(fourthTransaction, secondTransaction, thirdTransaction, fifthTransaction, firstTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getBySenderAndMinimumAmountDescending(SENDER, MINIMUM_AMOUNT);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test
+    public void GetBySenderAndMinimumAmountDescending_WithTheRequiredData_ReturnsSortedByIdTransactions() {
+        final String SENDER = "Brad";
+        final double MINIMUM_AMOUNT = 0.99;
+        final double AMOUNT = MINIMUM_AMOUNT + 0.01;
+
+        Transaction firstTransaction = createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, SENDER, "Donatello", AMOUNT);
+        Transaction secondTransaction = createAndAddTransaction(5, TransactionStatus.SUCCESSFUL, SENDER, "Angelina", AMOUNT);
+        Transaction thirdTransaction = createAndAddTransaction(4, TransactionStatus.ABORTED, SENDER, "Alan", AMOUNT);
+        Transaction fourthTransaction = createAndAddTransaction(3, TransactionStatus.UNAUTHORIZED, SENDER, "Robert", AMOUNT);
+        Transaction fifthTransaction = createAndAddTransaction(2, TransactionStatus.FAILED, SENDER, "Samuel", AMOUNT);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(firstTransaction, fifthTransaction, fourthTransaction, thirdTransaction, secondTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getBySenderAndMinimumAmountDescending(SENDER, MINIMUM_AMOUNT);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void GetByReceiverAndAmountRange_ReceiverOtherThanTheRequiredOne_ThrowsException() {
+        final String REQUIRED_RECEIVER = "Henry";
+        final double LOWER_BOUND = 0.99;
+        final double UPPER_BOUND = 1.00;
+
+        createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, "Michael", "Robin", LOWER_BOUND);
+
+        this.chainblock.getByReceiverAndAmountRange(REQUIRED_RECEIVER, LOWER_BOUND, UPPER_BOUND);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void GetByReceiverAndAmountRange_AmountsOutOfRange_ThrowsException() {
+        final String REQUIRED_RECEIVER = "Henry";
+        final double LOWER_BOUND = 1.00;
+        final double UPPER_BOUND = 10.00;
+
+        createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, "Michael", REQUIRED_RECEIVER, 0.99);
+        createAndAddTransaction(2, TransactionStatus.ABORTED, "Michael", REQUIRED_RECEIVER, 10.00);
+        createAndAddTransaction(3, TransactionStatus.SUCCESSFUL, "Michael", REQUIRED_RECEIVER, 0.01);
+
+        this.chainblock.getByReceiverAndAmountRange(REQUIRED_RECEIVER, LOWER_BOUND, UPPER_BOUND);
+    }
+
+    @Test
+    public void GetByReceiverAndAmountRange_WithTheRequiredData_ReturnsSortedByAmountTransactions() {
+        final String RECEIVER = "Clark";
+        final double LOWER_BOUND = 1.00;
+        final double UPPER_BOUND = 10.00;
+
+        Transaction firstTransaction = createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, "Donatello", RECEIVER, 1.01);
+        Transaction secondTransaction = createAndAddTransaction(2, TransactionStatus.SUCCESSFUL, "Angelina", RECEIVER, 9.99);
+        Transaction thirdTransaction = createAndAddTransaction(3, TransactionStatus.ABORTED, "Alan", RECEIVER, 1.00);
+        Transaction fourthTransaction = createAndAddTransaction(4, TransactionStatus.UNAUTHORIZED, "Robert", RECEIVER, 6.00);
+        Transaction fifthTransaction = createAndAddTransaction(5, TransactionStatus.FAILED, "Samuel", RECEIVER, 5.99);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(secondTransaction, fourthTransaction, fifthTransaction, firstTransaction, thirdTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getByReceiverAndAmountRange(RECEIVER, LOWER_BOUND, UPPER_BOUND);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test
+    public void GetByReceiverAndAmountRange_WithTheRequiredData_ReturnsSortedByIdTransactions() {
+        final String RECEIVER = "Clark";
+        final double LOWER_BOUND = 1.00;
+        final double UPPER_BOUND = 10.00;
+
+        Transaction firstTransaction = createAndAddTransaction(5, TransactionStatus.SUCCESSFUL, "Donatello", RECEIVER, LOWER_BOUND);
+        Transaction secondTransaction = createAndAddTransaction(2, TransactionStatus.SUCCESSFUL, "Angelina", RECEIVER, LOWER_BOUND);
+        Transaction thirdTransaction = createAndAddTransaction(4, TransactionStatus.ABORTED, "Alan", RECEIVER, LOWER_BOUND);
+        Transaction fourthTransaction = createAndAddTransaction(1, TransactionStatus.UNAUTHORIZED, "Robert", RECEIVER, LOWER_BOUND);
+        Transaction fifthTransaction = createAndAddTransaction(3, TransactionStatus.FAILED, "Samuel", RECEIVER, LOWER_BOUND);
+
+        List<Transaction> expectedlyArranged = new ArrayList<>
+                (Arrays.asList(fourthTransaction, secondTransaction, fifthTransaction, thirdTransaction, firstTransaction));
+
+        Iterable<Transaction> orderedTransactions = this.chainblock.getByReceiverAndAmountRange(RECEIVER, LOWER_BOUND, UPPER_BOUND);
+
+        assertThat(orderedTransactions, is(expectedlyArranged));
+    }
+
+    @Test
+    public void GetAllInAmountRange_AmountsOutOfRange_ReturnsEmptyCollection() {
+        createAndAddTransaction(1, TransactionStatus.SUCCESSFUL, "Tony", "Ivan", 0.99);
+        createAndAddTransaction(2, TransactionStatus.ABORTED, "Daniel", "Ellis", 2.00);
+
+        final double LOWER_BOUND = 1.00;
+        final double UPPER_BOUND = 2.00;
+
+        Iterable<Transaction> allInRange = this.chainblock.getAllInAmountRange(LOWER_BOUND, UPPER_BOUND);
+
+        List<Transaction> transactionList = convertIntoAList(allInRange);
+
+        assertTrue(transactionList.isEmpty());
+    }
+
+    @Test
+    public void GetAllInAmountRange_AmountsInTheRange_ReturnsInTheOrderOfAddition() {
+        final double LOWER_BOUND = 1.00;
+        final double UPPER_BOUND = 2.00;
+
+        Transaction firstTransaction = createAndAddTransaction(3, TransactionStatus.ABORTED, "Stella", "Nikol", 1.99);
+        Transaction secondTransaction = createAndAddTransaction(4, TransactionStatus.FAILED, "Esteban", "Jack", 1.00);
+        Transaction thirdTransaction = createAndAddTransaction(1, TransactionStatus.ABORTED, "Tommy", "Gary", 1.59);
+        Transaction fourthTransaction = createAndAddTransaction(2, TransactionStatus.SUCCESSFUL, "Xander", "Sean", 1.99);
+        Transaction fifthTransaction = createAndAddTransaction(5, TransactionStatus.UNAUTHORIZED, "Steven", "Liam", 1.01);
+
+        List<Transaction> expectedOrder = new ArrayList<>
+                (Arrays.asList(firstTransaction, secondTransaction, thirdTransaction, fourthTransaction, fifthTransaction));
+
+        Iterable<Transaction> allInRange = this.chainblock.getAllInAmountRange(LOWER_BOUND, UPPER_BOUND);
+
+        assertThat(allInRange, is(expectedOrder));
+    }
 
     private Transaction createAndAddTransaction(int id, TransactionStatus status, String from, String to, double amount) {
         Transaction transaction = new TransactionImpl(id, status, from, to, amount);
