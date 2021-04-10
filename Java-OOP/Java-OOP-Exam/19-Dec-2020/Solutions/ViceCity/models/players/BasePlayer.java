@@ -1,9 +1,8 @@
 package viceCity.models.players;
 
 import viceCity.models.guns.Gun;
+import viceCity.repositories.GunRepository;
 import viceCity.repositories.interfaces.Repository;
-
-import java.util.Map;
 
 import static viceCity.common.ExceptionMessages.*;
 
@@ -15,27 +14,21 @@ public abstract class BasePlayer implements Player {
     protected BasePlayer(String name, int lifePoints) {
         this.setName(name);
         this.setLifePoints(lifePoints);
+        this.gunRepository = new GunRepository();
     }
 
-    protected void setName(String name) {
-        validateName(name);
+    private void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new NullPointerException(NAME_NULL);
+        }
         this.name = name;
     }
 
-    protected void setLifePoints(int lifePoints) {
-        validateHealth(lifePoints);
-    }
-
-    protected void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new NumberFormatException(PLAYER_NULL_USERNAME);
-        }
-    }
-
-    protected void validateHealth(int lifePoints) {
-        if (0 < lifePoints) {
+    private void setLifePoints(int lifePoints) {
+        if (lifePoints < 0) {
             throw new IllegalArgumentException(PLAYER_LIFE_POINTS_LESS_THAN_ZERO);
         }
+        this.lifePoints = lifePoints;
     }
 
     @Override

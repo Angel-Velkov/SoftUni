@@ -4,6 +4,7 @@ import viceCity.models.guns.Gun;
 import viceCity.repositories.interfaces.Repository;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,21 +17,23 @@ public class GunRepository implements Repository<Gun> {
 
     @Override
     public Collection<Gun> getModels() {
-        return null;
+        return Collections.unmodifiableCollection(this.models.values());
     }
 
     @Override
     public void add(Gun model) {
-
+        this.models.putIfAbsent(model.getName(), model);
     }
 
     @Override
     public boolean remove(Gun model) {
-        return false;
+        Gun removedGun = this.models.remove(model.getName());
+
+        return removedGun != null;
     }
 
     @Override
     public Gun find(String name) {
-        return null;
+        return this.models.get(name);
     }
 }
