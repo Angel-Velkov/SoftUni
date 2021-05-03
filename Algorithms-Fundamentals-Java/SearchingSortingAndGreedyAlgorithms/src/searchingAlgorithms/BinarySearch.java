@@ -1,7 +1,8 @@
 package searchingAlgorithms;
 
-import java.util.Arrays;
 import java.util.Scanner;
+
+import static utils.ArrayOperations.parseArray;
 
 public class BinarySearch {
     private final static int KEY_NOT_FOUND = -1;
@@ -16,18 +17,13 @@ public class BinarySearch {
         System.out.println(element);
     }
 
-    private static int[] parseArray(String line, String separator) {
-        return Arrays.stream(line.split(separator))
-                .mapToInt(Integer::parseInt)
-                .toArray();
-    }
-
     public static int binarySearch(int[] arr, int key) {
         int start = 0;
         int end = arr.length - 1;
 
         while (end >= start) {
             int mid = (start + end) / 2;
+
             if (key > arr[mid]) {
                 start = mid + 1;
             } else if (key < arr[mid]) {
@@ -36,6 +32,7 @@ public class BinarySearch {
                 return mid;
             }
         }
+
         return KEY_NOT_FOUND;
     }
 }

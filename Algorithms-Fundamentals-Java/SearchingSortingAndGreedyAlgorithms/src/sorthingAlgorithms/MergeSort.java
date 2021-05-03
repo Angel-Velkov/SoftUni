@@ -3,7 +3,8 @@ package sorthingAlgorithms;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+
+import static utils.ArrayOperations.*;
 
 public class MergeSort {
     public static void main(String[] args) throws IOException {
@@ -57,23 +58,5 @@ public class MergeSort {
                 arr[i] = helper[leftPointer++];
             }
         }
-    }
-
-    private static int[] parseArray(String line, String separator) {
-        return Arrays.stream(line.split(separator))
-                .mapToInt(Integer::parseInt)
-                .toArray();
-    }
-
-    private static void print(int[] arr, String delimiter) {
-        StringBuilder out = new StringBuilder();
-
-        for (int i = 0; i < arr.length; i++) {
-            out.append(arr[i]);
-            if (i + 1 < arr.length) {
-                out.append(delimiter);
-            }
-        }
-        System.out.println(out);
     }
 }

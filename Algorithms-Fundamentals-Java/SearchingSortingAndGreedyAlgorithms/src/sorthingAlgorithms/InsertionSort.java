@@ -4,25 +4,25 @@ import java.util.Scanner;
 
 import static utils.ArrayOperations.*;
 
-public class SelectionSort {
+public class InsertionSort {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         int[] arr = parseArray(scanner.nextLine(), " ");
-        selectionSort(arr);
+        insertionSort(arr);
 
-        print(arr, ", ");
+        print(arr, " ");
     }
 
-    private static void selectionSort(int[] arr) {
+    private static void insertionSort(int[] arr) {
         for (int i = 0; i < arr.length; i++) {
-            int min = i;
-            for (int j = i + 1; j < arr.length; j++) {
-                if (arr[min] > arr[j]) {
-                    min = j;
-                }
+            int key = arr[i];
+
+            int j = i - 1;
+            while (0 <= j && key < arr[j]) {
+                arr[j + 1] = arr[j--];
             }
-            swap(arr, i, min);
+            arr[j + 1] = key;
         }
     }
 }
