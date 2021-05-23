@@ -1,4 +1,4 @@
-USE `missions`;
+USE `minions`;
 
 INSERT INTO `towns`
 	VALUES
