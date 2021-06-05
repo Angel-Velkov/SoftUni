@@ -1,7 +1,6 @@
 DROP SCHEMA IF EXISTS `soft_uni`;
 
 CREATE DATABASE `soft_uni`;
-
 USE `soft_uni`;
 
 CREATE TABLE `towns` (
@@ -9,36 +8,19 @@ CREATE TABLE `towns` (
     `name` VARCHAR(30) NOT NULL
 );
 
-INSERT INTO `towns` (`name`)
-VALUES
-('Sofia'),
-('Plovdiv'),
-('Varna'),
-('Burgas')
-;
-
 CREATE TABLE `addresses` (
 	`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `address_text` TEXT,
     `town_id` INT,
     CONSTRAINT `fk_addresses_towns`
-    FOREIGN KEY (`town_id`)
-    REFERENCES `towns` (`id`)
+		FOREIGN KEY (`town_id`)
+		REFERENCES `towns` (`id`)
 );
 
 CREATE TABLE `departments` (
 	`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(30) NOT NULL
 );
-
-INSERT INTO `departments` (`name`)
-VALUES
-('Engineering'),
-('Sales'),
-('Marketing'),
-('Software Development'),
-('Quality Assurance')
-;
 
 CREATE TABLE `employees` (
 	`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -50,15 +32,30 @@ CREATE TABLE `employees` (
     `hire_date` DATE NOT NULL,
     `salary` DECIMAL(10, 2),
     `address_id` INT,
-    
     CONSTRAINT `fk_employees_departments`
-    FOREIGN KEY (`department_id`)
-    REFERENCES `departments` (`id`),
-    
+		FOREIGN KEY (`department_id`)
+		REFERENCES `departments` (`id`),
     CONSTRAINT `fk_employees_addresses`
-    FOREIGN KEY (`address_id`)
-    REFERENCES `addresses` (`id`)
+		FOREIGN KEY (`address_id`)
+		REFERENCES `addresses` (`id`)
 );
+
+INSERT INTO `towns` (`name`)
+VALUES
+('Sofia'),
+('Plovdiv'),
+('Varna'),
+('Burgas')
+;
+
+INSERT INTO `departments` (`name`)
+VALUES
+('Engineering'),
+('Sales'),
+('Marketing'),
+('Software Development'),
+('Quality Assurance')
+;
 
 INSERT INTO `employees` (`first_name`, `middle_name`, 
 	`last_name`, `job_title`, `department_id`,
