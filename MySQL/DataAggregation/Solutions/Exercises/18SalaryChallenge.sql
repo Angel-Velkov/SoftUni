@@ -7,4 +7,5 @@ WHERE `e`.`salary` > (
     FROM `employees` AS `e2`
     GROUP BY `e2`.`department_id`
     HAVING `e2`.`department_id` = `e`.`department_id`)
-ORDER BY `department_id`, `employee_id`;
+ORDER BY `department_id`, `employee_id`
+LIMIT 10;

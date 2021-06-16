@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `employees_with_salary_more_than_3000`;
 
 CREATE TABLE `employees_with_salary_more_than_3000`
 AS SELECT * FROM `employees`
-WHERE `salary` > 3000;
+WHERE `salary` > 30000;
 
 DELETE FROM `employees_with_salary_more_than_3000`
 WHERE `manager_id` = 42;
@@ -16,6 +16,6 @@ SET `salary` = `salary` + 5000
 WHERE `department_id` = 1;
 
 SELECT `department_id`, AVG(`salary`) AS 'avg_salary'
-FROM `employees`
+FROM `employees_with_salary_more_than_3000`
 GROUP BY `department_id`
 ORDER BY `department_id`;
