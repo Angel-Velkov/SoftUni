@@ -10,6 +10,6 @@ SELECT `name` AS 'game',
 		WHEN `duration` <= 3 THEN 'Extra Short'
         WHEN `duration` <= 6 THEN 'Short'
         WHEN `duration` <= 10 THEN 'Long'
-        ELSE 'Estra Long'
+        ELSE 'Extra Long'
 	END AS 'Duration'
 FROM `games`;
