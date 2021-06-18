@@ -25,7 +25,7 @@ CREATE TABLE `cities` (
 CREATE TABLE `customers` (
 	`customer_id` INT PRIMARY KEY NOT NULL,
 	`name` VARCHAR(50),
-    `birthdate` DATE,
+    `birthday` DATE,
 	`city_id` INT,
     CONSTRAINT `fk_customers_cities`
 		FOREIGN KEY (`city_id`)

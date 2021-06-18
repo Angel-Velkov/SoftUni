@@ -3,8 +3,6 @@ DROP DATABASE IF EXISTS `model`;
 CREATE DATABASE `model`;
 USE `model`;
 
-DROP TABLES IF EXISTS `models`, `manufacturers`;
-
 CREATE TABLE `manufacturers` (
 	`manufacturer_id` INT NOT NULL,
     `name` VARCHAR(20) NOT NULL,

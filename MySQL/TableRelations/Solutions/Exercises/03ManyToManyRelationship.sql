@@ -3,8 +3,6 @@ DROP DATABASE IF EXISTS `model`;
 CREATE DATABASE `model`;
 USE `model`;
 
-DROP TABLES IF EXISTS `students`, `exams`, `students_exams`;
-
 CREATE TABLE `students` (
 	`student_id` INT PRIMARY KEY NOT NULL,
     `name` VARCHAR(20) NOT NULL
@@ -30,16 +28,16 @@ CREATE TABLE `students_exams` (
 
 INSERT INTO `students`
 VALUES
-	(1, 'Mia'),
-    (2, 'Tom'),
-    (3, 'Rom')
+	(1, 'Mila'),
+    (2, 'Toni'),
+    (3, 'Ron')
 ;
 
 INSERT INTO `exams`
 VALUES
 	(101, 'Spring MVC'),
     (102, 'Neo4j'),
-    (103, 'Oracle11g')
+    (103, 'Oracle 11g')
 ;
 
 INSERT INTO `students_exams`

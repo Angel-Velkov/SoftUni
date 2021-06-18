@@ -3,12 +3,10 @@ DROP DATABASE IF EXISTS `model`;
 CREATE DATABASE `model`;
 USE `model`;
 
-DROP TABLES IF EXISTS `people`, `passports`;
-
 CREATE TABLE `people` (
 	`person_id` INT NOT NULL,
     `first_name` VARCHAR(50) NOT NULL,
-    `salary` DOUBLE,
+    `salary` DECIMAL(17, 2),
     `passport_id` INT
 );
 
