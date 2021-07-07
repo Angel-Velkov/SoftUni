@@ -31,7 +31,7 @@ public class GetVillainsNames {
 
         System.out.println("Enter password:");
         String password = reader.readLine();
-        password = password.length() < 4 ? "Q7qR+sMf,S=.4n$u" : password;
+        password = password.length() < 4 ? "1234" : password;
 
         Properties props = new Properties();
         props.setProperty("user", user);
