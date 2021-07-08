@@ -10,12 +10,12 @@ public class AddMinion {
     private static final String CONNECTION_URL = "jdbc:mysql://localhost:3306";
     private static final String SCHEMA_NAME = "/minions_db";
 
-    private static final String TOWN_ID_SQL = "SELECT `id` FROM `towns` WHERE `name` = ?";
     private static final String ADD_TOWN_SQL = "INSERT INTO `towns` (`name`, `country`) VALUES (?, 'Unknown')";
     private static final String ADD_MINION_SQL = "INSERT INTO `minions` (`name`, `age`, `town_id`) VALUES (?, ?, ?)";
     private static final String ADD_VILLAIN_SQL = "INSERT INTO `villains` (`name`, `evilness_factor`) VALUES (?, 'evil')";
     private static final String ADD_MINION_TO_VILLAIN_SQL = "INSERT INTO `minions_villains` (`minion_id`, `villain_id`) VALUES (?, ?)";
     private static final String ID_OF_THE_LAST_ENTITY_SQL = "SELECT * FROM %s ORDER BY `id` DESC LIMIT 1";
+    private static final String GET_ENTITY_ID_SQL = "SELECT `id` FROM `%s` WHERE `name` = ?";
     private static final String GET_ENTITY_NAME_SQL = "SELECT `name` FROM %s WHERE `id` = ?";
 
     private static Connection connection;
@@ -38,13 +38,12 @@ public class AddMinion {
             int age = Integer.parseInt(minionData[1]);
             String townName = minionData[2];
 
-            long townId = getTownId(townName);
-
-            if (townId == 0) {
-                sb.append(addTown(townName))
-                        .append(System.lineSeparator());
-                townId = getTownId(townName);
+            String townMessage = addTown(townName);
+            if (!townMessage.isEmpty()) {
+                sb.append(townMessage).append(System.lineSeparator());
             }
+
+            long townId = getEntityId("towns", townName);
 
             addMinion(minionName, age, townId);
             long minionId = getTheIdOfTheLastEntity("minions");
@@ -52,12 +51,17 @@ public class AddMinion {
             String[] villainData = Arrays.stream(reader.readLine().split("\\s+")).skip(1).toArray(String[]::new);
             String villainName = villainData[0];
 
-            sb.append(addEvilVillain(villainName))
-                    .append(System.lineSeparator());
+            String villainMessage = addEvilVillain(villainName);
+            if (!villainMessage.isEmpty()) {
+                sb.append(villainMessage).append(System.lineSeparator());
+            }
+
             long villainId = getTheIdOfTheLastEntity("villains");
 
-            sb.append(connectMinionToVillain(minionId, villainId))
-                    .append(System.lineSeparator());
+            String connectionMessage = connectMinionToVillain(minionId, villainId);
+            if (!connectionMessage.isEmpty()) {
+                sb.append(connectionMessage).append(System.lineSeparator());
+            }
 
             connection.commit();
         } catch (SQLException e) {
@@ -77,20 +81,34 @@ public class AddMinion {
                 + " to be minion of " + getEntityName("villains", villainId);
     }
 
-    private static String addEvilVillain(String villainName) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(ADD_VILLAIN_SQL);
-        ps.setString(1, villainName);
-        ps.executeUpdate();
+    private static String addTown(String name) throws SQLException {
+        if (getEntityId("towns", name) == 0) {
+            PreparedStatement ps = connection.prepareStatement(ADD_TOWN_SQL);
+            ps.setString(1, name);
+            ps.executeUpdate();
 
-        return "Villain " + villainName + " was added to the database.";
+            return "Town " + name + " was added to the database.";
+        }
+        return "";
     }
 
-    private static void addMinion(String minionName, int age, long townId) throws SQLException {
-        validateName(minionName);
+    private static String addEvilVillain(String villain) throws SQLException {
+        if (getEntityId("villains", villain) == 0) {
+            PreparedStatement ps = connection.prepareStatement(ADD_VILLAIN_SQL);
+            ps.setString(1, villain);
+            ps.executeUpdate();
+
+            return "Villain " + villain + " was added to the database.";
+        }
+        return "";
+    }
+
+    private static void addMinion(String name, int age, long townId) throws SQLException {
+        validateName(name);
         validateAge(age);
 
         PreparedStatement ps = connection.prepareStatement(ADD_MINION_SQL);
-        ps.setString(1, minionName);
+        ps.setString(1, name);
         ps.setInt(2, age);
         ps.setLong(3, townId);
         ps.executeUpdate();
@@ -108,6 +126,18 @@ public class AddMinion {
         }
     }
 
+    private static long getEntityId(String tableName, String name) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(String.format(GET_ENTITY_ID_SQL, tableName));
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getLong("id");
+        } else {
+            return 0;
+        }
+    }
+
     private static String getEntityName(String tableName, long id) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(String.format(GET_ENTITY_NAME_SQL, tableName));
         ps.setLong(1, id);
@@ -116,7 +146,7 @@ public class AddMinion {
         if (rs.next()) {
             return rs.getString("name");
         } else {
-            return null;
+            return "";
         }
     }
 
@@ -130,26 +160,6 @@ public class AddMinion {
         } else {
             return 0L;
         }
-    }
-
-    private static long getTownId(String townName) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(TOWN_ID_SQL);
-        ps.setString(1, townName);
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            return rs.getInt("id");
-        } else {
-            return 0;
-        }
-    }
-
-    private static String addTown(String townName) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(ADD_TOWN_SQL);
-        ps.setString(1, townName);
-        ps.executeUpdate();
-
-        return "Town " + townName + " was added to the database.";
     }
 
     private static void loadDriver(String driver) {

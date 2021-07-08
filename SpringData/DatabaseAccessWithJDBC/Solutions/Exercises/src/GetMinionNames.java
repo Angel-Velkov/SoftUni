@@ -10,11 +10,11 @@ public class GetMinionNames {
     private static final String SCHEMA_NAME = "/minions_db";
     private static final String SQL =
             "SELECT v.`name`, m.`name`, m.`age` " +
-            "FROM `minions` AS m " +
-            "JOIN `minions_villains` mv ON m.id = mv.`minion_id` " +
-            "JOIN `villains` v on v.`id` = mv.`villain_id` " +
-            "WHERE v.`id` = ? " +
-            "ORDER BY m.`name`";
+                    "FROM `minions` AS m " +
+                    "JOIN `minions_villains` mv ON m.id = mv.`minion_id` " +
+                    "JOIN `villains` v on v.`id` = mv.`villain_id` " +
+                    "WHERE v.`id` = ? " +
+                    "ORDER BY m.`name`";
 
     public static void main(String[] args) throws IOException {
         try {

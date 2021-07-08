@@ -8,7 +8,7 @@ public class GetVillainsNames {
     private static final String CONNECTION_URL = "jdbc:mysql://localhost:3306";
     private static final String SCHEMA_NAME = "/minions_db";
     private static final String SQL =
-                    "SELECT `id`, `name`, COUNT(DISTINCT `minion_id`) AS 'minions_count' " +
+            "SELECT `id`, `name`, COUNT(DISTINCT `minion_id`) AS 'minions_count' " +
                     "FROM `villains` " +
                     "JOIN `minions_villains` ON `id` = `villain_id` " +
                     "GROUP BY `id`" +
