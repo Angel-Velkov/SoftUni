@@ -7,17 +7,17 @@ import orm.annotations.Id;
 import java.util.Date;
 import java.util.Objects;
 
-@Entity(name = "USERS")
+@Entity(name = "users")
 public class User {
     @Id
     private int id;
-    @Column(name = "username")
+    @Column(name = "username", columnDefinition = "VARCHAR(30)")
     private String username;
-    @Column(name = "password")
+    @Column(name = "password", columnDefinition = "VARCHAR(80)")
     private String password;
-    @Column(name = "age")
+    @Column(name = "age", columnDefinition = "INT")
     private int age;
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", columnDefinition = "DATE")
     private Date registrationDate;
 
     public User(String username, String password, int age, Date registrationDate) {

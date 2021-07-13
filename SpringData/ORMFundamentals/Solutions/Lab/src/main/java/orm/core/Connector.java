@@ -1,4 +1,4 @@
-package orm;
+package orm.core;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,8 +9,7 @@ public class Connector {
     private static final String URL_CONNECTION = "jdbc:mysql://localhost:3306/";
     private static Connection connection;
 
-    public static void createConnection(String username, String password, String dbName)
-            throws SQLException {
+    public static void createConnection(String username, String password, String dbName) throws SQLException {
         Properties props = new Properties();
         props.setProperty("user", username);
         props.setProperty("password", password);
