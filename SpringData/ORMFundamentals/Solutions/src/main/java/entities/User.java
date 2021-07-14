@@ -20,11 +20,14 @@ public class User {
     @Column(name = "registration_date", columnDefinition = "DATE")
     private Date registrationDate;
 
-    public User(String username, String password, int age, Date registrationDate) {
+    public User() {
+    }
+
+    public User(String username, String password, int age) {
         this.username = username;
         this.password = password;
         this.age = age;
-        this.registrationDate = registrationDate;
+        this.registrationDate = new Date();
     }
 
     public int getId() {
@@ -82,12 +85,11 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", age=" + age +
-                ", registrationDate='" + registrationDate + '\'' +
-                '}';
+        return "User:" + System.lineSeparator()
+                + "  id = " + id + System.lineSeparator()
+                + "  username = " + username + System.lineSeparator()
+                + "  password = " + password + System.lineSeparator()
+                + "  age = " + age + System.lineSeparator()
+                + "  registration_date = " + registrationDate + System.lineSeparator();
     }
 }

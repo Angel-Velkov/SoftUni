@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class EntityManager<E> implements DbContext<E> {
     private static final String SELECT_STAR_FROM = "SELECT * FROM ";
-    private static final String INSERT_QUERY = "INSERT INTO %s (%s) VALUES (%s);";
+    private static final String INSERT_QUERY = "INSERT INTO %s (%s) VALUE (%s);";
     private static final String UPDATE_QUERY = "UPDATE %s SET %s WHERE %s;";
     private static final String DELETE_QUERY = "DELETE FROM %s WHERE %s;";
 
@@ -30,7 +32,7 @@ public class EntityManager<E> implements DbContext<E> {
     }
 
     @Override
-    public boolean persist(E entity) throws IllegalAccessException, SQLException {
+    public boolean persist(E entity) throws IllegalAccessException, SQLException, ParseException {
         Field primary = this.getId(entity.getClass());
         primary.setAccessible(true);
         Object value = primary.get(entity);
@@ -42,7 +44,8 @@ public class EntityManager<E> implements DbContext<E> {
     }
 
     @Override
-    public List<E> find(Class<E> table, String where) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+    public List<E> find(Class<E> table, String where) throws SQLException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException {
         Statement statement = connection.createStatement();
         String query = SELECT_STAR_FROM + getTableName(table) +
                 (where.equals("")
@@ -58,27 +61,65 @@ public class EntityManager<E> implements DbContext<E> {
     }
 
     @Override
-    public E findFirst(Class<E> table, String where) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+    public E findFirst(Class<E> table, String where) throws SQLException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException {
         Statement statement = connection.createStatement();
-        String query = SELECT_STAR_FROM + getTableName(table) +
+        String query = SELECT_STAR_FROM + getTableName(table) + " WHERE " +
                 (where.equals("")
                         ? ""
                         : where + " LIMIT 1;");
 
         ResultSet rs = statement.executeQuery(query);
+        if (!rs.next()) {
+            return null;
+        }
+
         E entity = table.getConstructor().newInstance();
-        rs.next();
         this.fillEntity(table, rs, entity);
+
         return entity;
     }
 
-    public static void createTables(Connection connection, Class<?> mainClass) throws SQLException, URISyntaxException, ClassNotFoundException {
+    @Override
+    public E findById(Class<E> table, int id) throws SQLException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
+        String tableName = table.getAnnotation(Entity.class).name();
+        String idColumnName = Arrays.stream(table.getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow()
+                .getName();
+
+        PreparedStatement ps = this.connection.prepareStatement(
+                SELECT_STAR_FROM + tableName + " WHERE " + idColumnName + " = ?"
+        );
+
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+        if (!rs.next()) {
+            return null;
+        }
+
+        E entity = table.getDeclaredConstructor().newInstance();
+        this.fillEntity(table, rs, entity);
+
+        return entity;
+    }
+
+    @Override
+    public boolean delete(Class<E> table, int id) throws SQLException {
+        String query = String.format(DELETE_QUERY, getTableName(table), "id = " + id);
+
+        return executeQuery(query);
+    }
+
+    public void createTables(Class<?> mainClass) throws SQLException, URISyntaxException, ClassNotFoundException {
         List<Class<?>> classes = getEntities(mainClass);
 
         for (Class<?> classInfo : classes) {
             Entity entityInfo = classInfo.getAnnotation(Entity.class);
-            StringBuilder createStatement = new StringBuilder("CREATE TABLE ");
-
+            StringBuilder createStatement = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             String tableName = entityInfo.name();
             createStatement.append(tableName).append("(")
                     .append(System.lineSeparator());
@@ -105,26 +146,6 @@ public class EntityManager<E> implements DbContext<E> {
 
             connection.createStatement().execute(createStatement.toString());
         }
-    }
-
-    private static List<Class<?>> getEntities(Class<?> mainClass) throws URISyntaxException, ClassNotFoundException {
-        String path = mainClass
-                .getProtectionDomain()
-                .getCodeSource()
-                .getLocation().toURI()
-                .getPath();
-        String packageName = mainClass.getPackageName();
-
-        File rootDir = new File(path + packageName.replace(".", "/"));
-        List<Class<?>> classes = new ArrayList<>();
-
-        scanEntities(
-                rootDir,
-                packageName,
-                classes
-        );
-
-        return classes;
     }
 
     private static void scanEntities(File dir, String packageName, List<Class<?>> classes) throws ClassNotFoundException {
@@ -157,6 +178,7 @@ public class EntityManager<E> implements DbContext<E> {
         }
     }
 
+    // TODO: Make it generic
     private void fillField(Field field, E entity, ResultSet resultSet, String name) throws SQLException, IllegalAccessException {
         field.setAccessible(true);
         switch (name) {
@@ -164,26 +186,28 @@ public class EntityManager<E> implements DbContext<E> {
             case "username" -> field.set(entity, resultSet.getString("username"));
             case "password" -> field.set(entity, resultSet.getString("password"));
             case "age" -> field.set(entity, resultSet.getInt("age"));
-            case "registrationDate" -> field.set(entity, resultSet.getString("registration_date"));
+            case "registration_date" -> {
+                try {
+                    field.set(entity, new SimpleDateFormat("yyyy-MM-dd").parse(resultSet.getString("registration_date")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    @Override
-    public E findById(Class<E> table, int id) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        return findFirst(table, "WHERE `id` = " + id);
-    }
-
-    @Override
-    public boolean delete(Class<E> table, int id) throws SQLException {
-        String query = String.format(DELETE_QUERY, getTableName(table), "id = " + id);
-
-        return executeQuery(query);
-    }
-
-    private boolean doInsert(E entity) throws SQLException {
+    private boolean doInsert(E entity) throws SQLException, ParseException {
         String tableName = this.getTableName(entity.getClass());
         List<String> fieldNames = this.getFieldNames(entity);
         List<String> fieldValues = this.getFieldValues(entity);
+
+        // I know it is not very right but I just wanted it to work.
+        // Especially this with the hardcore class 'User'.
+        // There must be other ways besides the triple parse of the Date.
+        for (String date : getColumnsWithType(entity.getClass(), "DATE")) {
+            int i = fieldNames.indexOf(date);
+            fieldValues.set(i, "'" + new java.sql.Date(new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy").parse(fieldValues.get(i)).getTime()) + "'");
+        }
 
         String insertQuery = String.format(INSERT_QUERY,
                 tableName,
@@ -210,6 +234,42 @@ public class EntityManager<E> implements DbContext<E> {
     private boolean executeQuery(String statement) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(statement);
         return ps.execute();
+    }
+
+    private List<String> getColumnsWithType(Class<?> clazz, String columnDefinition) {
+        ArrayList<String> columnNames = new ArrayList<>();
+
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Column.class)) {
+                Column column = field.getAnnotation(Column.class);
+                if (column.columnDefinition().equals(columnDefinition)) {
+                    columnNames.add(column.name());
+                }
+            }
+        }
+
+        return columnNames;
+    }
+
+    private static List<Class<?>> getEntities(Class<?> mainClass) throws URISyntaxException, ClassNotFoundException {
+        String path = mainClass
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation().toURI()
+                .getPath();
+        String packageName = mainClass.getPackageName();
+
+        File rootDir = new File(path + packageName.replace(".", "/"));
+        List<Class<?>> classes = new ArrayList<>();
+
+        scanEntities(
+                rootDir,
+                packageName,
+                classes
+        );
+
+        return classes;
     }
 
     private Field getId(Class<?> entity) {

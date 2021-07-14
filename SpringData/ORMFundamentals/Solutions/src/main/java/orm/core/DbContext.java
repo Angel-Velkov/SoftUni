@@ -2,11 +2,12 @@ package orm.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 
 public interface DbContext<E> {
 
-    boolean persist(E entity) throws IllegalAccessException, SQLException;
+    boolean persist(E entity) throws IllegalAccessException, SQLException, ParseException;
 
     List<E> find(Class<E> table, String where) throws SQLException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException;
 
