@@ -7,9 +7,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "students")
 public class Student {
-    private static long idCounter = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     private String name;
     @Column(name = "registration_date")
@@ -19,21 +18,8 @@ public class Student {
     }
 
     public Student(String name) {
-        this(idCounter++, name);
-    }
-
-    public Student(long id, String name) {
-        this.id = id;
         this.name = name;
         this.registrationDate = new Date();
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {
