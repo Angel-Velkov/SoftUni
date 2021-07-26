@@ -1,14 +1,10 @@
 package solutions;
 
 import entities.Employee;
-import org.hibernate.FlushMode;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class IncreaseSalaries {
