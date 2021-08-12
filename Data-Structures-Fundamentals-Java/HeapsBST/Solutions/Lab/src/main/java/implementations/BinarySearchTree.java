@@ -1,82 +1,45 @@
-package Lab;
+package implementations;
+
+import interfaces.AbstractBinarySearchTree;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BinarySearchTree<K extends Comparable<K>> {
-    private static class Node<K> {
-        private K key;
-        private Node<K> left;
-        private Node<K> right;
-
-        private Node(K key, Node<K> left, Node<K> right) {
-            this.key = key;
-            this.left = left;
-            this.right = right;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
-        }
-
-        public Node<K> getLeft() {
-            return left;
-        }
-
-        public void setLeft(Node<K> left) {
-            this.left = left;
-        }
-
-        public Node<K> getRight() {
-            return right;
-        }
-
-        public void setRight(Node<K> right) {
-            this.right = right;
-        }
-    }
-
-    private Node<K> root;
+public class BinarySearchTree<E extends Comparable<E>> implements AbstractBinarySearchTree<E> {
+    private Node<E> root;
 
     public BinarySearchTree() {
     }
 
-    private BinarySearchTree(Node<K> node) {
+    private BinarySearchTree(Node<E> node) {
         this.root = node;
     }
 
-    public Node<K> getRoot() {
-        return this.root;
-    }
-
-    public void insert(K key) {
-        Node<K> newNode = new Node<>(key, null, null);
+    @Override
+    public void insert(E element) {
+        Node<E> newNode = new Node<>(element, null, null);
 
         if (this.root == null) {
             this.root = newNode;
         }
 
-        Node<K> currentNode = this.root;
+        Node<E> currentNode = this.root;
         while (true) {
-            int compare = key.compareTo(currentNode.getKey());
+            int compare = element.compareTo(currentNode.value);
             if (compare < 0) {
-                if (currentNode.getLeft() == null) {
-                    currentNode.setLeft(newNode);
+                if (currentNode.leftChild == null) {
+                    currentNode.leftChild = newNode;
                     return;
                 } else {
-                    currentNode = currentNode.getLeft();
+                    currentNode = currentNode.leftChild;
                 }
             } else if (compare > 0) {
-                if (currentNode.getRight() == null) {
-                    currentNode.setRight(newNode);
+                if (currentNode.rightChild == null) {
+                    currentNode.rightChild = newNode;
                     return;
                 } else {
-                    currentNode = currentNode.getRight();
+                    currentNode = currentNode.rightChild;
                 }
             } else {
                 return;
@@ -84,36 +47,72 @@ public class BinarySearchTree<K extends Comparable<K>> {
         }
     }
 
-    public BinarySearchTree<K> copy() {
-        return new BinarySearchTree<>(copy(this.root));
-    }
+    @Override
+    public boolean contains(E element) {
+        Node<E> node = root;
 
-    public Node<K> copy(Node<K> node) {
-        if (node == null) {
-            return null;
+        while (node != null) {
+            int compare = element.compareTo(node.value);
+
+            if (compare == 0) {
+                return true;
+            }
+
+            if (compare > 0) {
+                node = node.rightChild;
+            } else {
+                node = node.leftChild;
+            }
         }
-
-        return new Node<>(
-                node.getKey(),
-                copy(node.getLeft()),
-                copy(node.getRight())
-        );
+        return false;
     }
 
+    @Override
+    public AbstractBinarySearchTree<E> search(E element) {
+        Node<E> node = root;
+
+        while (node != null) {
+            int compare = element.compareTo(node.value);
+
+            if (compare == 0) {
+                return new BinarySearchTree<>(node);
+            }
+
+            if (compare > 0) {
+                node = node.rightChild;
+            } else {
+                node = node.leftChild;
+            }
+        }
+        return new BinarySearchTree<>();
+    }
+
+    @Override
+    public Node<E> getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public Node<E> getLeft() {
+        return this.root.leftChild;
+    }
+
+    @Override
+    public Node<E> getRight() {
+        return this.root.rightChild;
+    }
+
+    @Override
+    public E getValue() {
+        return this.root.value;
+    }
+
+    @Override
     public void print() {
-        print(this.root);
+        BTreePrinter.printNode(this.root);
     }
 
-    public void print(Node<K> node) {
-        if (node == null) {
-            return;
-        }
-        print(node.getLeft());
-        System.out.println(node.getKey());
-        print(node.getRight());
-    }
-
-    static class BTreePrinter {
+    private static class BTreePrinter {
 
         public static <K extends Comparable<K>> void printNode(Node<K> root) {
             int maxLevel = BTreePrinter.maxLevel(root);
@@ -138,7 +137,7 @@ public class BinarySearchTree<K extends Comparable<K>> {
             List<Node<K>> newNodes = new ArrayList<>();
             for (Node<K> node : nodes) {
                 if (node != null) {
-                    buffer.append(node.getKey());
+                    buffer.append(node.getValue());
                     newNodes.add(node.getLeft());
                     newNodes.add(node.getRight());
                 } else {
