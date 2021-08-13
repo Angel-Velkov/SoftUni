@@ -75,7 +75,7 @@ public class BinarySearchTree<E extends Comparable<E>> implements AbstractBinary
             int compare = element.compareTo(node.value);
 
             if (compare == 0) {
-                return new BinarySearchTree<>(node);
+                break;
             }
 
             if (compare > 0) {
@@ -84,7 +84,20 @@ public class BinarySearchTree<E extends Comparable<E>> implements AbstractBinary
                 node = node.leftChild;
             }
         }
-        return new BinarySearchTree<>();
+
+        return new BinarySearchTree<>(copy(node));
+    }
+
+    private Node<E> copy(Node<E> node) {
+        if (node == null) {
+            return null;
+        }
+
+        return new Node<E>(
+                node.value,
+                copy(node.leftChild),
+                copy(node.rightChild)
+        );
     }
 
     @Override

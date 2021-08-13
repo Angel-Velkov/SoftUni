@@ -1,7 +1,5 @@
 import implementations.BinarySearchTree;
-import implementations.PriorityQueue;
 import interfaces.AbstractBinarySearchTree;
-import interfaces.AbstractBinaryTree;
 
 public class Main {
     public static void main(String[] args) {
