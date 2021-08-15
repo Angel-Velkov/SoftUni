@@ -55,7 +55,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
         eachInOrder(consumer, this.root);
     }
 
-    public void eachInOrder(Consumer<E> consumer, Node<E> node) {
+    private void eachInOrder(Consumer<E> consumer, Node<E> node) {
         if (node == null) {
             return;
         }
@@ -73,6 +73,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
 
     public Node<E> getRoot() {
         return this.root;
+    }
+
+    private void setSize(int size) {
+        this.size = size;
     }
 
     public void insert(E element) {
@@ -140,7 +144,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
             }
         }
 
-        return new BinarySearchTree<>(copy(node));
+        BinarySearchTree<E> bst = new BinarySearchTree<>(copy(node));
+        bst.setSize(count(bst.root));
+
+        return bst;
     }
 
     private Node<E> copy(Node<E> node) {
@@ -148,17 +155,24 @@ public class BinarySearchTree<E extends Comparable<E>> {
             return null;
         }
 
-        Node<E> newNode = new Node<>(node.getValue());
-        newNode.setLeftChild(copy(node.getLeft()));
-        newNode.setRightChild(copy(node.getRight()));
-
-        return newNode;
+        return new Node<>(
+                node.getValue(),
+                copy(node.getLeft()),
+                copy(node.getRight())
+        );
     }
 
-    // We can use the eachInOrder method and submit the list to fill it out.
     public List<E> range(E first, E second) {
         List<E> elements = new ArrayList<>();
-        fillInOrder(elements, root, first, second);
+        fillInOrder(elements, this.root, first, second);
+
+        /*
+        this.eachInOrder(e -> {
+            if (e.compareTo(first) >= 0 && e.compareTo(second) <= 0) {
+                elements.add(e);
+            }
+        });
+        */
 
         return elements;
     }
@@ -170,22 +184,20 @@ public class BinarySearchTree<E extends Comparable<E>> {
 
         Node<E> leftChild = parent.getLeft();
         if (leftChild != null) {
-            if (isBetween(leftChild, from, to)) {
-                fillInOrder(list, leftChild, from, to);
-            }
+            fillInOrder(list, leftChild, from, to);
         }
 
-        list.add(parent.getValue());
+        if (isBetweenInclusive(parent, from, to)) {
+            list.add(parent.getValue());
+        }
 
         Node<E> rightChild = parent.getRight();
         if (rightChild != null) {
-            if (isBetween(rightChild, from, to)) {
-                fillInOrder(list, rightChild, from, to);
-            }
+            fillInOrder(list, rightChild, from, to);
         }
     }
 
-    private boolean isBetween(Node<E> node, E from, E to) {
+    private boolean isBetweenInclusive(Node<E> node, E from, E to) {
         int lowerBound = from.compareTo(node.getValue());
         int upperBound = to.compareTo(node.getValue());
 
@@ -229,8 +241,8 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
 
     private void ensureNonEmpty() {
-        if (count() == 0) {
-            throw new IllegalStateException("The collection is empty");
+        if (this.root == null) {
+            throw new IllegalArgumentException("The collection is empty");
         }
     }
 
@@ -238,9 +250,17 @@ public class BinarySearchTree<E extends Comparable<E>> {
         return this.size;
     }
 
+    private int count(Node<E> node) {
+        if (node == null) {
+            return 0;
+        } else {
+            return count(node.getLeft()) + count(node.getRight());
+        }
+    }
+
     public int rank(E element) {
         /*
-        Node<E> currentNode = this.search(element).getRoot();
+        Node<E> currentNode = this.root;
 
         Queue<Node<E>> queue = new ArrayDeque<>();
         queue.offer(currentNode);
@@ -278,10 +298,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
         int compare = node.getValue().compareTo(element);
 
         if (compare < 0) {
-            count++;
+            count = 1;
         }
 
-        if (node.getRight() != null && node.getRight().getValue().compareTo(element) < 0) {
+        if (node.getRight() != null) {
             count += countOfSmallerElements(element, node.getRight());
         }
 
@@ -292,42 +312,81 @@ public class BinarySearchTree<E extends Comparable<E>> {
         return count;
     }
 
-    // Todo: Need to be fixed
     public E ceil(E element) {
-        ensureNonEmpty();
+        if (this.root == null) {
+            return null;
+        }
 
         Node<E> currentNode = this.root;
+        E maxValue = null;
 
         while (true) {
             if (isGreaterThan(currentNode.getValue(), element)) {
+
+                if (maxValue == null || isGreaterThan(maxValue, currentNode.getValue())) {
+                    maxValue = currentNode.getValue();
+                } else {
+                    break;
+                }
+
                 if (currentNode.getLeft() != null) {
                     if (isGreaterThan(currentNode.getLeft().getValue(), element)) {
                         currentNode = currentNode.getLeft();
                     } else if (currentNode.getLeft().getRight() != null) {
                         currentNode = currentNode.getLeft().getRight();
-                    } else {
-                        break;
                     }
-                } else {
-                    break;
                 }
+
             } else if (currentNode.getRight() != null) {
                 currentNode = currentNode.getRight();
             } else {
-                return null;
+                break;
             }
         }
 
-        return currentNode.getValue();
+        return maxValue;
     }
 
     public E floor(E element) {
-        return null;
+        if (this.root == null) {
+            return null;
+        }
+
+        Node<E> currentNode = this.root;
+        E minValue = null;
+
+        while (true) {
+            if (isLessThan(currentNode.getValue(), element)) {
+
+                if (minValue == null || isLessThan(minValue, currentNode.getValue())) {
+                    minValue = currentNode.getValue();
+                } else {
+                    break;
+                }
+
+                if (currentNode.getRight() != null) {
+                    if (isLessThan(currentNode.getRight().getValue(), element)) {
+                        currentNode = currentNode.getRight();
+                    } else if (currentNode.getRight().getLeft() != null) {
+                        currentNode = currentNode.getRight().getLeft();
+                    }
+                }
+
+            } else if (currentNode.getLeft() != null) {
+                currentNode = currentNode.getLeft();
+            } else {
+                break;
+            }
+        }
+
+        return minValue;
     }
 
     private boolean isGreaterThan(E first, E second) {
         return first.compareTo(second) > 0;
     }
 
-
+    private boolean isLessThan(E first, E second) {
+        return first.compareTo(second) < 0;
+    }
 }
