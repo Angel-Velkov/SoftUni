@@ -82,7 +82,8 @@ public class BinaryTree {
         if (tree == null) {
             return;
         }
-        abscissaValue.computeIfAbsent(abscissa, k -> tree.getKey());
+        
+        abscissaValue.putIfAbsent(abscissa, tree.getKey());
 
         traverseTree(tree.getLeft(), abscissa - 1,  abscissaValue);
         traverseTree(tree.getRight(), abscissa + 1,  abscissaValue);
