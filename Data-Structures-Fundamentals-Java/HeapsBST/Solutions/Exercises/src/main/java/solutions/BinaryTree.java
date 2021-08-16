@@ -1,8 +1,9 @@
 package solutions;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BinaryTree {
     private int key;
@@ -13,6 +14,18 @@ public class BinaryTree {
         this.key = key;
         this.left = left;
         this.right = right;
+    }
+
+    public int getKey() {
+        return this.key;
+    }
+
+    public BinaryTree getLeft() {
+        return this.left;
+    }
+
+    public BinaryTree getRight() {
+        return this.right;
     }
 
     public Integer findLowestCommonAncestor(int first, int second) {
@@ -58,6 +71,20 @@ public class BinaryTree {
     }
 
     public List<Integer> topView() {
-        return null;
+        Map<Integer, Integer> abscissaValue = new TreeMap<>();
+
+        traverseTree(this, 0, abscissaValue);
+
+        return new ArrayList<>(abscissaValue.values());
+    }
+
+    private void traverseTree(BinaryTree tree, int abscissa, Map<Integer, Integer> abscissaValue) {
+        if (tree == null) {
+            return;
+        }
+        abscissaValue.computeIfAbsent(abscissa, k -> tree.getKey());
+
+        traverseTree(tree.getLeft(), abscissa - 1,  abscissaValue);
+        traverseTree(tree.getRight(), abscissa + 1,  abscissaValue);
     }
 }
