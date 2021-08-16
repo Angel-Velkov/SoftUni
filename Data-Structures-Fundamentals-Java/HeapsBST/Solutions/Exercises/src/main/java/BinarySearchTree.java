@@ -6,21 +6,38 @@ import java.util.function.Consumer;
 
 public class BinarySearchTree<E extends Comparable<E>> {
     private Node<E> root;
-    private int size;
 
     public static class Node<E> {
         private E value;
         private Node<E> leftChild;
         private Node<E> rightChild;
 
+        private int count;
+
         public Node(E value) {
             this.value = value;
+            this.count = 1;
         }
 
         public Node(E value, Node<E> leftChild, Node<E> rightChild) {
             this(value);
             this.leftChild = leftChild;
             this.rightChild = rightChild;
+            this.increaseCount();
+        }
+
+        private void increaseCount() {
+            if (this.getLeft() != null) {
+                this.count += this.getLeft().count;
+            }
+
+            if (this.getRight() != null) {
+                this.count += this.getRight().count;
+            }
+        }
+
+        public int getCount() {
+            return this.count;
         }
 
         public Node<E> getLeft() {
@@ -75,18 +92,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
         return this.root;
     }
 
-    private void setSize(int size) {
-        this.size = size;
-    }
-
     public void insert(E element) {
         if (this.root == null) {
             this.root = new Node<>(element);
         } else {
             insert(element, this.root);
         }
-
-        this.size++;
     }
 
     private void insert(E element, Node<E> node) {
@@ -105,6 +116,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
                 insert(element, node.getRight());
             }
         }
+        node.count++;
     }
 
     public boolean contains(E element) {
@@ -144,10 +156,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
             }
         }
 
-        BinarySearchTree<E> bst = new BinarySearchTree<>(copy(node));
-        bst.setSize(count(bst.root));
-
-        return bst;
+        return new BinarySearchTree<>(copy(node));
     }
 
     private Node<E> copy(Node<E> node) {
@@ -213,13 +222,13 @@ public class BinarySearchTree<E extends Comparable<E>> {
             Node<E> currentNode = this.root;
 
             while (currentNode.getLeft().getLeft() != null) {
+                currentNode.count--;
                 currentNode = currentNode.getLeft();
             }
 
+            currentNode.count--;
             currentNode.leftChild = currentNode.getLeft().getRight();
         }
-
-        this.size--;
     }
 
     public void deleteMax() {
@@ -231,13 +240,13 @@ public class BinarySearchTree<E extends Comparable<E>> {
             Node<E> currentNode = this.root;
 
             while (currentNode.getRight().getRight() != null) {
+                currentNode.count--;
                 currentNode = currentNode.getRight();
             }
 
+            currentNode.count--;
             currentNode.rightChild = currentNode.getRight().getLeft();
         }
-
-        this.size--;
     }
 
     private void ensureNonEmpty() {
@@ -247,14 +256,16 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
 
     public int count() {
-        return this.size;
+        return this.root.count;
     }
 
+    // I used it to take the size of a tree created from the copy method
+    // The BST carried information about the size of the tree
     private int count(Node<E> node) {
         if (node == null) {
             return 0;
         } else {
-            return count(node.getLeft()) + count(node.getRight());
+            return 1 + count(node.getLeft()) + count(node.getRight());
         }
     }
 
@@ -289,6 +300,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
 
     private int countOfSmallerElements(E element, Node<E> node) {
+        /*
         if (node == null) {
             return 0;
         }
@@ -310,6 +322,23 @@ public class BinarySearchTree<E extends Comparable<E>> {
         }
 
         return count;
+        */
+
+        if (node == null) {
+            return 0;
+        }
+
+        if (isLessThan(element, node.getValue())) {
+            return this.countOfSmallerElements(element, node.getLeft());
+        } else if (isGreaterThan(element, node.getValue())) {
+            return getNodeCount(node.getLeft()) + 1 + this.countOfSmallerElements(element, node.getRight());
+        } else {
+            return this.getNodeCount(node.getLeft());
+        }
+    }
+
+    private int getNodeCount(Node<E> node) {
+        return node == null ? 0 : node.getCount();
     }
 
     public E ceil(E element) {

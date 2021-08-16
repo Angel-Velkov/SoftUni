@@ -27,6 +27,6 @@ public class MinHeap<E extends Comparable<E> & Decrease<E>> implements Heap<E> {
 
     @Override
     public void decrease(E element) {
-
+        element.decrease();
     }
 }
