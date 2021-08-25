@@ -32,11 +32,11 @@ public class Tree23<K extends Comparable<K>> {
     }
 
     private void add(Node23<K> node, K key) {
-        Node23<K> insertionNode = node;
-        int insertionIndex = getInsertionIndex(insertionNode, key);
+        int insertionIndex = getInsertionIndex(node, key);
 
         if (node.children.isEmpty()) {
-            insertionNode.keys.add(insertionIndex, key);
+            node.keys.add(insertionIndex, key);
+            Node23<K> insertionNode = node;
 
             while (insertionNode.keys.size() > 2) {
                 K midKey = insertionNode.keys.get(1);
@@ -50,7 +50,7 @@ public class Tree23<K extends Comparable<K>> {
                     leftPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(0),
                             insertionNode.children.get(0), insertionNode.children.get(1));
                     rightPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(2),
-                            insertionNode.children.get(0), insertionNode.children.get(1));
+                            insertionNode.children.get(2), insertionNode.children.get(3));
                 }
 
                 insertionNode = insertionNode.parent;
@@ -61,11 +61,11 @@ public class Tree23<K extends Comparable<K>> {
                     insertionNode.children.set(midKeyInsertionIndex + 1, rightPart);
                 } else {
                     insertionNode = new Node23<>(null, midKey, leftPart, rightPart);
-                    root = insertionNode;
+                    this.root = insertionNode;
                 }
             }
         } else {
-            add(node.children.get(insertionIndex), key);
+            this.add(node.children.get(insertionIndex), key);
         }
     }
 
