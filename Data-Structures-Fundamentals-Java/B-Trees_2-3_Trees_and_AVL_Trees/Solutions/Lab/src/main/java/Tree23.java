@@ -2,19 +2,18 @@ import java.util.*;
 
 public class Tree23<K extends Comparable<K>> {
 
-    private static class Node23<K> {
+    public static class Node23<K> {
         private Node23<K> parent;
         private List<K> keys;
         private List<Node23<K>> children;
 
-        private Node23(Node23<K> parent, K key) {
-            this.parent = parent;
+        private Node23(K key) {
             this.keys = new ArrayList<>(List.of(key));
             this.children = new ArrayList<>();
         }
 
-        private Node23(Node23<K> parent, K key, Node23<K> left, Node23<K> right) {
-            this(parent, key);
+        private Node23(K key, Node23<K> left, Node23<K> right) {
+            this(key);
             this.children = new ArrayList<>(Arrays.asList(left, right));
             left.parent = this;
             right.parent = this;
@@ -25,7 +24,7 @@ public class Tree23<K extends Comparable<K>> {
 
     public void add(K key) {
         if (root == null) {
-            root = new Node23<>(null, key);
+            root = new Node23<>(key);
         } else {
             add(root, key);
         }
@@ -44,23 +43,24 @@ public class Tree23<K extends Comparable<K>> {
                 Node23<K> leftPart;
                 Node23<K> rightPart;
                 if (insertionNode.children.isEmpty()) {
-                    leftPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(0));
-                    rightPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(2));
+                    leftPart = new Node23<>(insertionNode.keys.get(0));
+                    rightPart = new Node23<>(insertionNode.keys.get(2));
                 } else {
-                    leftPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(0),
+                    leftPart = new Node23<>(insertionNode.keys.get(0),
                             insertionNode.children.get(0), insertionNode.children.get(1));
-                    rightPart = new Node23<>(insertionNode.parent, insertionNode.keys.get(2),
+                    rightPart = new Node23<>(insertionNode.keys.get(2),
                             insertionNode.children.get(2), insertionNode.children.get(3));
                 }
 
                 insertionNode = insertionNode.parent;
                 if (insertionNode != null) {
                     int midKeyInsertionIndex = getInsertionIndex(insertionNode, midKey);
+
                     insertionNode.keys.add(midKeyInsertionIndex, midKey);
                     insertionNode.children.add(midKeyInsertionIndex, leftPart);
                     insertionNode.children.set(midKeyInsertionIndex + 1, rightPart);
                 } else {
-                    insertionNode = new Node23<>(null, midKey, leftPart, rightPart);
+                    insertionNode = new Node23<>(midKey, leftPart, rightPart);
                     this.root = insertionNode;
                 }
             }
