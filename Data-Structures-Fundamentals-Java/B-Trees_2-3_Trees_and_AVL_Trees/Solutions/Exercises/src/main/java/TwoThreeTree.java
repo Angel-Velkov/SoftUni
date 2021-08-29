@@ -27,11 +27,90 @@ public class TwoThreeTree<K extends Comparable<K>> {
     }
 
     public void insert(K key) {
+        if (this.root == null) {
+            this.root = new TreeNode<>(key);
+        } else {
 
+            TreeNode<K> node = this.insert(key, this.root);
+
+            if (node != null) {
+                this.root = node;
+            }
+        }
     }
 
-    private void insert(K key, TreeNode<K> node) {
+    private TreeNode<K> insert(K key, TreeNode<K> node) {
+        if (node.isLeaf()) {
+            if (node.isTwoNode()) {
+                if (isGreaterThan(key, node.leftKey)) {
+                    node.rightKey = key;
+                } else {
+                    node.rightKey = node.leftKey;
+                    node.leftKey = key;
+                }
+            } else {
+                return splitLeaf(node, key);
+            }
+        } else {
+            TreeNode<K> restructuredNode;
+            if (node.isTwoNode()) {
+                if (isLessThan(key, node.leftKey)) {
+                    restructuredNode = insert(key, node.leftChild);
+                } else {
+                    restructuredNode = insert(key, node.rightChild);
+                }
 
+                if (restructuredNode != null) {
+                    if (isLessThan(restructuredNode.leftKey, node.leftKey)) {
+                        node.rightKey = node.leftKey;
+                        node.leftKey = restructuredNode.leftKey;
+
+                        node.leftChild = restructuredNode.leftChild;
+                        node.middleChild = restructuredNode.rightChild;
+                    } else {
+                        node.rightKey = restructuredNode.leftKey;
+
+                        node.middleChild = restructuredNode.leftChild;
+                        node.rightChild = restructuredNode.rightChild;
+                    }
+                }
+            } else {
+
+            }
+        }
+
+        return null;
+    }
+
+    private TreeNode<K> splitLeaf(TreeNode<K> node, K key) {
+        K left;
+        K mid;
+        K right;
+
+        if (isLessThan(key, node.leftKey)) {
+            left = key;
+            mid = node.leftKey;
+            right = node.rightKey;
+        } else if (isGreaterThan(key, node.rightKey)) {
+            left = node.leftKey;
+            mid = node.rightKey;
+            right = key;
+        } else {
+            left = node.leftKey;
+            mid = key;
+            right = node.rightKey;
+        }
+
+        TreeNode<K> rebalancedLeaf = new TreeNode<>(mid);
+        rebalancedLeaf.leftChild = new TreeNode<>(left);
+        rebalancedLeaf.rightChild = new TreeNode<>(right);
+
+        return rebalancedLeaf;
+    }
+
+    private TreeNode<K> splitNode(TreeNode<K> node, K key) {
+
+        return null;
     }
 
     public String getAsString() {
@@ -93,8 +172,8 @@ public class TwoThreeTree<K extends Comparable<K>> {
         return a.compareTo(b) > 0;
     }
 
-    private boolean isBetween(K lowerBound, K element, K upperBound) {
-        return isGreaterThan(element, lowerBound) && isLessThan(element, upperBound)
-                ||isLessThan(element, lowerBound) && isGreaterThan(element, upperBound);
+    private boolean isBetween(K element, K boundA, K boundB) {
+        return isGreaterThan(element, boundA) && isLessThan(element, boundB)
+                || isLessThan(element, boundA) && isGreaterThan(element, boundB);
     }
 }
