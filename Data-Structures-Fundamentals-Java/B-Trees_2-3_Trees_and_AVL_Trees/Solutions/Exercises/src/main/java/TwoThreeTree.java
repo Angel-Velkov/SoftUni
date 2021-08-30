@@ -13,6 +13,18 @@ public class TwoThreeTree<K extends Comparable<K>> {
             this.leftKey = key;
         }
 
+        private TreeNode(K key, K leftChild, K rightChild) {
+            this(key);
+            this.leftChild = new TreeNode<>(leftChild);
+            this.rightChild = new TreeNode<>(rightChild);
+        }
+
+        private TreeNode(K key, TreeNode<K> leftChild, TreeNode<K> rightChild) {
+            this(key);
+            this.leftChild = leftChild;
+            this.rightChild = rightChild;
+        }
+
         boolean isThreeNode() {
             return rightKey != null;
         }
@@ -53,32 +65,70 @@ public class TwoThreeTree<K extends Comparable<K>> {
             }
         } else {
             TreeNode<K> restructuredNode;
-            if (node.isTwoNode()) {
-                if (isLessThan(key, node.leftKey)) {
-                    restructuredNode = insert(key, node.leftChild);
-                } else {
-                    restructuredNode = insert(key, node.rightChild);
-                }
 
-                if (restructuredNode != null) {
-                    if (isLessThan(restructuredNode.leftKey, node.leftKey)) {
-                        node.rightKey = node.leftKey;
-                        node.leftKey = restructuredNode.leftKey;
-
-                        node.leftChild = restructuredNode.leftChild;
-                        node.middleChild = restructuredNode.rightChild;
-                    } else {
-                        node.rightKey = restructuredNode.leftKey;
-
-                        node.middleChild = restructuredNode.leftChild;
-                        node.rightChild = restructuredNode.rightChild;
-                    }
-                }
+            if (isLessThan(key, node.leftKey)) {
+                restructuredNode = insert(key, node.leftChild);
+            } else if (node.isThreeNode() && isLessThan(key, node.rightKey)) {
+                restructuredNode = insert(key, node.middleChild);
             } else {
+                restructuredNode = insert(key, node.rightChild);
+            }
 
+            if (restructuredNode != null) {
+                return splitNode(node, restructuredNode);
             }
         }
 
+        return null;
+    }
+
+    private TreeNode<K> splitNode(TreeNode<K> node, TreeNode<K> restructuredNode) {
+        if (node.isTwoNode()) {
+            if (isLessThan(restructuredNode.leftKey, node.leftKey)) {
+                node.rightKey = node.leftKey;
+                node.leftKey = restructuredNode.leftKey;
+
+                node.leftChild = restructuredNode.leftChild;
+                node.middleChild = restructuredNode.rightChild;
+            } else {
+                node.rightKey = restructuredNode.leftKey;
+
+                node.middleChild = restructuredNode.leftChild;
+                node.rightChild = restructuredNode.rightChild;
+            }
+        } else {
+            TreeNode<K> newNode;
+
+            if (isLessThan(restructuredNode.leftKey, node.leftKey)) {
+                newNode = new TreeNode<>(node.leftKey);
+
+                newNode.leftChild = new TreeNode<>(restructuredNode.leftKey);
+                newNode.rightChild = new TreeNode<>(restructuredNode.rightKey);
+
+                newNode.rightChild.leftChild = node.middleChild;
+                newNode.rightChild.rightChild = node.rightChild;
+            } else if (isGreaterThan(restructuredNode.leftKey, node.rightKey)) {
+                newNode = new TreeNode<>(node.rightKey);
+
+                newNode.leftChild = new TreeNode<>(node.leftKey);
+                newNode.rightChild = restructuredNode;
+
+                newNode.leftChild.leftChild = node.leftChild;
+                newNode.leftChild.rightChild = node.middleChild;
+            } else {
+                newNode = new TreeNode<>(restructuredNode.leftKey);
+
+                newNode.leftChild = new TreeNode<>(node.leftKey);
+                newNode.rightChild = new TreeNode<>(node.rightKey);
+
+                newNode.leftChild.leftChild = node.leftChild;
+                newNode.leftChild.rightChild = restructuredNode.leftChild;
+
+                newNode.rightChild.rightChild = node.rightChild;
+                newNode.rightChild.leftChild = restructuredNode.rightChild;
+            }
+            return newNode;
+        }
         return null;
     }
 
@@ -101,11 +151,7 @@ public class TwoThreeTree<K extends Comparable<K>> {
             right = node.rightKey;
         }
 
-        TreeNode<K> rebalancedLeaf = new TreeNode<>(mid);
-        rebalancedLeaf.leftChild = new TreeNode<>(left);
-        rebalancedLeaf.rightChild = new TreeNode<>(right);
-
-        return rebalancedLeaf;
+        return new TreeNode<>(mid, left, right);
     }
 
     private TreeNode<K> splitNode(TreeNode<K> node, K key) {
