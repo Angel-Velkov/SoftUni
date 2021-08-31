@@ -26,15 +26,73 @@ public class AVL<T extends Comparable<T>> {
     }
 
     public void delete(T item) {
-        throw new UnsupportedOperationException();
+        this.root = this.delete(item, this.root);
+    }
+
+    private Node<T> delete(T item, Node<T> node) {
+        if (node == null) {
+            return null;
+        }
+
+        int comp = item.compareTo(node.value);
+
+        if (comp < 0) {
+            this.delete(item, node.left);
+        } else if (comp > 0) {
+            this.delete(item, node.right);
+        } else {
+            if (node.left == null) {
+                return node.right;
+            } else if (node.right == null) {
+                return node.left;
+            } else {
+                Node<T> min = getMin(node.right);
+                min.right = deleteMin(node.right);
+                min.left = node.left;
+                node = min;
+            }
+        }
+
+        node = balance(node);
+        return node;
     }
 
     public void deleteMin() {
-        throw new UnsupportedOperationException();
+        this.root = this.deleteMin(this.root);
+    }
+
+    private Node<T> deleteMin(Node<T> node) {
+        if (node == null) {
+            return null;
+        }
+
+        if (node.left == null) {
+            return node.right;
+        }
+
+        node.left = this.deleteMin(node.left);
+        node = this.balance(node);
+
+        return node;
     }
 
     public void deleteMax() {
-        throw new UnsupportedOperationException();
+        this.root = this.deleteMax(this.root);
+    }
+
+    private Node<T> deleteMax(Node<T> node) {
+        if (node == null) {
+            return null;
+        }
+
+        if (node.right == null) {
+            return node.left;
+        }
+
+        node.left = deleteMax(node.right);
+        node = balance(node);
+
+        return node;
     }
 
     private void eachInOrder(Node<T> node, Consumer<T> action) {
@@ -101,7 +159,7 @@ public class AVL<T extends Comparable<T>> {
     private Node<T> balance(Node<T> node) {
         int balance = this.balanceFactor(node);
 
-        if (balance < - 1) {
+        if (balance < -1) {
             int childBalance = this.balanceFactor(node.right);
             if (childBalance > 0) {
                 node.right = rotateRight(node.right);
@@ -133,6 +191,7 @@ public class AVL<T extends Comparable<T>> {
 
         return node;
     }
+
     private int balanceFactor(Node<T> node) {
         return height(node.left) - height(node.right);
     }
