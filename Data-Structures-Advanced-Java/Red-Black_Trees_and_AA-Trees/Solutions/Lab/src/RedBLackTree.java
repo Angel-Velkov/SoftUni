@@ -109,9 +109,111 @@ public class RedBLackTree<K extends Comparable<K>> {
     }
 
     private void ensureBalance(Node<K> redNode) {
+        if (redNode.parent.color == Color.RED) {
+            while (redNode != null && redNode.parent != null && redNode.parent.color == Color.RED) {
+                boolean uncleIsBlack = redNode.getUncleColor() == Color.BLACK;
+                if (uncleIsBlack) {
+                    Node<K> grandparent = redNode.getGrandParent();
+                    if (grandparent != null && grandparent.left == redNode.parent) {
+                        if (redNode.parent.left != redNode) {
+                            rotateLeft(redNode.parent);
+                        }
+                        fixRedLeftLeft(grandparent);
+                    } else {
+                        if (redNode.parent.left != redNode) {
+                            rotateRight(redNode.parent);
+                        }
+                        fixRedRightRight(grandparent);
+                    }
+                    break;
+                } else {
+                    Node<K> grandparent = redNode.getGrandParent();
+                    Node<K> parent = redNode.parent;
+                    Node<K> uncle = redNode.getUncle();
+
+                    if (grandparent != null) {
+                        grandparent.color = Color.RED;
+                    }
+
+                    parent.color = Color.BLACK;
+                    uncle.color = Color.BLACK;
+                    redNode = grandparent;
+                }
+            }
+            this.root.color = Color.BLACK;
+        }
+    }
+
+    private void rotateRight(Node<K> node) {
+        if (node.parent != null) {
+            if (node.parent.left == node) {
+                node.parent.setLeft(node.left);
+            } else {
+                node.parent.setRight(node.left);
+            }
+        } else {
+            node.left.parent = null;
+            this.root = node.left;
+        }
+
+        Node<K> leftRight = node.left.right;
+        node.left.setRight(node);
+        node.setLeft(leftRight);
+    }
+
+    private void rotateLeft(Node<K> node) {
+        if (node.parent != null) {
+            if (node.parent.left == node) {
+                node.parent.setLeft(node.right);
+            } else {
+                node.parent.setRight(node.right);
+            }
+        } else {
+            node.right.parent = null;
+            this.root = node.right;
+        }
+
+        Node<K> rightLeft = node.right.left;
+        node.right.setLeft(node);
+        node.setRight(rightLeft);
+    }
+
+    private void fixRedRightRight(Node<K> grandparent) {
+        swapColors(grandparent, grandparent.right);
+        rotateLeft(grandparent);
+    }
+
+    private void fixRedLeftLeft(Node<K> grandparent) {
+        swapColors(grandparent, grandparent.left);
+        rotateRight(grandparent);
+    }
+
+    private void swapColors(Node<K> a, Node<K> b) {
+        Color aColor = a.color;
+        a.color = b.color;
+        b.color = aColor;
     }
 
     private boolean isLessThan(K first, K second) {
         return first.compareTo(second) < 0;
+    }
+
+    public void getInPreOrder() {
+        StringBuilder buffer = new StringBuilder();
+        getInPreOrder(this.root, 0,buffer);
+        System.out.println(buffer);
+        System.out.println("<======================>");
+    }
+
+    private void getInPreOrder(Node<K> node, int level, StringBuilder buffer) {
+        if (node == null) {
+            return;
+        }
+
+        buffer.append("    ".repeat(Math.max(0, level)));
+
+        buffer.append(node);
+        getInPreOrder(node.left, level + 1, buffer);
+        getInPreOrder(node.right, level + 1, buffer);
     }
 }
