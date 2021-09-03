@@ -1,4 +1,5 @@
-public class RedBLackTree<K extends Comparable<K>> {
+public class RBTree<K extends Comparable<K>> {
+
     private enum Color {
         RED,
         BLACK
@@ -61,7 +62,6 @@ public class RedBLackTree<K extends Comparable<K>> {
             } else {
                 return grandparent.left;
             }
-
         }
 
         Node<K> getGrandParent() {
@@ -74,7 +74,7 @@ public class RedBLackTree<K extends Comparable<K>> {
 
         @Override
         public String toString() {
-            return color + "(" + key + ")";
+            return this.color + "(" + this.key + ")";
         }
     }
 
@@ -110,9 +110,13 @@ public class RedBLackTree<K extends Comparable<K>> {
 
     private void ensureBalance(Node<K> redNode) {
         if (redNode.parent.color == Color.RED) {
-            while (redNode != null && redNode.parent != null && redNode.parent.color == Color.RED) {
+            while (redNode != null
+                    && redNode.parent != null
+                    && redNode.parent.color == Color.RED) {
+
                 boolean uncleIsBlack = redNode.getUncleColor() == Color.BLACK;
                 if (uncleIsBlack) {
+                    // uncle is black -> rotations
                     Node<K> grandparent = redNode.getGrandParent();
                     if (grandparent != null && grandparent.left == redNode.parent) {
                         if (redNode.parent.left != redNode) {
@@ -127,6 +131,7 @@ public class RedBLackTree<K extends Comparable<K>> {
                     }
                     break;
                 } else {
+                    // uncle is red -> changing the colors of the grandparent and his two children (parent & uncle)
                     Node<K> grandparent = redNode.getGrandParent();
                     Node<K> parent = redNode.parent;
                     Node<K> uncle = redNode.getUncle();
@@ -198,11 +203,10 @@ public class RedBLackTree<K extends Comparable<K>> {
         return first.compareTo(second) < 0;
     }
 
-    public void getInPreOrder() {
+    public void printPreOrder() {
         StringBuilder buffer = new StringBuilder();
-        getInPreOrder(this.root, 0,buffer);
+        getInPreOrder(this.root, 0, buffer);
         System.out.println(buffer);
-        System.out.println("<======================>");
     }
 
     private void getInPreOrder(Node<K> node, int level, StringBuilder buffer) {
