@@ -74,7 +74,8 @@ public class RBTree<K extends Comparable<K>> {
 
         @Override
         public String toString() {
-            return this.color + "(" + this.key + ")";
+            return this.color.equals(Color.RED) ? "R" : "B"
+                    + "(" + this.key + ")";
         }
     }
 
@@ -216,7 +217,7 @@ public class RBTree<K extends Comparable<K>> {
 
         buffer.append("    ".repeat(Math.max(0, level)));
 
-        buffer.append(node);
+        buffer.append(node).append(System.lineSeparator());
         getInPreOrder(node.left, level + 1, buffer);
         getInPreOrder(node.right, level + 1, buffer);
     }

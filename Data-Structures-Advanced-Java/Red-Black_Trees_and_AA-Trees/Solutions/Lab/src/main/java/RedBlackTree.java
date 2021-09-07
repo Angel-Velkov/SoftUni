@@ -18,6 +18,11 @@ public class RedBlackTree<T extends Comparable<T>> {
             this.value = value;
             this.color = color;
         }
+
+        @Override
+        public String toString() {
+            return (this.color ? "R" : "B") + "(" + value + ")";
+        }
     }
 
     private Node<T> root;
@@ -60,10 +65,14 @@ public class RedBlackTree<T extends Comparable<T>> {
             return;
         }
 
-        if (node.color == RED) {
-            node.color = BLACK;
-        } else {
-            node.color = RED;
+        node.color = RED;
+
+        if (node.left != null) {
+            node.left.color = BLACK;
+        }
+
+        if (node.right != null) {
+            node.right.color = BLACK;
         }
     }
 
@@ -108,10 +117,47 @@ public class RedBlackTree<T extends Comparable<T>> {
 
     private Node<T> insert(T value, Node<T> node) {
         if (node == null) {
-            node= new Node<>(value, RED);
+            node = new Node<>(value, RED);
+        } else if (this.isLessThan(value, node.value)) {
+            node.left = this.insert(value, node.left);
+        } else if (this.isGreaterThan(value, node.value)) {
+            node.right = this.insert(value, node.right);
         }
 
+        if (this.isRed(node.right) && !this.isRed(node.left)) {
+            if (this.isRed(node.right.left)) {
+                node.right = rightRotate(node.right);
+            }
+
+            if (this.isRed(node.right.right)) {
+                node = this.leftRotate(node);
+            }
+        }
+
+        if (this.isRed(node.left) && !this.isRed(node.right)) {
+            if (this.isRed(node.left.right)) {
+                node.left = leftRotate(node.left);
+            }
+
+            if (isRed(node.left.left)) {
+                node = this.rightRotate(node);
+            }
+        }
+
+        if (this.isRed(node.left) && this.isRed(node.right)) {
+            this.flipColors(node);
+        }
+
+        node.count = 1 + this.count(node.left) + this.count(node.right);
         return node;
+    }
+
+    private boolean isLessThan(T a, T b) {
+        return a.compareTo(b) < 0;
+    }
+
+    private boolean isGreaterThan(T a, T b) {
+        return a.compareTo(b) > 0;
     }
 
     public boolean contains(T value) {
@@ -149,5 +195,22 @@ public class RedBlackTree<T extends Comparable<T>> {
         consumer.accept(node.value);
         this.eachInOrder(node.right, consumer);
     }
-}
 
+    public void printPreOrder() {
+        StringBuilder buffer = new StringBuilder();
+        getInPreOrder(this.root, 0, buffer);
+        System.out.println(buffer);
+    }
+
+    private void getInPreOrder(Node<T> node, int level, StringBuilder buffer) {
+        if (node == null) {
+            return;
+        }
+
+        buffer.append("    ".repeat(Math.max(0, level)));
+
+        buffer.append(node).append(System.lineSeparator());
+        getInPreOrder(node.left, level + 1, buffer);
+        getInPreOrder(node.right, level + 1, buffer);
+    }
+}
