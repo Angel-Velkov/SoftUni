@@ -232,6 +232,7 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         this.swapColors(temp, node);
 
         this.resize(node);
+        temp.size++;
 
         return temp;
     }
@@ -251,20 +252,6 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         if (node.right != null) {
             node.right.color = BLACK;
         }
-    }
-
-    // Assuming that node is red and both node.left and node.left.left
-    // are black, make node.left or one of its children red.
-    private Node moveRedLeft(Node node) {
-        return null;
-        //TODO
-    }
-
-    // Assuming that node is red and both node.right and node.right.left
-    // are black, make node.right or one of its children red.
-    private Node moveRedRight(Node node) {
-        return null;
-        //TODO
     }
 
     // restore red-black tree invariant
@@ -362,24 +349,24 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
     }
 
     public Key ceiling(Key key) {
-        Node node = this.ceiling(key, this.root);
+        Node node = this.ceiling(this.root, key);
 
         return node == null ? null : node.key;
     }
 
     // the smallest key in the subtree rooted at x greater than or equal to the given key
-    private Node ceiling(Key key, Node node) {
+    private Node ceiling(Node node, Key key) {
         if (node == null) {
             return null;
         }
 
         if (this.isGreaterThan(key, node.key)) {
-            return this.ceiling(key, node.right);
+            return this.ceiling(node.right, key);
         } else {
             if (node.left == null || this.isGreaterThan(key, node.left.key)) {
                 return node;
             } else {
-                return this.ceiling(key, node.left);
+                return this.ceiling(node.left, key);
             }
         }
     }
@@ -451,79 +438,39 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         return keys;
     }
 
-    public Iterable<Key> keys(Key lo, Key hi) {
-        return null;
-        //TODO
+    public Iterable<Key> keys(Key low, Key high) {
+        Deque<Key> keys = new ArrayDeque<>();
+        this.keys(this.root, keys, low, high);
+
+        return keys;
     }
 
-    // add the keys between lo and hi in the subtree rooted at x
+    // add the keys between lo and hi in the subtree rooted at node
     // to the queue
-    private void keys(Node x, Deque<Key> queue, Key lo, Key hi) {
-        // TODO
+    private void keys(Node node, Deque<Key> queue, Key low, Key high) {
+        if (node == null) {
+            return;
+        }
+        Key key = node.key;
+
+        if (isGreaterThan(key, low)) {
+            this.keys(node.left, queue, low, high);
+        }
+
+        if (!isLessThan(key, low) && !isGreaterThan(key, high)) {
+            queue.add(key);
+        }
+
+        if (isLessThan(key, high)) {
+            this.keys(node.right, queue, low, high);
+        }
     }
 
-    public int size(Key lo, Key hi) {
-        return 0;
-    }
+    public int size(Key low, Key high) {
+        Deque<Key> deque = new ArrayDeque<>();
+        this.keys(this.root, deque, low, high);
 
-    private boolean check() {
-        return false;
-        //TODO
-    }
-
-    // does this binary tree satisfy symmetric order?
-    // Note: this test also ensures that data structure is a binary tree since order is strict
-    private boolean isBST() {
-        return false;
-        //TODO
-    }
-
-    // is the tree rooted at x a BST with all keys strictly between min and max
-    // (if min or max is null, treat as empty constraint)
-    private boolean isBST(Node x, Key min, Key max) {
-        return false;
-        //TODO
-    }
-
-    // are the size fields correct?
-    private boolean isSizeConsistent() {
-        return false;
-        //TODO
-    }
-
-    private boolean isSizeConsistent(Node x) {
-        return false;
-        //TODO
-    }
-
-    // check that ranks are consistent
-    private boolean isRankConsistent() {
-        return false;
-        //TODO
-    }
-
-    // Does the tree have no red right links, and at most one (left)
-    // red links in a row on any path?
-    private boolean isTwoThree() {
-        return false;
-        //TODO
-    }
-
-    private boolean isTwoThree(Node x) {
-        return false;
-        //TODO
-    }
-
-    // do all paths from root to leaf have same number of black edges?
-    private boolean isBalanced() {
-        return false;
-        //TODO
-    }
-
-    // does every path from the root to a leaf have the given number of black links?
-    private boolean isBalanced(Node x, int black) {
-        return false;
-        //TODO
+        return deque.size();
     }
 
     private void resize(Node node) {
