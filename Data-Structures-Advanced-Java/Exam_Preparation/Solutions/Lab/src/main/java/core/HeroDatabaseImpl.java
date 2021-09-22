@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HeroDatabaseImpl implements HeroDatabase {
+
     private static class HeroesOrderedByName {
         SortedMap<String, Hero> sortedHeroes;
 
