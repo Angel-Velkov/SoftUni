@@ -6,11 +6,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RePlayerImpl implements RePlayer {
+    //            Id    Track
     private Map<String, Track> tracksById;
+    //          Album       Title   Track
     private Map<String, Map<String, Track>> albumsWithTracksByTitle;
+    //                Album   Tracks by plays desc
     private SortedMap<String, SortedSet<Track>> albumWithSortedTracks;
     private Queue<Track> listeningQueue;
+    //             Duration  Tracks by plays desc
     private TreeMap<Integer, TreeSet<Track>> tracksByDurationByPlays;
+    //          Album       Artist  Tracks
     private Map<String, Map<String, List<Track>>> tracksByArtist;
 
     public RePlayerImpl() {
@@ -25,23 +30,30 @@ public class RePlayerImpl implements RePlayer {
 
     @Override
     public void addTrack(Track track, String album) {
-        if (track != null && album != null) {
-            this.tracksById.putIfAbsent(track.getId(), track);
+        this.tracksById.putIfAbsent(track.getId(), track);
 
-            this.addToIndices(track, album);
-        }
+        this.addToIndices(track, album);
+
     }
 
     private void addToIndices(Track track, String album) {
-        this.albumsWithTracksByTitle.computeIfAbsent(album, k -> new HashMap<>()).putIfAbsent(track.getTitle(), track);
+        this.albumsWithTracksByTitle.computeIfAbsent(album, k -> new HashMap<>()).put(track.getTitle(), track);
 
         this.albumWithSortedTracks.computeIfAbsent(album, k ->
-                new TreeSet<>(Comparator.comparing(Track::getPlays)
-                        .thenComparing(Track::getDurationInSeconds).reversed()
-                        .thenComparing(Track::getId))).add(track);
+                        new TreeSet<>(Comparator.comparing(Track::getPlays)
+                                .thenComparing(Track::getDurationInSeconds).reversed()
+                                .thenComparing(Track::getId)))
+                .add(track);
 
-        this.tracksByDurationByPlays.computeIfAbsent(track.getDurationInSeconds(), k -> new TreeSet<>(Comparator.comparing(Track::getPlays).reversed().thenComparing(Track::getId))).add(track);
-        this.tracksByArtist.computeIfAbsent(track.getArtist(), k -> new HashMap<>()).computeIfAbsent(album, k -> new LinkedList<>()).add(track);
+        this.tracksByDurationByPlays.computeIfAbsent(track.getDurationInSeconds(), k ->
+                        new TreeSet<>(Comparator.comparing(Track::getPlays).reversed()
+                                .thenComparing(Track::getId)))
+                .add(track);
+
+        this.tracksByArtist
+                .computeIfAbsent(track.getArtist(), k -> new HashMap<>())
+                .computeIfAbsent(album, k -> new LinkedList<>())
+                .add(track);
     }
 
     private void removeFromIndices(Track track, String albumName) {
@@ -53,6 +65,7 @@ public class RePlayerImpl implements RePlayer {
         this.albumWithSortedTracks.get(albumName).remove(track);
 
         TreeSet<Track> sortedTracks = this.tracksByDurationByPlays.get(durationInSeconds);
+
         if (sortedTracks.size() == 1) {
             this.tracksByDurationByPlays.remove(durationInSeconds);
         } else {
@@ -61,6 +74,7 @@ public class RePlayerImpl implements RePlayer {
 
         Map<String, List<Track>> albums = this.tracksByArtist.get(artist);
         List<Track> trackList = albums.get(albumName);
+
         if (albums.size() == 1 && trackList.size() == 1) {
             this.tracksByArtist.remove(artist);
         } else if (trackList.size() == 1) {
@@ -74,8 +88,10 @@ public class RePlayerImpl implements RePlayer {
     public void removeTrack(String trackTitle, String albumName) {
         if (trackTitle != null && albumName != null) {
             Map<String, Track> tracksByName = this.albumsWithTracksByTitle.get(albumName);
+
             if (tracksByName != null) {
                 Track removedTrack = tracksByName.remove(trackTitle);
+
                 if (removedTrack != null) {
                     this.removeFromIndices(removedTrack, albumName);
                     return;
@@ -130,26 +146,22 @@ public class RePlayerImpl implements RePlayer {
 
     @Override
     public void addToQueue(String trackName, String albumName) {
-        if (trackName != null && albumName != null) {
-            Track track = this.getTrack(trackName, albumName);
+        Track track = this.getTrack(trackName, albumName);
 
-            this.listeningQueue.add(track);
-            return;
-        }
-
-        throw new IllegalArgumentException();
+        this.listeningQueue.add(track);
     }
 
     @Override
     public Track play() {
-        if (!this.listeningQueue.isEmpty()) {
-            Track track = this.listeningQueue.poll();
-            track.setPlays(track.getPlays() + 1);
+        Track track = this.listeningQueue.poll();
 
-            return track;
+        if (track == null) {
+            throw new IllegalArgumentException();
         }
 
-        throw new IllegalArgumentException();
+        track.setPlays(track.getPlays() + 1);
+
+        return track;
     }
 
     @Override
@@ -161,6 +173,7 @@ public class RePlayerImpl implements RePlayer {
         }
 
         List<Track> result = new ArrayList<>();
+
         for (TreeSet<Track> sorted : sortedByPlays) {
             result.addAll(sorted);
         }
@@ -168,7 +181,6 @@ public class RePlayerImpl implements RePlayer {
         return result;
     }
 
-    // Todo: chek if it is too slow
     @Override
     public Iterable<Track> getTracksOrderedByAlbumNameThenByPlaysDescendingThenByDurationDescending() {
         if (this.albumWithSortedTracks.isEmpty()) {
@@ -180,13 +192,12 @@ public class RePlayerImpl implements RePlayer {
 
     @Override
     public Map<String, List<Track>> getDiscography(String artistName) {
-        if (artistName != null) {
-            Map<String, List<Track>> albumsWithTracks = this.tracksByArtist.get(artistName);
-            if (albumsWithTracks != null && !albumsWithTracks.isEmpty()) {
-                return albumsWithTracks;
-            }
+        Map<String, List<Track>> albumsWithTracks = this.tracksByArtist.get(artistName);
+
+        if (albumsWithTracks == null || albumsWithTracks.isEmpty()) {
+            throw new IllegalArgumentException();
         }
 
-        throw new IllegalArgumentException();
+        return albumsWithTracks;
     }
 }
