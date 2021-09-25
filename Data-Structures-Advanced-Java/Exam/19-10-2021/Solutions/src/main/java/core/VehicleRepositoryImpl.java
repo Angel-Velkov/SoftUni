@@ -6,146 +6,50 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class VehicleRepositoryImpl implements VehicleRepository {
-    private final Map<String, Vehicle> vehiclesById;
-    private final Map<String, Map<String, Vehicle>> vehiclesBySellers;
-    private final Map<String, String> sellerByVehicleId;
-
-    private final Map<String, TreeSet<Vehicle>> orderedVehiclesByBrand;
-    private final Map<String, Map<String, Vehicle>> vehiclesByModel;
-    private final Map<String, Map<String, Vehicle>> vehiclesByLocation;
-    private final Map<String, Map<String, Vehicle>> vehiclesByColor;
-
-    private final TreeMap<Double, TreeSet<Vehicle>> vehiclesByPrice;
-
-    private final TreeMap<Integer, TreeMap<Double, TreeMap<String, Vehicle>>> ordered;
-
-    private final Map<String, PriorityQueue<Vehicle>> vehiclesOrderedByPriceBySeller;
+    private Map<String, Vehicle> vehiclesById;
+    private Map<Vehicle, String> sellersByVehicle;
+    private Map<String, Map<String, Vehicle>> vehiclesBySeller;
+    private Map<String, Map<String, Vehicle>> vehiclesByBrand;
 
     public VehicleRepositoryImpl() {
-        this.vehiclesById = new HashMap<>();
-        this.vehiclesBySellers = new HashMap<>();
-        this.sellerByVehicleId = new HashMap<>();
-
-        this.orderedVehiclesByBrand = new HashMap<>();
-        this.vehiclesByModel = new HashMap<>();
-        this.vehiclesByLocation = new HashMap<>();
-        this.vehiclesByColor = new HashMap<>();
-
-        this.vehiclesByPrice = new TreeMap<>();
-
-        this.ordered = new TreeMap<>((a, b) -> Integer.compare(b, a));
-
-        this.vehiclesOrderedByPriceBySeller = new HashMap<>();
+        this.vehiclesById = new LinkedHashMap<>();
+        this.sellersByVehicle = new LinkedHashMap<>();
+        this.vehiclesBySeller = new LinkedHashMap<>();
+        this.vehiclesByBrand = new LinkedHashMap<>();
     }
 
     @Override
     public void addVehicleForSale(Vehicle vehicle, String sellerName) {
-        if (vehicle != null && sellerName != null) {
-            this.vehiclesById.put(vehicle.getId(), vehicle);
-            this.vehiclesBySellers.computeIfAbsent(sellerName, k -> new LinkedHashMap<>()).put(vehicle.getId(), vehicle);
-            this.sellerByVehicleId.put(vehicle.getId(), sellerName);
-            this.ordered
-                    .computeIfAbsent(vehicle.getHorsepower(), k -> new TreeMap<>())
-                    .computeIfAbsent(vehicle.getPrice(), k -> new TreeMap<>())
-                    .put(sellerName, vehicle);
+        String vehicleId = vehicle.getId();
 
-            this.vehiclesOrderedByPriceBySeller.computeIfAbsent(sellerName, k -> new PriorityQueue<>(Comparator.comparing(Vehicle::getPrice))).offer(vehicle);
-
-            this.addToIndices(vehicle);
-        }
-    }
-
-    private void addToIndices(Vehicle vehicle) {
-        this.orderedVehiclesByBrand.computeIfAbsent(vehicle.getBrand(), k -> new TreeSet<>(Comparator.comparing(Vehicle::getPrice).thenComparing(Vehicle::getId))).add(vehicle);
-        this.vehiclesByModel.computeIfAbsent(vehicle.getModel(), k -> new HashMap<>()).put(vehicle.getId(), vehicle);
-        this.vehiclesByLocation.computeIfAbsent(vehicle.getLocation(), k -> new HashMap<>()).put(vehicle.getId(), vehicle);
-        this.vehiclesByColor.computeIfAbsent(vehicle.getColor(), k -> new HashMap<>()).put(vehicle.getId(), vehicle);
-        this.vehiclesByPrice.computeIfAbsent(vehicle.getPrice(), k -> new TreeSet<>(Comparator.comparing(Vehicle::getHorsepower).reversed().thenComparing(Vehicle::getId))).add(vehicle);
+        this.vehiclesById.put(vehicleId, vehicle);
+        this.sellersByVehicle.put(vehicle, sellerName);
+        this.vehiclesBySeller.computeIfAbsent(sellerName, k -> new LinkedHashMap<>()).put(vehicleId, vehicle);
+        this.vehiclesByBrand.computeIfAbsent(vehicle.getBrand(), k -> new LinkedHashMap<>()).put(vehicleId, vehicle);
     }
 
     @Override
     public void removeVehicle(String vehicleId) {
-        Vehicle removedVehicle = this.vehiclesById.remove(vehicleId);
+        Vehicle vehicleToRemove = this.vehiclesById.remove(vehicleId);
 
-        if (removedVehicle == null) {
+        if (vehicleToRemove == null) {
             throw new IllegalArgumentException();
         }
 
-        this.removeFromIndices(removedVehicle);
+        String sellerName = this.sellersByVehicle.remove(vehicleToRemove);
+        this.removeFrom(this.vehiclesBySeller, sellerName, vehicleId);
+
+        String brand = vehicleToRemove.getBrand();
+        this.removeFrom(this.vehiclesByBrand, brand, vehicleId);
     }
 
-    private void removeFromIndices(Vehicle vehicle) {
-        String id = vehicle.getId();
-        String brand = vehicle.getBrand();
-        String model = vehicle.getModel();
-        String location = vehicle.getLocation();
-        String color = vehicle.getColor();
-        double price = vehicle.getPrice();
+    private <K1, K2, V> void removeFrom(Map<K1, Map <K2, V>> collection, K1 firstKey, K2 secondKey) {
+        Map<K2, V> innerMap = collection.get(firstKey);
 
-        String seller = this.sellerByVehicleId.remove(id);
-
-        Map<String, Vehicle> sellerVehicles = this.vehiclesBySellers.get(seller);
-        if (sellerVehicles.size() == 1) {
-            this.vehiclesBySellers.remove(seller);
+        if (innerMap.size() == 1) {
+            collection.remove(firstKey);
         } else {
-            sellerVehicles.remove(id);
-        }
-
-        TreeSet<Vehicle> byBrand = this.orderedVehiclesByBrand.get(brand);
-        if (byBrand.size() == 1) {
-            this.orderedVehiclesByBrand.remove(brand);
-        } else {
-            byBrand.remove(vehicle);
-        }
-
-        Map<String, Vehicle> byModel = this.vehiclesByModel.get(model);
-        if (byModel.size() == 1) {
-            this.vehiclesByModel.remove(model);
-        } else {
-            byModel.remove(id);
-        }
-
-        Map<String, Vehicle> byLocation = this.vehiclesByLocation.get(location);
-        if (byLocation.size() == 1) {
-            this.vehiclesByLocation.remove(location);
-        } else {
-            byLocation.remove(id);
-        }
-
-        Map<String, Vehicle> byColor = this.vehiclesByColor.get(color);
-        if (byColor.size() == 1) {
-            this.vehiclesByColor.remove(color);
-        } else {
-            byColor.remove(id);
-        }
-
-        TreeSet<Vehicle> byPrice = this.vehiclesByPrice.get(price);
-        if (byPrice.size() == 1) {
-            this.vehiclesByPrice.remove(price);
-        } else {
-            byPrice.remove(vehicle);
-        }
-
-        // Level 1: By horsepower
-        TreeMap<Double, TreeMap<String, Vehicle>> byHorsepower = this.ordered.get(vehicle.getHorsepower());
-        if (byHorsepower.size() == 1) {
-            this.ordered.remove(vehicle.getHorsepower());
-        } else {
-            // Level 2: By price
-            TreeMap<String, Vehicle> thenByPrice = byHorsepower.get(price);
-            if (thenByPrice.size() == 1) {
-                byHorsepower.remove(price);
-            } else {
-                // Level 3: By seller name
-                thenByPrice.remove(seller);
-            }
-        }
-
-        PriorityQueue<Vehicle> vehicleQueue = this.vehiclesOrderedByPriceBySeller.get(seller);
-        if (vehicleQueue.size() == 1) {
-            this.vehiclesOrderedByPriceBySeller.remove(seller);
-        } else {
-            byBrand.remove(vehicle);
+            innerMap.remove(secondKey);
         }
     }
 
@@ -156,55 +60,26 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Override
     public boolean contains(Vehicle vehicle) {
-        if (vehicle != null) {
-            return this.vehiclesById.containsKey(vehicle.getId());
-        }
-
-        return false;
+        return this.vehiclesById.containsKey(vehicle.getId());
     }
 
     @Override
     public Iterable<Vehicle> getVehicles(List<String> keywords) {
-        if (keywords.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        TreeSet<Vehicle> result = new TreeSet<>(Comparator.comparing(Vehicle::getIsVIP)
-                .thenComparing(Vehicle::getPrice)
-                .reversed().thenComparing(Vehicle::getId));
-
-        for (String keyword : keywords) {
-            TreeSet<Vehicle> brand = this.orderedVehiclesByBrand.get(keyword);
-
-            if (brand != null) {
-                result.addAll(brand);
-            }
-
-            Map<String, Vehicle> model = this.vehiclesByModel.get(keyword);
-
-            if (model != null) {
-                result.addAll(model.values());
-            }
-
-            Map<String, Vehicle> location = this.vehiclesByLocation.get(keyword);
-
-            if (location != null) {
-                result.addAll(location.values());
-            }
-
-            Map<String, Vehicle> color = this.vehiclesByColor.get(keyword);
-
-            if (color != null) {
-                result.addAll(color.values());
-            }
-        }
-
-        return result;
+        return this.vehiclesById
+                .values()
+                .stream()
+                .filter(vehicle -> keywords.contains(vehicle.getBrand())
+                        || keywords.contains(vehicle.getModel())
+                        || keywords.contains(vehicle.getLocation())
+                        || keywords.contains(vehicle.getColor()))
+                .sorted(Comparator.comparing(Vehicle::getIsVIP).reversed()
+                        .thenComparing(Vehicle::getPrice))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Iterable<Vehicle> getVehiclesBySeller(String sellerName) {
-        Map<String, Vehicle> vehicles = this.vehiclesBySellers.get(sellerName);
+        Map<String, Vehicle> vehicles = this.vehiclesBySeller.get(sellerName);
 
         if (vehicles == null) {
             throw new IllegalArgumentException();
@@ -215,56 +90,75 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Override
     public Iterable<Vehicle> getVehiclesInPriceRange(double lowerBound, double upperBound) {
-        NavigableMap<Double, TreeSet<Vehicle>> vehiclesInRange = this.vehiclesByPrice.subMap(lowerBound, true, upperBound, true);
-
-        if (vehiclesInRange == null) {
-            return Collections.emptyList();
-        }
-
-        return vehiclesInRange
+        return this.vehiclesById
                 .values()
                 .stream()
-                .flatMap(Collection::stream)
+                .filter(vehicle -> lowerBound <= vehicle.getPrice()
+                        && vehicle.getPrice() <= upperBound)
+                .sorted(Comparator.comparingInt(Vehicle::getHorsepower).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     public Map<String, List<Vehicle>> getAllVehiclesGroupedByBrand() {
-        if (this.vehiclesById.isEmpty()) {
+        if (this.vehiclesByBrand.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        Map<String, List<Vehicle>> result = new HashMap<>();
-        for (Map.Entry<String, TreeSet<Vehicle>> entry : this.orderedVehiclesByBrand.entrySet()) {
-            result.computeIfAbsent(entry.getKey(), k -> new LinkedList<>()).addAll(entry.getValue());
-        }
-
-        return result;
+        return this.vehiclesByBrand
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                (entry) -> entry.getValue().values()
+                                        .stream()
+                                        .sorted(Comparator.comparingDouble(Vehicle::getPrice))
+                                        .collect(Collectors.toList())
+                        )
+                );
     }
 
     @Override
     public Iterable<Vehicle> getAllVehiclesOrderedByHorsepowerDescendingThenByPriceThenBySellerName() {
-        return this.ordered
+        return this.vehiclesById
                 .values()
                 .stream()
-                .flatMap(l -> l
-                        .values()
-                        .stream()
-                        .flatMap(m -> m
-                                .values()
-                                .stream()))
+                .sorted(compareByHorsepowerDescThenPriceAscThenSellerNameAsc())
                 .collect(Collectors.toList());
+    }
+
+    private Comparator<Vehicle> compareByHorsepowerDescThenPriceAscThenSellerNameAsc() {
+        return (firstVehicle, secondVehicle) -> {
+            int result = Integer.compare(secondVehicle.getHorsepower(), firstVehicle.getHorsepower());
+
+            if (result == 0) {
+                result = Double.compare(firstVehicle.getPrice(), secondVehicle.getPrice());
+            }
+
+            if (result == 0) {
+                result = this.sellersByVehicle.get(firstVehicle).compareTo(this.sellersByVehicle.get(secondVehicle));
+            }
+
+            return result;
+        };
     }
 
     @Override
     public Vehicle buyCheapestFromSeller(String sellerName) {
-        PriorityQueue<Vehicle> vehicles = this.vehiclesOrderedByPriceBySeller.get(sellerName);
-        if (vehicles != null) {
-            if (!vehicles.isEmpty()) {
-                return vehicles.poll();
-            }
+        Map<String, Vehicle> sellerVehicles = this.vehiclesBySeller.get(sellerName);
+
+        if (sellerVehicles == null || sellerVehicles.isEmpty()) {
+            throw new IllegalArgumentException();
         }
 
-        throw new IllegalArgumentException();
+        Vehicle cheapestVehicle = sellerVehicles
+                .values()
+                .stream()
+                .min(Comparator.comparingDouble(Vehicle::getPrice))
+                .orElse(null);
+
+        this.removeVehicle(cheapestVehicle.getId());
+
+        return cheapestVehicle;
     }
 }
