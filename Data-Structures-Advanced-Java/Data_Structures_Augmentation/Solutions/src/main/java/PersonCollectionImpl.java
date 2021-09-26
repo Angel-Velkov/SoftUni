@@ -40,7 +40,7 @@ public class PersonCollectionImpl implements PersonCollection {
     // Indices
     private final Map<String, SortedMap<String, Person>> peopleByEmailDomain;
     private final Map<NameTownKey, SortedMap<String, Person>> peopleByNameTownCombination;
-    private final Map<Integer, SortedMap<String, Person>> peopleByAge;
+    private final TreeMap<Integer, SortedMap<String, Person>> peopleByAge;
     private final Map<String, SortedMap<Integer, SortedMap<String, Person>>> peopleByTownByAge;
 
     public PersonCollectionImpl() {
@@ -65,18 +65,6 @@ public class PersonCollectionImpl implements PersonCollection {
         return true;
     }
 
-    @Override
-    public boolean delete(String email) {
-        Person removedPerson = this.peopleByEmail.remove(email);
-
-        if (removedPerson != null) {
-            removeFromIndices(removedPerson);
-            return true;
-        }
-
-        return false;
-    }
-
     private void addToIndices(Person person) {
         String domain = getEmailDomain(person.getEmail());
         this.peopleByEmailDomain.putIfAbsent(domain, new TreeMap<>());
@@ -96,6 +84,18 @@ public class PersonCollectionImpl implements PersonCollection {
         this.peopleByTownByAge.get(town).get(age).put(person.getEmail(), person);
     }
 
+    @Override
+    public boolean delete(String email) {
+        Person removedPerson = this.peopleByEmail.remove(email);
+
+        if (removedPerson != null) {
+            removeFromIndices(removedPerson);
+            return true;
+        }
+
+        return false;
+    }
+
     private void removeFromIndices(Person person) {
         String email = person.getEmail();
 
@@ -105,7 +105,8 @@ public class PersonCollectionImpl implements PersonCollection {
             domainSortedPeopleByEmail.remove(email);
         }
 
-        SortedMap<String, Person> nameTownSortedPeopleByEmail = this.peopleByNameTownCombination.get(new NameTownKey(person.getName(), person.getTown()));
+        SortedMap<String, Person> nameTownSortedPeopleByEmail
+                = this.peopleByNameTownCombination.get(new NameTownKey(person.getName(), person.getTown()));
         if (nameTownSortedPeopleByEmail != null) {
             nameTownSortedPeopleByEmail.remove(email);
         }
