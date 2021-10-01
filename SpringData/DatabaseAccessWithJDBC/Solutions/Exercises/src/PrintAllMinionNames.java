@@ -21,13 +21,14 @@ public class PrintAllMinionNames {
 
         try (Connection connection = DriverManager.getConnection(CONNECTION_URL + SCHEMA_NAME, props);
              Statement getMinionNames = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+
             ResultSet rs = getMinionNames.executeQuery(SELECT_MINION_NAMES_SQL);
             rs.last();
             int size = rs.getRow();
 
             StringBuilder output = new StringBuilder();
-            rs.beforeFirst();
-            for (int i = 1; i < (size / 2) + 1; i++) {
+
+            for (int i = 1; i <= (size / 2); i++) {
                 rs.absolute(i);
                 output.append(rs.getString("name"))
                         .append(System.lineSeparator());

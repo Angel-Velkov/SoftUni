@@ -12,7 +12,7 @@ public class AddMinion {
 
     private static final String ADD_TOWN_SQL = "INSERT INTO `towns` (`name`, `country`) VALUES (?, 'Unknown')";
     private static final String ADD_MINION_SQL = "INSERT INTO `minions` (`name`, `age`, `town_id`) VALUES (?, ?, ?)";
-    private static final String ADD_VILLAIN_SQL = "INSERT INTO `villains` (`name`, `evilness_factor`) VALUES (?, 'evil')";
+    private static final String ADD_EVIL_VILLAIN_SQL = "INSERT INTO `villains` (`name`, `evilness_factor`) VALUES (?, 'evil')";
     private static final String ADD_MINION_TO_VILLAIN_SQL = "INSERT INTO `minions_villains` (`minion_id`, `villain_id`) VALUES (?, ?)";
     private static final String ID_OF_THE_LAST_ENTITY_SQL = "SELECT * FROM %s ORDER BY `id` DESC LIMIT 1";
     private static final String GET_ENTITY_ID_SQL = "SELECT `id` FROM `%s` WHERE `name` = ?";
@@ -27,7 +27,7 @@ public class AddMinion {
         props.setProperty("user", "root");
         props.setProperty("password", "1234");
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder output = new StringBuilder();
         try {
             connection = DriverManager.getConnection(CONNECTION_URL + SCHEMA_NAME, props);
             connection.setAutoCommit(false);
@@ -38,9 +38,9 @@ public class AddMinion {
             int age = Integer.parseInt(minionData[1]);
             String townName = minionData[2];
 
-            String townMessage = addTown(townName);
-            if (!townMessage.isEmpty()) {
-                sb.append(townMessage).append(System.lineSeparator());
+            if (addTown(townName)) {
+                output.append("Town ").append(townName).append(" was added to the database.")
+                        .append(System.lineSeparator());
             }
 
             long townId = getEntityId("towns", townName);
@@ -51,24 +51,23 @@ public class AddMinion {
             String[] villainData = Arrays.stream(reader.readLine().split("\\s+")).skip(1).toArray(String[]::new);
             String villainName = villainData[0];
 
-            String villainMessage = addEvilVillain(villainName);
-            if (!villainMessage.isEmpty()) {
-                sb.append(villainMessage).append(System.lineSeparator());
+            if (addEvilVillain(villainName)) {
+                output.append("Villain ").append(villainName).append(" was added to the database.")
+                        .append(System.lineSeparator());
             }
 
             long villainId = getTheIdOfTheLastEntity("villains");
 
             String connectionMessage = connectMinionToVillain(minionId, villainId);
-            if (!connectionMessage.isEmpty()) {
-                sb.append(connectionMessage).append(System.lineSeparator());
-            }
+            output.append(connectionMessage).append(System.lineSeparator());
 
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             connection.rollback();
         }
-        System.out.println(sb.toString().trim());
+        System.out.println(output.toString().trim());
+
     }
 
     private static String connectMinionToVillain(long minionId, long villainId) throws SQLException {
@@ -81,26 +80,28 @@ public class AddMinion {
                 + " to be minion of " + getEntityName("villains", villainId);
     }
 
-    private static String addTown(String name) throws SQLException {
+    private static boolean addTown(String name) throws SQLException {
         if (getEntityId("towns", name) == 0) {
             PreparedStatement ps = connection.prepareStatement(ADD_TOWN_SQL);
             ps.setString(1, name);
             ps.executeUpdate();
 
-            return "Town " + name + " was added to the database.";
+            return true;
         }
-        return "";
+
+        return false;
     }
 
-    private static String addEvilVillain(String villain) throws SQLException {
+    private static boolean addEvilVillain(String villain) throws SQLException {
         if (getEntityId("villains", villain) == 0) {
-            PreparedStatement ps = connection.prepareStatement(ADD_VILLAIN_SQL);
+            PreparedStatement ps = connection.prepareStatement(ADD_EVIL_VILLAIN_SQL);
             ps.setString(1, villain);
             ps.executeUpdate();
 
-            return "Villain " + villain + " was added to the database.";
+            return true;
         }
-        return "";
+
+        return false;
     }
 
     private static void addMinion(String name, int age, long townId) throws SQLException {

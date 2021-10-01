@@ -28,9 +28,11 @@ public class RemoveVillain {
              PreparedStatement deleteFromMinionsVillains = connection.prepareStatement(DELETE_FROM_MINIONS_VILLAINS_SQL);
              PreparedStatement deleteFromVillains = connection.prepareStatement(DELETE_FROM_VILLAINS_SQL);
              PreparedStatement getVillainName = connection.prepareStatement(SELECT_VILLAIN_NAME_SQL)) {
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             long id = Long.parseLong(reader.readLine());
+
             deleteFromMinionsVillains.setLong(1, id);
             deleteFromVillains.setLong(1, id);
             getVillainName.setLong(1, id);
@@ -38,6 +40,7 @@ public class RemoveVillain {
             try {
                 connection.setAutoCommit(false);
                 ResultSet rs = getVillainName.executeQuery();
+
                 if (rs.next()) {
                     String deletedVillain = rs.getString("name");
                     int releasedMinions = deleteFromMinionsVillains.executeUpdate();

@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -18,11 +15,14 @@ public class IncreaseMinionsAge {
                     "SET `age` = `age` + 1, `name` = LOWER(`name`) " +
                     "WHERE `id` = ?";
 
+    public static final String SELECT_MINIONS = "SELECT `id`, `name`, `age` FROM minions;";
+
     public static void main(String[] args) {
         try {
             Class.forName(DB_DRIVER);
         } catch (ClassNotFoundException e) {
             System.err.println("Driver " + DB_DRIVER + " not found.");
+            System.exit(-1);
         }
 
         Properties props = new Properties();
@@ -30,17 +30,32 @@ public class IncreaseMinionsAge {
         props.setProperty("password", "1234");
 
         try (Connection connection = DriverManager.getConnection(CONNECTION_URL + SCHEMA_NAME, props);
-             PreparedStatement ps = connection.prepareStatement(UPDATE_INCREASE_AGE_BY_ONE_SQL)) {
+             PreparedStatement increaseAge = connection.prepareStatement(UPDATE_INCREASE_AGE_BY_ONE_SQL);
+             Statement getMinions = connection.createStatement()) {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
             int[] ids = Arrays.stream(reader.readLine().split("\\s+"))
                     .mapToInt(Integer::parseInt)
                     .toArray();
-            StringBuilder output = new StringBuilder();
+
+
             for (int id : ids) {
-                ps.setInt(1, id);
-                ps.executeUpdate();
+                increaseAge.setInt(1, id);
+                increaseAge.executeUpdate();
             }
+
+            StringBuilder output = new StringBuilder();
+
+            ResultSet minions = getMinions.executeQuery(SELECT_MINIONS);
+            while (minions.next()) {
+                output.append(String.format("%5d | %-15.15s | %d%n",
+                        minions.getLong("id"),
+                        minions.getString("name"),
+                        minions.getInt("age")));
+            }
+
+            System.out.println(output);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
