@@ -1,4 +1,4 @@
-package ormFramework.core;
+package orm_framework.core;
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -7,8 +7,6 @@ import java.sql.SQLException;
 public interface EntityManager {
 
     <T> T findById(int id, Class<T> type) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException;
-
-    //ToDo: We try to implement part of this :)))
 
     <T> boolean persist(T entity) throws IllegalAccessException, SQLException;
 

@@ -1,8 +1,8 @@
-package bg.codexio.customOrmDemo.entity;
+package bg.codexio.custom_orm_demo.entity;
 
-import ormFramework.annotation.Column;
-import ormFramework.annotation.Entity;
-import ormFramework.annotation.Id;
+import orm_framework.annotation.Column;
+import orm_framework.annotation.Entity;
+import orm_framework.annotation.Id;
 
 @Entity(tableName = "departments")
 public class Department {

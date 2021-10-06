@@ -1,8 +1,8 @@
-package ormFramework.core;
+package orm_framework.core;
 
-import ormFramework.annotation.Column;
-import ormFramework.annotation.Entity;
-import ormFramework.annotation.Id;
+import orm_framework.annotation.Column;
+import orm_framework.annotation.Entity;
+import orm_framework.annotation.Id;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EntityManagerFactory {
 
@@ -24,47 +25,62 @@ public class EntityManagerFactory {
             String dbName,
             Class<?> mainClass
     ) throws SQLException, URISyntaxException, ClassNotFoundException {
+
         Connection connection = createConnection(dbType, host, port, user, pass, dbName);
 
         List<Class<?>> classes = getEntities(mainClass);
 
-    //    createTables(connection, classes);
+        createTables(connection, classes);
 
         return new EntityManagerImpl(connection);
     }
 
+    private static Connection createConnection(String dbType, String host, int port, String user, String pass, String dbName) throws SQLException {
+        return DriverManager.getConnection(
+                "jdbc:" + dbType + "://" + host + ":" + port + "/" + dbName,
+                user,
+                pass
+        );
+    }
+
     private static void createTables(Connection connection, List<Class<?>> classes) throws SQLException {
-        for (Class classInfo : classes) {
-            Entity entityInfo = (Entity) classInfo.getAnnotation(Entity.class);
-            String sql = "CREATE TABLE ";
+        for (Class<?> classInfo : classes) {
+            Entity entityInfo = classInfo.getAnnotation(Entity.class);
+            StringBuilder sql = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
 
             String tableName = entityInfo.tableName();
 
-            sql += tableName + " (\n";
+            sql.append(tableName).append(" (")
+                    .append(System.lineSeparator());
+
             String primaryKeyDef = "";
 
             for (Field field : classInfo.getDeclaredFields()) {
+
                 if (field.isAnnotationPresent(Id.class)) {
-                    sql += "  " + field.getName() + " int auto_increment,\n";
-                    primaryKeyDef = "constraint " + tableName + "_pk primary key (" + field.getName() + ")";
+                    sql.append("  ").append(field.getName()).append(" INT AUTO_INCREMENT,")
+                            .append(System.lineSeparator());
+
+                    primaryKeyDef = "CONSTRAINT " + tableName + "_pk PRIMARY KEY (" + field.getName() + ")";
                 } else if (field.isAnnotationPresent(Column.class)) {
                     Column columnInfo = field.getAnnotation(Column.class);
-                    sql += "  " + columnInfo.name() + " " + columnInfo.columnDefinition() + ",\n";
+                    sql.append("  ").append(columnInfo.name()).append(" ").append(columnInfo.columnDefinition()).append(",")
+                            .append(System.lineSeparator());
                 }
             }
 
-            sql += "  " + primaryKeyDef + "\n);";
+            sql.append("  ").append(primaryKeyDef)
+                    .append(System.lineSeparator()).append(");");
 
             System.out.println(sql);
 
-            connection.createStatement().execute(sql);
+            connection.createStatement().execute(sql.toString());
         }
     }
 
     private static List<Class<?>> getEntities(Class<?> mainClass) throws URISyntaxException, ClassNotFoundException {
         String path = mainClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
         String packageName = mainClass.getPackageName();
-
 
         File rootDir = new File(path + packageName.replace(".", "/"));
         List<Class<?>> classes = new ArrayList<>();
@@ -74,24 +90,18 @@ public class EntityManagerFactory {
                 packageName,
                 classes
         );
+
         return classes;
     }
 
-    private static Connection createConnection(String dbType, String host, int port, String user, String pass, String dbName) throws SQLException {
-        Connection connection = DriverManager.getConnection(
-                "jdbc:" + dbType + "://" + host + ":" + port + "/" + dbName,
-                user,
-                pass
-        );
-        return connection;
-    }
-
     private static void scanEntities(File dir, String packageName, List<Class<?>> classes) throws ClassNotFoundException {
-        for (File file : dir.listFiles()) {
+        for (File file : Objects.requireNonNull(dir.listFiles())) {
+
             if (file.isDirectory()) {
                 scanEntities(file, packageName + "." + file.getName(), classes);
             } else if (file.getName().endsWith(".class")) {
                 Class<?> classInfo = Class.forName(packageName + "." + file.getName().replace(".class", ""));
+
                 if (classInfo.isAnnotationPresent(Entity.class)) {
                     classes.add(classInfo);
                 }

@@ -40,19 +40,20 @@ public class EntityManager<E> implements DbContext<E> {
         if (value == null || (int) value <= 0) {
             return this.doInsert(entity);
         }
+
         return this.doUpdate(entity, primary);
     }
 
     @Override
     public List<E> find(Class<E> table, String where) throws SQLException, IllegalAccessException,
             InstantiationException, NoSuchMethodException, InvocationTargetException {
+
         Statement statement = connection.createStatement();
-        String query = SELECT_STAR_FROM + getTableName(table) +
-                (where.equals("")
-                        ? ""
-                        : where);
+        String query = SELECT_STAR_FROM + getTableName(table) + where;
         ResultSet resultSet = statement.executeQuery(query);
+
         List<E> entities = new ArrayList<>();
+
         while (resultSet.next()) {
             E entity = table.getConstructor().newInstance();
             this.fillEntity(table, resultSet, entity);
@@ -63,13 +64,16 @@ public class EntityManager<E> implements DbContext<E> {
     @Override
     public E findFirst(Class<E> table, String where) throws SQLException, IllegalAccessException,
             InstantiationException, NoSuchMethodException, InvocationTargetException {
+
         Statement statement = connection.createStatement();
+
         String query = SELECT_STAR_FROM + getTableName(table) + " WHERE " +
                 (where.equals("")
                         ? ""
                         : where + " LIMIT 1;");
 
         ResultSet rs = statement.executeQuery(query);
+
         if (!rs.next()) {
             return null;
         }
@@ -83,7 +87,9 @@ public class EntityManager<E> implements DbContext<E> {
     @Override
     public E findById(Class<E> table, int id) throws SQLException, NoSuchMethodException,
             InvocationTargetException, InstantiationException, IllegalAccessException {
+
         String tableName = table.getAnnotation(Entity.class).name();
+
         String idColumnName = Arrays.stream(table.getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(Id.class))
                 .findFirst()
@@ -97,6 +103,7 @@ public class EntityManager<E> implements DbContext<E> {
         ps.setInt(1, id);
 
         ResultSet rs = ps.executeQuery();
+
         if (!rs.next()) {
             return null;
         }
@@ -119,6 +126,7 @@ public class EntityManager<E> implements DbContext<E> {
 
         for (Class<?> classInfo : classes) {
             Entity entityInfo = classInfo.getAnnotation(Entity.class);
+
             StringBuilder createStatement = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             String tableName = entityInfo.name();
             createStatement.append(tableName).append("(")
@@ -127,13 +135,17 @@ public class EntityManager<E> implements DbContext<E> {
             String primaryKeyDef = "";
 
             for (Field field : classInfo.getDeclaredFields()) {
+
                 if (field.isAnnotationPresent(Id.class)) {
                     createStatement.append("    ").append(field.getName())
                             .append(" INT").append(" AUTO_INCREMENT").append(",")
                             .append(System.lineSeparator());
+
                     primaryKeyDef = "CONSTRAINT " + tableName + "_pk PRIMARY KEY(" + field.getName() + ")";
+
                 } else if (field.isAnnotationPresent(Column.class)) {
                     Column columnInfo = field.getAnnotation(Column.class);
+
                     createStatement.append("    ").append(columnInfo.name())
                             .append(" ").append(columnInfo.columnDefinition()).append(",")
                             .append(System.lineSeparator());
@@ -142,9 +154,10 @@ public class EntityManager<E> implements DbContext<E> {
 
             createStatement.append(primaryKeyDef)
                     .append(System.lineSeparator()).append(");");
+
             System.out.println(createStatement);
 
-            connection.createStatement().execute(createStatement.toString());
+            this.connection.createStatement().execute(createStatement.toString());
         }
     }
 
@@ -154,11 +167,14 @@ public class EntityManager<E> implements DbContext<E> {
         packageName = packageName.equals("")
                 ? packageName
                 : packageName + ".";
+
         for (File file : Objects.requireNonNull(dir.listFiles())) {
+
             if (file.isDirectory()) {
                 scanEntities(file, packageName + file.getName(), classes);
             } else if (file.getName().endsWith(".class")) {
                 Class<?> classInfo = Class.forName(packageName + file.getName().replace(".class", ""));
+
                 if (classInfo.isAnnotationPresent(Entity.class)) {
                     classes.add(classInfo);
                 }
@@ -168,8 +184,10 @@ public class EntityManager<E> implements DbContext<E> {
 
     private void fillEntity(Class<?> table, ResultSet resultSet, E entity) throws SQLException, IllegalAccessException {
         Field[] declaredFields = table.getDeclaredFields();
+
         for (Field field : declaredFields) {
             field.setAccessible(true);
+
             this.fillField(field, entity, resultSet,
                     field.isAnnotationPresent(Id.class)
                             ? "id"
@@ -180,7 +198,9 @@ public class EntityManager<E> implements DbContext<E> {
 
     // TODO: Make it generic
     private void fillField(Field field, E entity, ResultSet resultSet, String name) throws SQLException, IllegalAccessException {
+
         field.setAccessible(true);
+
         switch (name) {
             case "id" -> field.set(entity, resultSet.getInt("id"));
             case "username" -> field.set(entity, resultSet.getString("username"));
@@ -201,19 +221,80 @@ public class EntityManager<E> implements DbContext<E> {
         List<String> fieldNames = this.getFieldNames(entity);
         List<String> fieldValues = this.getFieldValues(entity);
 
-        // I know it is not very right but I just wanted it to work.
+        // I know it is not very right, but I just wanted it to work.
         // Especially this with the hardcore class 'User'.
         // There must be other ways besides the triple parse of the Date.
-        for (String date : getColumnsWithType(entity.getClass(), "DATE")) {
+        for (String date : getColumnNamesWithType(entity.getClass(), "DATE")) {
             int i = fieldNames.indexOf(date);
-            fieldValues.set(i, "'" + new java.sql.Date(new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy").parse(fieldValues.get(i)).getTime()) + "'");
+
+            fieldValues.set(i, "'" + new java.sql.Date(
+                            new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy")
+                                    .parse(fieldValues.get(i)).getTime()
+                    ) + "'"
+            );
         }
 
         String insertQuery = String.format(INSERT_QUERY,
                 tableName,
                 String.join(", ", fieldNames),
                 String.join(", ", fieldValues));
+
         return executeQuery(insertQuery);
+    }
+
+    private List<String> getFieldNames(E entity) {
+        return Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(Column.class))
+                .map(f -> {
+                    f.setAccessible(true);
+                    return f.getAnnotation(Column.class).name();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getFieldValues(E entity) {
+        return Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(Column.class))
+                .map(getFieldValue(entity))
+                .collect(Collectors.toList());
+    }
+
+    private Function<Field, String> getFieldValue(E entity) {
+        return field -> {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(entity);
+                Class<?> type = field.getType();
+
+                return type == String.class || type == LocalDate.class
+                        ? String.format("'%s'", value.toString())
+                        : value.toString();
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            return "";
+        };
+    }
+
+    private List<String> getColumnNamesWithType(Class<?> clazz, String columnDefinition) {
+        List<String> columnNames = new ArrayList<>();
+
+        Field[] fields = clazz.getDeclaredFields();
+
+        for (Field field : fields) {
+
+            if (field.isAnnotationPresent(Column.class)) {
+                Column column = field.getAnnotation(Column.class);
+
+                if (column.columnDefinition().equals(columnDefinition)) {
+                    columnNames.add(column.name());
+                }
+            }
+        }
+
+        return columnNames;
     }
 
     private boolean doUpdate(E entity, Field primaryKey) throws IllegalAccessException, SQLException {
@@ -236,28 +317,13 @@ public class EntityManager<E> implements DbContext<E> {
         return ps.execute();
     }
 
-    private List<String> getColumnsWithType(Class<?> clazz, String columnDefinition) {
-        ArrayList<String> columnNames = new ArrayList<>();
-
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Column.class)) {
-                Column column = field.getAnnotation(Column.class);
-                if (column.columnDefinition().equals(columnDefinition)) {
-                    columnNames.add(column.name());
-                }
-            }
-        }
-
-        return columnNames;
-    }
-
     private static List<Class<?>> getEntities(Class<?> mainClass) throws URISyntaxException, ClassNotFoundException {
         String path = mainClass
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation().toURI()
                 .getPath();
+
         String packageName = mainClass.getPackageName();
 
         File rootDir = new File(path + packageName.replace(".", "/"));
@@ -282,18 +348,12 @@ public class EntityManager<E> implements DbContext<E> {
 
     private String getTableName(Class<?> entity) {
         Entity entityAnnotation = entity.getAnnotation(Entity.class);
+
         if (entityAnnotation != null && entityAnnotation.name().length() > 0) {
             return entityAnnotation.name();
         } else {
             return entity.getSimpleName();
         }
-    }
-
-    private List<String> getFieldValues(E entity) {
-        return Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(Column.class))
-                .map(getFieldValue(entity))
-                .collect(Collectors.toList());
     }
 
     private Function<Field, String> getFieldNameAndValue(E entity) {
@@ -310,37 +370,12 @@ public class EntityManager<E> implements DbContext<E> {
                         type == String.class || type == LocalDate.class
                                 ? String.format("'%s'", value.toString())
                                 : value.toString());
+
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+
             return "";
         };
-    }
-
-    private Function<Field, String> getFieldValue(E entity) {
-        return field -> {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(entity);
-                Class<?> type = field.getType();
-
-                return type == String.class || type == LocalDate.class
-                        ? String.format("'%s'", value.toString())
-                        : value.toString();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return "";
-        };
-    }
-
-    private List<String> getFieldNames(E entity) {
-        return Arrays.stream(entity.getClass().getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(Column.class))
-                .map(f -> {
-                    f.setAccessible(true);
-                    return f.getAnnotation(Column.class).name();
-                })
-                .collect(Collectors.toList());
     }
 }
