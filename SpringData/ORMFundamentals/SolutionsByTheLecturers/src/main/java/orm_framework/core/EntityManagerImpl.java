@@ -6,10 +6,7 @@ import orm_framework.annotation.Id;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -87,7 +84,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private <T> boolean doInsert(T entity) throws SQLException {
-        String tableName = this.getTableNameByEntity(entity);
+        String tableName = this.getTableName(entity);
 
         String fieldNames = this.getFieldNamesBy(entity.getClass());
 
@@ -126,9 +123,9 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private <T> boolean doUpdate(int id, T entity) throws SQLException {
-        String tableName = this.getTableNameByEntity(entity);
+        String tableName = this.getTableName(entity);
 
-        String fieldsNamesAndValues = this.getFieldAndValuesAsMap(entity)
+        String fieldsNamesAndValues = this.getFieldNamesAndValuesAsMap(entity)
                 .entrySet()
                 .stream()
                 .map(kvp -> String.format(" %s = %s ", kvp.getKey(), kvp.getValue()))
@@ -144,7 +141,7 @@ public class EntityManagerImpl implements EntityManager {
         return preparedStatement.execute();
     }
 
-    private <T> Map<String, String> getFieldAndValuesAsMap(T entity) {
+    private <T> Map<String, String> getFieldNamesAndValuesAsMap(T entity) {
         Map<String, String> resultMap = new LinkedHashMap<>();
 
         Arrays.stream(entity.getClass().getDeclaredFields())
@@ -188,7 +185,7 @@ public class EntityManagerImpl implements EntityManager {
         fieldId.setAccessible(true);
         int id = (int) fieldId.get(entity);
 
-        String tableName = this.getTableNameByEntity(entity);
+        String tableName = this.getTableName(entity);
 
         String deleteQuery = String.format("DELETE FROM `%s` WHERE id = ?", tableName);
 
@@ -207,26 +204,68 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> boolean alterTable(T entity) throws SQLException {
-        Set<String> columnsInTable = this.getAllColumnsInTableBy(entity);
-        return false;
+        Map<String, String> newColumns = this.getAllNewColumnsFrom(entity);
+
+        if (newColumns.isEmpty()) {
+            return false;
+        }
+
+        String tableName = this.getTableName(entity);
+
+        StringBuilder columnsInfo = new StringBuilder();
+
+        Iterator<Map.Entry<String, String>> iterator = newColumns.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> nameAndDefinition = iterator.next();
+
+            columnsInfo.append(nameAndDefinition.getKey()).append(" ").append(nameAndDefinition.getValue());
+
+            if (iterator.hasNext()) {
+                columnsInfo.append(", ");
+            }
+        }
+
+        String alterQuery = String.format("ALTER TABLE `%s` ADD COLUMN %s",
+                tableName,
+                columnsInfo);
+
+        return this.connection.prepareStatement(alterQuery).execute();
+    }
+
+    private <E> Map<String, String> getAllNewColumnsFrom(E entity) throws SQLException {
+        Map<String, String> newColumns = new HashMap<>();
+        Set<String> allColumnsInTheTable = this.getAllColumnsInTableBy(entity);
+
+        Arrays.stream(entity.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Column.class))
+                .forEach(field -> {
+                    String columnsName = field.getAnnotation(Column.class).name();
+                    if (!allColumnsInTheTable.contains(columnsName)) {
+                        newColumns.put(columnsName, field.getAnnotation(Column.class).columnDefinition());
+                    }
+                });
+
+        return newColumns;
     }
 
     private <T> Set<String> getAllColumnsInTableBy(T entity) throws SQLException {
-        String tableName = this.getTableNameByEntity(entity);
+        String tableName = this.getTableName(entity);
         Set<String> allColumns = new HashSet<>();
 
-        String query = "";
-        PreparedStatement preparedStatement = this.connection.prepareStatement(query);
-        ResultSet resultSet = preparedStatement.executeQuery(query);
+        String selectQuery = String.format("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` " +
+                "WHERE `TABLE_SCHEMA` = 'test_orm' AND `TABLE_NAME` = '%s'", tableName);
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(selectQuery);
 
         while (resultSet.next()) {
-            //Todo: allColumns.add();
+            allColumns.add(resultSet.getString(1));
         }
 
         return allColumns;
     }
 
-    private <T> String getTableNameByEntity(T entity) {
+    private <T> String getTableName(T entity) {
         return entity
                 .getClass()
                 .getAnnotation(Entity.class)
