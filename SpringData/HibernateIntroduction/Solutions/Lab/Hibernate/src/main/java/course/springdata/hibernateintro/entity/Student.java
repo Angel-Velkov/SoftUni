@@ -4,22 +4,22 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Student {
-    private static long idCounter = 1;
     private long id;
     private String name;
     private Date registrationDate;
+    private Address address;
 
     public Student() {
     }
 
     public Student(String name) {
-        this(idCounter++, name);
-    }
-
-    public Student(long id, String name) {
-        this.id = id;
         this.name = name;
         this.registrationDate = new Date();
+    }
+
+    public Student(String name, Address address) {
+        this(name);
+        this.address = address;
     }
 
     public long getId() {
@@ -44,6 +44,14 @@ public class Student {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public Address getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override

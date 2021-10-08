@@ -12,5 +12,7 @@
         </id>
         <property name="name" column="name" type="string"/>
         <property name="registrationDate" column="registration_date" type="timestamp"/>
+        <many-to-one name="address" column="address_id"
+                     class="course.springdata.hibernateintro.entity.Address"/>
     </class>
 </hibernate-mapping>

@@ -21,5 +21,6 @@
 
         <!-- List of XML mapping files -->
         <mapping resource="student.hbm.xml"/>
+        <mapping resource="address.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
