@@ -20,7 +20,10 @@
         <property name="hibernate.use_sql_comments">true</property>
 
         <!-- List of XML mapping files -->
-        <mapping resource="student.hbm.xml"/>
-        <mapping resource="address.hbm.xml"/>
+        <mapping resource="school/student.hbm.xml"/>
+        <mapping resource="school/address.hbm.xml"/>
+
+        <mapping resource="stock/stock.hbm.xml"/>
+        <mapping resource="stock/category.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
