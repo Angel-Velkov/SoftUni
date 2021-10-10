@@ -22,8 +22,7 @@ public class GetEmployeeWithProject {
         int id = Integer.parseInt(reader.readLine());
         Employee employee = em.find(Employee.class, id);
 
-        System.out.printf("%s %s - %s%n" +
-                        "   %s",
+        System.out.printf("%s %s - %s%n   %s",
                 employee.getFirstName(),
                 employee.getLastName(),
                 employee.getJobTitle(),

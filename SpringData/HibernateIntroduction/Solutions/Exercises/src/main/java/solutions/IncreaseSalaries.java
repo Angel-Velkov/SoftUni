@@ -5,6 +5,7 @@ import entities.Employee;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class IncreaseSalaries {
@@ -12,36 +13,38 @@ public class IncreaseSalaries {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("soft_uni");
         EntityManager em = emf.createEntityManager();
 
-        // I'm using their ids because if I'm using their names it doesn't allows me to update the employees.
-        // I don't know hot to disable the auto-update mode.
-        List<Integer> departmentIds = List.of(1, 2, 4, 11);
+        List<String> departmentNames = List.of("Engineering", "Tool Design", "Marketing", "Information Services");
+
+        List<Employee> employees = em.createQuery("SELECT e " +
+                        "FROM Employee AS e " +
+                        "WHERE e.department.name IN (:departmentNames)", Employee.class)
+                .setParameter("departmentNames", departmentNames)
+                .getResultList();
 
         em.getTransaction().begin();
-        int affectedEmployees = em.createQuery("UPDATE Employee AS e " +
-                "SET e.salary = e.salary * 1.12 " +
-                "WHERE e.department.id IN (:departmentNames)")
-                .setParameter("departmentNames", departmentIds)
-                .executeUpdate();
+        employees.forEach(em::detach);
 
-        System.out.println("Affected employees: " + affectedEmployees);
-        System.out.println("<=====================>");
+        for (Employee employee : employees) {
+            employee.setSalary(employee.getSalary().multiply(BigDecimal.valueOf(1.12)));
+        }
+
+        employees.forEach(em::merge);
+        em.flush();
 
         em.getTransaction().commit();
 
-        List<Employee> employees = em.createQuery("SELECT e " +
-                "FROM Employee AS e " +
-                "WHERE e.department.id IN (:departmentNames)", Employee.class)
-                .setParameter("departmentNames", departmentIds)
-                .getResultList();
-
         StringBuilder output = new StringBuilder();
+
         employees.forEach(e ->
                 output.append(String.format("%s %s ($%.2f)%n",
                         e.getFirstName(),
                         e.getLastName(),
                         e.getSalary()))
         );
+
         System.out.println(output);
+
+        emf.close();
         em.close();
     }
 }

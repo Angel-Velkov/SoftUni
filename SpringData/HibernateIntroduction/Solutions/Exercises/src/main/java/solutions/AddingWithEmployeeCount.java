@@ -21,7 +21,9 @@ public class AddingWithEmployeeCount {
         for (Address address : addresses) {
             System.out.printf("%s, %s - %d employees%n",
                     address.getText(),
-                    address.getTown().getName(),
+                    address.getTown() == null
+                            ? "Unknown"
+                            : address.getTown().getName(),
                     address.getEmployees().size());
         }
         em.close();
