@@ -1,26 +1,35 @@
 package entitties;
 
+import entitties.vehicles.Airliner;
 import entitties.vehicles.Plane;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "companies")
 public class Company {
     private long id;
     private String name;
-    private Set<Plane> planes;
+    private Set<Airliner> planes;
 
     public Company() {
     }
 
-    public Company(String name, Set<Plane> planes) {
+    public Company(String name) {
         this.name = name;
+        this.planes = new HashSet<>();
+    }
+
+    public Company(String name, Set<Airliner> planes) {
+        this(name);
         this.planes = planes;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long getId() {
         return id;
     }
@@ -37,12 +46,16 @@ public class Company {
         this.name = name;
     }
 
+    public boolean addPlane(Airliner airliner) {
+        return this.planes.add(airliner);
+    }
+
     @OneToMany(mappedBy = "company", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    public Set<Plane> getPlanes() {
+    public Set<Airliner> getPlanes() {
         return planes;
     }
 
-    public void setPlanes(Set<Plane> planes) {
+    public void setPlanes(Set<Airliner> planes) {
         this.planes = planes;
     }
 }

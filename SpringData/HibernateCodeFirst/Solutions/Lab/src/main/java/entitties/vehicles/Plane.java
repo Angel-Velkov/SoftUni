@@ -9,15 +9,13 @@ import java.math.BigDecimal;
 @Table(name = "planes")
 public class Plane extends Vehicle {
     private Integer passengerCapacity;
-    private Company company;
 
     public Plane() {
     }
 
-    public Plane(String model, BigDecimal price, String fuelType, Integer passengerCapacity, Company company) {
+    public Plane(String model, BigDecimal price, String fuelType, Integer passengerCapacity) {
         super(model, price, fuelType);
         this.passengerCapacity = passengerCapacity;
-        this.company = company;
     }
 
     @Column(name = "passenger_capacity")
@@ -27,16 +25,6 @@ public class Plane extends Vehicle {
 
     public void setPassengerCapacity(Integer passengerCapacity) {
         this.passengerCapacity = passengerCapacity;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "company_id", referencedColumnName = "id")
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
     }
 
     @Override

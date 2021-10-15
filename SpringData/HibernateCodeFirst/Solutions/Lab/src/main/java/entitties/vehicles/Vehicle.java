@@ -7,8 +7,7 @@ import java.util.Objects;
 @Entity
 // With SINGLE_TABLE strategy don't use @Table annotation in the classes that inherit it.
 @Table(name = "vehicles")
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "type")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Vehicle {
     private Long id;
     private String model;
@@ -25,6 +24,7 @@ public abstract class Vehicle {
     }
 
     @Id
+    // Use TABLE strategy when the inheritance type is TABLE_PER_CLASS
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return this.id;
@@ -59,6 +59,7 @@ public abstract class Vehicle {
         this.fuelType = fuelType;
     }
 
+    // They only work if we use find(), but not for persist();
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
