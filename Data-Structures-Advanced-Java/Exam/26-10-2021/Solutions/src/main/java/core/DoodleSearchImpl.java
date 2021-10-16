@@ -12,12 +12,13 @@ public class DoodleSearchImpl implements DoodleSearch {
     private Map<String, Doodle> doodlesById;
     //          Title   Doodle
     private Map<String, Doodle> doodlesByTitle;
-
-    private double totalRevenueFromAds;
+    //            Id    Doodle
+    private Map<String, Doodle> ads;
 
     public DoodleSearchImpl() {
         this.doodlesById = new LinkedHashMap<>();
         this.doodlesByTitle = new LinkedHashMap<>();
+        this.ads = new LinkedHashMap<>();
     }
 
     @Override
@@ -26,7 +27,7 @@ public class DoodleSearchImpl implements DoodleSearch {
         this.doodlesByTitle.put(doodle.getTitle(), doodle);
 
         if (doodle.getIsAd()) {
-            this.totalRevenueFromAds += doodle.getVisits() * doodle.getRevenue();
+            ads.put(doodle.getId(), doodle);
         }
     }
 
@@ -40,8 +41,8 @@ public class DoodleSearchImpl implements DoodleSearch {
 
         this.doodlesByTitle.remove(removedDoodle.getTitle());
 
-        if (removedDoodle.getIsAd()) {
-            this.totalRevenueFromAds -= removedDoodle.getVisits() * removedDoodle.getRevenue();
+        if(removedDoodle.getIsAd()) {
+            this.ads.remove(doodleId);
         }
     }
 
@@ -68,7 +69,11 @@ public class DoodleSearchImpl implements DoodleSearch {
 
     @Override
     public double getTotalRevenueFromDoodleAds() {
-        return this.totalRevenueFromAds;
+        return this.ads
+                .values()
+                .stream()
+                .mapToDouble(d -> d.getRevenue() * d.getVisits())
+                .sum() ;
     }
 
     @Override
@@ -107,10 +112,9 @@ public class DoodleSearchImpl implements DoodleSearch {
 
     @Override
     public Iterable<Doodle> getDoodleAds() {
-        return this.doodlesById
+        return this.ads
                 .values()
                 .stream()
-                .filter(Doodle::getIsAd)
                 .sorted(Comparator.comparingDouble(Doodle::getRevenue)
                         .thenComparingInt(Doodle::getVisits).reversed())
                 .collect(Collectors.toList());

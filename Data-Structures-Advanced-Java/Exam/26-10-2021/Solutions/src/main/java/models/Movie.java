@@ -4,13 +4,9 @@ import java.util.List;
 
 public class Movie {
     private String id;
-
     private String name;
-
     private int releaseYear;
-
     private double rating;
-
     private List<String> actors;
 
     public Movie(String id, String name, int releaseYear, double rating, List<String> actors) {

@@ -18,7 +18,6 @@ public class MovieDatabaseImpl implements MovieDatabase {
     public MovieDatabaseImpl() {
         this.moviesById = new LinkedHashMap<>();
         this.moviesByActor = new LinkedHashMap<>();
-
         this.moviesByRating = new TreeMap<>();
         this.moviesByYear = new HashMap<>();
     }
@@ -34,7 +33,8 @@ public class MovieDatabaseImpl implements MovieDatabase {
         for (String actor : movie.getActors()) {
             this.moviesByActor.computeIfAbsent(actor, k ->
                     new TreeSet<>(Comparator.comparingDouble(Movie::getRating)
-                            .thenComparingInt(Movie::getReleaseYear).reversed())).add(movie);
+                            .thenComparingInt(Movie::getReleaseYear).reversed()
+                            .thenComparing(Movie::getId))).add(movie);
         }
 
         this.moviesByRating.computeIfAbsent(movie.getRating(), k -> new LinkedHashMap<>()).put(movie.getId(), movie);
@@ -46,7 +46,7 @@ public class MovieDatabaseImpl implements MovieDatabase {
 
     @Override
     public void removeMovie(String movieId) {
-        if (!this.moviesById.containsKey(movieId)) {
+        if (!this.contains(movieId)) {
             throw new IllegalArgumentException();
         }
 
@@ -88,7 +88,11 @@ public class MovieDatabaseImpl implements MovieDatabase {
 
     @Override
     public boolean contains(Movie movie) {
-        return this.moviesById.containsKey(movie.getId());
+        return this.contains(movie.getId());
+    }
+
+    private boolean contains(String id) {
+        return this.moviesById.containsKey(id);
     }
 
     @Override
@@ -104,14 +108,22 @@ public class MovieDatabaseImpl implements MovieDatabase {
 
     @Override
     public Iterable<Movie> getMoviesByActors(List<String> actors) {
-        TreeSet<Movie> result = new TreeSet<>(Comparator.comparingDouble(Movie::getRating).reversed()
-                .thenComparingInt(Movie::getReleaseYear).reversed());
+        if (actors.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
 
-        for (String actor : actors) {
-            TreeSet<Movie> movies = this.moviesByActor.get(actor);
-            if (movies != null) {
-                result.addAll(movies.stream().filter(m -> m.getActors().containsAll(actors) && m.getActors().size() == actors.size()).collect(Collectors.toList()));
-            }
+        Iterator<String> iterator = actors.iterator();
+        TreeSet<Movie> movies = this.moviesByActor.get(iterator.next());
+
+        if (movies == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Movie> result = new LinkedList<>(movies);
+
+        while (!result.isEmpty() && iterator.hasNext()) {
+            TreeSet<Movie> currentMovies = this.moviesByActor.get(iterator.next());
+            result.removeIf(m -> !currentMovies.contains(m));
         }
 
         if (result.isEmpty()) {
