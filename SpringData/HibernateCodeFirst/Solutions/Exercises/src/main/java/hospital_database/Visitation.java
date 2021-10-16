@@ -1,6 +1,7 @@
 package hospital_database;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class Visitation {
         this.date = date;
     }
 
-    @Column(columnDefinition = "BLOB")
+    @Column(columnDefinition = "TEXT")
     public String getComments() {
         return comments;
     }
@@ -49,6 +50,7 @@ public class Visitation {
     }
 
     @ManyToOne
+    @JoinColumn
     public Patient getPatient() {
         return patient;
     }
@@ -73,8 +75,8 @@ public class Visitation {
     @Override
     public String toString() {
         return "Visitation:" + System.lineSeparator() +
-                "id = " + id + System.lineSeparator() +
-                "date = " + date + System.lineSeparator() +
-                "comments = " + comments;
+                "   id = " + id + System.lineSeparator() +
+                "   date = " + new SimpleDateFormat("dd/MM/yyyy").format(date) + System.lineSeparator() +
+                "   comments = " + comments;
     }
 }

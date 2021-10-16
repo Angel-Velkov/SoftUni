@@ -40,6 +40,9 @@ public class PrescribedMedicament {
     }
 
     @ManyToMany
+    @JoinTable(name = "medicaments_patents",
+            joinColumns = @JoinColumn(name = "medicament_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "patient_id", referencedColumnName = "id"))
     public Set<Patient> getPatients() {
         return patients;
     }
@@ -64,8 +67,8 @@ public class PrescribedMedicament {
     @Override
     public String toString() {
         return "PrescribedMedicament:" + System.lineSeparator() +
-                "id = " + id + System.lineSeparator() +
-                "name = " + name + System.lineSeparator() +
-                "patients = " + patients;
+                "   id = " + id + System.lineSeparator() +
+                "   name = " + name + System.lineSeparator() +
+                "   patients = " + patients;
     }
 }

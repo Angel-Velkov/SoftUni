@@ -17,7 +17,7 @@ public class Patient {
     private String picture;
     private boolean hasMedicalInsurance;
     private Set<Visitation> visitations;
-    private Diagnose diagnose;
+    private Set<Diagnose> diagnoses;
     private Set<PrescribedMedicament> prescribedMedicaments;
 
     public Patient() {
@@ -31,6 +31,7 @@ public class Patient {
         this.picture = picture;
         this.hasMedicalInsurance = hasMedicalInsurance;
         this.visitations = new HashSet<>();
+        this.diagnoses = new HashSet<>();
         this.prescribedMedicaments = new HashSet<>();
     }
 
@@ -70,7 +71,7 @@ public class Patient {
         this.email = email;
     }
 
-    @Column(name = "date_of_birth")
+    @Temporal(value = TemporalType.DATE)
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
@@ -79,7 +80,7 @@ public class Patient {
         this.dateOfBirth = dateOfBirth;
     }
 
-    @Column(columnDefinition = "BLOB")
+    @Lob
     public String getPicture() {
         return picture;
     }
@@ -88,16 +89,16 @@ public class Patient {
         this.picture = picture;
     }
 
-    @Column(name = "medical_insurance")
-    public boolean hasMedicalInsurance() {
+    @Column(name = "has_medical_insurance", nullable = false)
+    public boolean isHasMedicalInsurance() {
         return hasMedicalInsurance;
     }
 
-    public void setMedicalInsurance(boolean hasMedicalInsurance) {
+    public void setHasMedicalInsurance(boolean hasMedicalInsurance) {
         this.hasMedicalInsurance = hasMedicalInsurance;
     }
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "patient")
     public Set<Visitation> getVisitations() {
         return visitations;
     }
@@ -106,17 +107,16 @@ public class Patient {
         this.visitations = visitations;
     }
 
-    @OneToOne(mappedBy = "patient")
-    public Diagnose getDiagnose() {
-        return diagnose;
+    @OneToMany(mappedBy = "patient")
+    public Set<Diagnose> getDiagnoses() {
+        return diagnoses;
     }
 
-    public void setDiagnose(Diagnose diagnose) {
-        this.diagnose = diagnose;
+    public void setDiagnoses(Set<Diagnose> diagnoses) {
+        this.diagnoses = diagnoses;
     }
 
-    @ManyToMany(mappedBy = "patients", cascade = CascadeType.PERSIST)
-    @Column(name = "prescribed_medicaments")
+    @ManyToMany(mappedBy = "patients")
     public Set<PrescribedMedicament> getPrescribedMedicaments() {
         return prescribedMedicaments;
     }
@@ -147,9 +147,6 @@ public class Patient {
                 "email = " + email + System.lineSeparator() +
                 "dateOfBirth = " + dateOfBirth + System.lineSeparator() +
                 "picture = " + picture + System.lineSeparator() +
-                "hasMedicalInsurance = " + hasMedicalInsurance + System.lineSeparator() +
-                "visitations = " + visitations + System.lineSeparator() +
-                "diagnose = " + diagnose + System.lineSeparator() +
-                "prescribedMedicaments = " + prescribedMedicaments;
+                "hasMedicalInsurance = " + hasMedicalInsurance + System.lineSeparator();
     }
 }

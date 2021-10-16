@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Diagnose {
     private long id;
     private String name;
-    private String comment;
+    private String comments;
     private Patient patient;
 
     public Diagnose() {
@@ -15,7 +15,7 @@ public class Diagnose {
 
     public Diagnose(String name, String comment, Patient patient) {
         this.name = name;
-        this.comment = comment;
+        this.comments = comment;
         this.patient = patient;
     }
 
@@ -29,7 +29,7 @@ public class Diagnose {
         this.id = id;
     }
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     public String getName() {
         return name;
     }
@@ -39,15 +39,16 @@ public class Diagnose {
     }
 
     @Column(columnDefinition = "TEXT")
-    public String getComment() {
-        return comment;
+    public String getComments() {
+        return comments;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
-    @OneToOne(targetEntity = Patient.class)
+    @ManyToOne
+    @JoinColumn
     public Patient getPatient() {
         return patient;
     }
