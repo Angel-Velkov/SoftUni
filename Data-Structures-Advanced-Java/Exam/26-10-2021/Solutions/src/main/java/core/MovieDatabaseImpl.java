@@ -135,7 +135,7 @@ public class MovieDatabaseImpl implements MovieDatabase {
 
     @Override
     public Iterable<Movie> getMoviesByYear(Integer releaseYear) {
-        if (this.moviesByYear.isEmpty() || moviesByYear.get(releaseYear).isEmpty()) {
+        if (this.moviesByYear.isEmpty() || this.moviesByYear.get(releaseYear).isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -186,15 +186,15 @@ public class MovieDatabaseImpl implements MovieDatabase {
     }
 
     private int getTotalAmountOfMoviesWitchActorsPlayed(List<String> actors) {
-        int totalMount = 0;
+        int totalAmount = 0;
 
         for (String actor : actors) {
             TreeSet<Movie> movies = this.moviesByActor.get(actor);
             if (movies != null) {
-                totalMount += movies.size();
+                totalAmount += movies.size();
             }
         }
 
-        return totalMount;
+        return totalAmount;
     }
 }

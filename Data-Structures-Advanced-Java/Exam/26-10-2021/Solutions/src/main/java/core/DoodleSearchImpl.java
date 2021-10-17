@@ -41,7 +41,7 @@ public class DoodleSearchImpl implements DoodleSearch {
 
         this.doodlesByTitle.remove(removedDoodle.getTitle());
 
-        if(removedDoodle.getIsAd()) {
+        if (removedDoodle.getIsAd()) {
             this.ads.remove(doodleId);
         }
     }
@@ -73,7 +73,7 @@ public class DoodleSearchImpl implements DoodleSearch {
                 .values()
                 .stream()
                 .mapToDouble(d -> d.getRevenue() * d.getVisits())
-                .sum() ;
+                .sum();
     }
 
     @Override
@@ -125,7 +125,8 @@ public class DoodleSearchImpl implements DoodleSearch {
         return this.doodlesById
                 .values()
                 .stream()
-                .sorted(Comparator.comparingInt(Doodle::getVisits).reversed())
+                .sorted(Comparator.comparingDouble(Doodle::getRevenue)
+                        .thenComparingInt(Doodle::getVisits).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
     }

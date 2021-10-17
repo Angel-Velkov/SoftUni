@@ -2,13 +2,9 @@ package models;
 
 public class Doodle {
     private String id;
-
     private String title;
-
     private int visits;
-
     private boolean isAd;
-
     private double revenue;
 
     public Doodle(String id, String title, int visits, boolean isAd, double revenue) {
