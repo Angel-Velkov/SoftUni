@@ -5,7 +5,7 @@ import bills_payment_system.billing_dedatils.BillingDetail;
 import javax.persistence.*;
 import java.util.Set;
 
-@Entity(name = "bank_user")
+@Entity(name = "BankUser")
 @Table(name = "bank_users")
 public class User {
     private long id;

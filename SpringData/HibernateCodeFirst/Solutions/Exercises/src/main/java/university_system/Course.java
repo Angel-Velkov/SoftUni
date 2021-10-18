@@ -86,6 +86,7 @@ public class Course {
     }
 
     @ManyToMany
+    @JoinTable
     public Set<Student> getStudents() {
         return this.students;
     }

@@ -12,7 +12,7 @@ public class Main {
     private final static String PERSISTENCE_UNIT_NAME = "persist";
 
     public static void main(String[] args) {
-        EntityManagerFactory entityManagerFactory = createEntityManagerFactory(PERSISTENCE_UNIT_NAME, "sales");
+        EntityManagerFactory entityManagerFactory = createEntityManagerFactory(PERSISTENCE_UNIT_NAME, "exercise");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         // 2. Sales Database
