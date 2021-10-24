@@ -2,6 +2,7 @@ package springdata.lab.springdataintro.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import springdata.lab.springdataintro.exeptions.InvalidAccountOperationException;
 import springdata.lab.springdataintro.exeptions.NonExistingEntityException;
 import springdata.lab.springdataintro.models.Account;
@@ -9,10 +10,9 @@ import springdata.lab.springdataintro.models.User;
 import springdata.lab.springdataintro.repositories.AccountRepository;
 import springdata.lab.springdataintro.services.AccountService;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
-@Transactional
+@Transactional()
 @Service
 public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
@@ -23,7 +23,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void createAccount(User user, Account account) {
+    public void createUserAccount(User user, Account account) {
         account.setUser(user);
         user.getAccounts().add(account);
         this.accountRepository.save(account);
@@ -69,3 +69,4 @@ public class AccountServiceImpl implements AccountService {
         this.withdrawMoney(amount, fromAccountId);
     } // commit transaction - @Transactional
 }
+

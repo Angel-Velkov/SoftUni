@@ -6,7 +6,7 @@ import springdata.lab.springdataintro.models.User;
 import java.math.BigDecimal;
 
 public interface AccountService {
-    void createAccount(User user, Account account);
+    void createUserAccount(User user, Account account);
 
     void withdrawMoney(BigDecimal amount, Long accountId);
 

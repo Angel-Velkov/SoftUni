@@ -1,6 +1,6 @@
 package springdata.lab.springdataintro.exeptions;
 
-public class InvalidAccountOperationException extends RuntimeException{
+public class InvalidAccountOperationException extends RuntimeException {
     public InvalidAccountOperationException() {
     }
 

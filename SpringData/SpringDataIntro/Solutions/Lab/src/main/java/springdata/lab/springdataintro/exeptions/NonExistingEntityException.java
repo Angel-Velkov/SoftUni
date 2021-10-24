@@ -1,6 +1,6 @@
 package springdata.lab.springdataintro.exeptions;
 
-public class NonExistingEntityException extends RuntimeException{
+public class NonExistingEntityException extends RuntimeException {
     public NonExistingEntityException() {
     }
 
