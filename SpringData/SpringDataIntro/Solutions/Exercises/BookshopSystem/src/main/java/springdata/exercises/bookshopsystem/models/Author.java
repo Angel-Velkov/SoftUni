@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -26,6 +27,10 @@ public class Author {
     @NonNull
     @Column(name = "last_name", nullable = false)
     private String lastName;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
+    private Set<Book> books;
 
     @Override
     public boolean equals(Object o) {

@@ -49,9 +49,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Set<Category> result = new HashSet<>();
         while (count > result.size()) {
-            Long randomId = ThreadLocalRandom.current().nextLong(categoryRepositoryCount);
+            Long randomId = ThreadLocalRandom.current().nextLong(categoryRepositoryCount) + 1;
 
-            result.add(categoryRepository.getById(randomId));
+            result.add(this.categoryRepository.findById(randomId).get());
         }
 
         return result;

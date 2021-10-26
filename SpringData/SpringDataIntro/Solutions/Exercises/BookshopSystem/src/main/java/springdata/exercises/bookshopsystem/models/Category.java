@@ -25,10 +25,7 @@ public class Category {
     private String name;
 
     @ToString.Exclude
-    @ManyToMany
-    @JoinTable(name = "books_categories",
-            joinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id", referencedColumnName = "book_id"))
+    @ManyToMany(mappedBy = "categories")
     private Set<Book> books;
 
     public Category(@NonNull String name, Set<Book> books) {

@@ -28,6 +28,8 @@ public class Book {
     @Column(length = 50, nullable = false)
     private String title;
 
+    @NonNull
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "author_id")
     private Author author;
@@ -45,33 +47,24 @@ public class Book {
     private BigDecimal price;
 
     @NonNull
+    @ManyToMany
+    @JoinTable(name = "books_categories",
+            joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"))
+    private Set<Category> categories;
+
+    @NonNull
     @Column(nullable = false)
     private int copies;
 
-    @Column(name = "relesae_date")
+    @NonNull
+    @Column(name = "release_date")
     private LocalDate releaseDate;
 
     @NonNull
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "age_registration", nullable = false)
     private AgeRestriction ageRestriction;
-
-    public Book(@NonNull String title, Author author, String description,
-                @NonNull EditionType editionType, @NonNull BigDecimal price,
-                @NonNull int copies, LocalDate releaseDate, @NonNull AgeRestriction ageRestriction) {
-        this.title = title;
-        this.author = author;
-        this.description = description;
-        this.editionType = editionType;
-        this.price = price;
-        this.copies = copies;
-        this.releaseDate = releaseDate;
-        this.ageRestriction = ageRestriction;
-    }
-
-    public Book(String title, Author randomAuthor, EditionType editionType, BigDecimal price, LocalDate releaseDate, AgeRestriction ageRestriction, Set<Category> randomCategories, int copies) {
-
-    }
 
     @Override
     public boolean equals(Object o) {
