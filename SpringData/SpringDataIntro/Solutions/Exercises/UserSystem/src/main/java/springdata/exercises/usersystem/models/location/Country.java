@@ -1,4 +1,4 @@
-package springdata.exercises.usersystem.models;
+package springdata.exercises.usersystem.models.location;
 
 import javax.persistence.*;
 import java.util.Set;

@@ -1,4 +1,6 @@
-package springdata.exercises.usersystem.models;
+package springdata.exercises.usersystem.models.location;
+
+import springdata.exercises.usersystem.models.location.Country;
 
 import javax.persistence.*;
 

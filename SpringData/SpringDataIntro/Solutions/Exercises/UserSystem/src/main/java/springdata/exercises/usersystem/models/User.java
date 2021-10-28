@@ -1,5 +1,10 @@
 package springdata.exercises.usersystem.models;
 
+import springdata.exercises.usersystem.exceptions.InvalidEmailException;
+import springdata.exercises.usersystem.exceptions.InvalidPasswordException;
+import springdata.exercises.usersystem.models.location.Town;
+import springdata.exercises.usersystem.models.gallery.Album;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,12 +27,18 @@ public class User {
     private Town bornTown;
     private Town currentlyLiving;
 
+    private String firstName;
+    private String lastName;
+
     private Set<User> friends;
+
+    private Set<Album> albums;
 
     public User() {
     }
 
-    public User(String username, String password, String email, byte age) {
+    public User(String username, String password, String email,
+                byte age, String firstName, String lastName) {
         this.setUsername(username);
         this.setPassword(password);
         this.setEmail(email);
@@ -35,7 +46,20 @@ public class User {
 
         this.registeredOn = new Date();
 
+        this.firstName = firstName;
+        this.lastName = lastName;
+
         this.friends = new HashSet<>();
+
+        this.albums = new HashSet<>();
+    }
+
+    public User(String username, String password, String email, byte age,
+                String firstName, String lastName, Town bornTown, Town currentlyLiving) {
+        this(username, password, email, age, firstName, lastName);
+
+        this.bornTown = bornTown;
+        this.currentlyLiving = currentlyLiving;
     }
 
     @Id
@@ -79,6 +103,27 @@ public class User {
         this.email = email;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    @Transient
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
     public Date getRegisteredOn() {
         return registeredOn;
     }
@@ -113,7 +158,7 @@ public class User {
         isDeleted = deleted;
     }
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.ALL})
     public Town getBornTown() {
         return bornTown;
     }
@@ -131,8 +176,8 @@ public class User {
         this.currentlyLiving = currentlyLiving;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_friends",
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "users_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id"))
     public Set<User> getFriends() {
@@ -147,6 +192,24 @@ public class User {
         this.friends.add(user);
     }
 
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    public Set<Album> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(Set<Album> albums) {
+        this.albums = albums;
+    }
+
+    public void addAlbum(Album album) {
+        if (album.getOwner() != null) {
+            throw new IllegalStateException("The album already has an owner!");
+        }
+
+        this.albums.add(album);
+        album.setOwner(this);
+    }
+
     private void validateUsername(String username) {
         this.ensureNonNull(username, "username");
 
@@ -158,22 +221,18 @@ public class User {
     private void validatePassword(String password) {
         this.ensureNonNull(password, "password");
 
-        String regex = "^(?=.*[0-9])" +
-                "(?=.*[a-z])" +
-                "(?=.*[A-Z])" +
-                "(?=.*[!#$%^&*()_+<>?])" +
-                "(?=\\S+$)" +
-                ".{6,50}$";
+        String regex = "^(?=.*[0-9])" +        // Whether it contains at least one digit
+                "(?=.*[a-z])" +                // Whether it contains at least one lowercase letter
+                "(?=.*[A-Z])" +                // Whether it contains at least one uppercase letter
+                "(?=.*[!#$%^&*()_+<>?])" +     // Whether it contains at least one of the symbols
+                "(?=\\S+$)" +                  // It doesn't contain any white space
+                ".{6,50}$";                    // With a length between 6 and 50 characters
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
 
         if (!matcher.find()) {
-            throw new IllegalArgumentException("The password must contain at least:" + System.lineSeparator() +
-                    "   1 lowercase letter" + System.lineSeparator() +
-                    "   1 uppercase letter" + System.lineSeparator() +
-                    "   1 digit" + System.lineSeparator() +
-                    "   1 special symbol (!, @, #, $, %, ^, &, *, (, ), _, +, <, >, ?)");
+            throw new InvalidPasswordException();
         }
     }
 
@@ -187,7 +246,7 @@ public class User {
         Matcher matcher = pattern.matcher(email);
 
         if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid email!");
+            throw new InvalidEmailException();
         }
     }
 
