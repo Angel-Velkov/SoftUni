@@ -1,6 +1,7 @@
 package springdata.exercises.usersystem.models.gallery;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pictures")
@@ -29,7 +30,6 @@ public class Picture {
         this.id = id;
     }
 
-
     public String getTitle() {
         return title;
     }
@@ -53,5 +53,18 @@ public class Picture {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Picture picture = (Picture) o;
+        return id == picture.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

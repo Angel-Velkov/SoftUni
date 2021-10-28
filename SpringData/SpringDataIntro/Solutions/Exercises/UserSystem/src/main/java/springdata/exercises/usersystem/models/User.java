@@ -8,6 +8,7 @@ import springdata.exercises.usersystem.models.gallery.Album;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -158,7 +159,7 @@ public class User {
         isDeleted = deleted;
     }
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.ALL})
+    @ManyToOne(cascade = CascadeType.PERSIST)
     public Town getBornTown() {
         return bornTown;
     }
@@ -176,7 +177,7 @@ public class User {
         this.currentlyLiving = currentlyLiving;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id"))
@@ -192,7 +193,7 @@ public class User {
         this.friends.add(user);
     }
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     public Set<Album> getAlbums() {
         return albums;
     }
@@ -260,5 +261,18 @@ public class User {
         if (o == null) {
             throw new IllegalArgumentException("The " + entityType + " cannot be null!");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

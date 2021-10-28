@@ -104,6 +104,4 @@ public class UserServiceImpl implements UserService {
     public int deleteInactiveUsers() {
         return this.userRepository.deleteAllByIsDeletedTrue();
     }
-
-
 }

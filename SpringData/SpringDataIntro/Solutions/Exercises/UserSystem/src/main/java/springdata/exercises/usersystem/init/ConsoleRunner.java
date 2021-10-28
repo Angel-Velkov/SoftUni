@@ -13,8 +13,8 @@ import springdata.exercises.usersystem.models.location.Town;
 import springdata.exercises.usersystem.services.interfaces.AlbumService;
 import springdata.exercises.usersystem.services.interfaces.UserService;
 
-@Component
 @Slf4j
+@Component
 public class ConsoleRunner implements CommandLineRunner {
 
     private final UserService userService;
@@ -41,26 +41,27 @@ public class ConsoleRunner implements CommandLineRunner {
                     "peter_veliki", "pat1Ad?an", "pepi-rabivacha21@tam.pon", (byte) 69,
                     "Peter", "Petrov");
 
+            user2.setDeleted(true);
+
             this.userService.registerUser(user2);
 
-//            this.userService.befriend(1, 2);
-//
-//            Album album = new Album("Screenshots", "blue", false);
-//
-//            this.userService.addAlbumToUser(album, 1);
-//
-//            Picture picture = new Picture("dog", "rex", "some/random/path");
-//
-//            this.albumService.addPictureToAlbum(picture, 1);
-//
-//            this.userService.setBornTownToUser(new Town("Sofia", new Country("Bulgaria")), 1);
-//
-//            for (String host : this.userService.findAllEmailsByProvider("kom.pot")) {
-//                System.out.println(host);
-//            }
+            this.userService.befriend(1, 2);
 
-            // TODO: REMOVE ALL CONSTRAINTS
+            Album album = new Album("Screenshots", "blue", false);
 
+            this.userService.addAlbumToUser(album, 1);
+
+            Picture picture = new Picture("dog", "rex", "some/random/path");
+
+            this.albumService.addPictureToAlbum(picture, 1);
+
+            this.userService.setBornTownToUser(new Town("Sofia", new Country("Bulgaria")), 1);
+
+            for (String host : this.userService.findAllEmailsByProvider("kom.pot")) {
+                System.out.println(host);
+            }
+
+            this.albumService.setOwner(1, null);
             System.out.println(this.userService.deleteInactiveUsers());
 
         } catch (IllegalArgumentException | NonExistentUserException e) {

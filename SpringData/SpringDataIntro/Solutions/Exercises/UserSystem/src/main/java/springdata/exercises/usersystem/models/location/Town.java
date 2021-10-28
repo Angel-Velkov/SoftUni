@@ -3,6 +3,7 @@ package springdata.exercises.usersystem.models.location;
 import springdata.exercises.usersystem.models.location.Country;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "towns")
@@ -46,5 +47,18 @@ public class Town {
 
     public void setCountry(Country country) {
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Town town = (Town) o;
+        return id == town.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
