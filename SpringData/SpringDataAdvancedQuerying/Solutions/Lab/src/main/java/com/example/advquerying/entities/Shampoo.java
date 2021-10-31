@@ -56,7 +56,7 @@ public class Shampoo extends BaseEntity {
         this.label = label;
     }
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "shampoos_ingredients",
             joinColumns = @JoinColumn(name = "shampoo_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "ingredient_id", referencedColumnName = "id"))
