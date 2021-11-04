@@ -24,9 +24,16 @@ public interface ShampooRepository extends JpaRepository<Shampoo, Long> {
     @Query("SELECT s FROM Shampoo AS s, IN(s.ingredients) AS i WHERE i = :ingredient")
     List<Shampoo> findAllByIngredient(@Param("ingredient") Ingredient ingredient);
 
-    // @Query("SELECT s FROM Shampoo AS s, IN(s.ingredients) AS i WHERE i.name IN :ingredients")
-    @Query("SELECT s FROM Ingredient AS i LEFT JOIN i.shampoos AS s WHERE i.name IN :ingredients")
-    List<Shampoo> findAllByIngredientNames(@Param("ingredients") Iterable<String> ingredientNames);
+    /*
+    @Query(value = "SELECT * " +
+        "FROM shampoos AS s " +
+        "JOIN shampoos_ingredients si on s.id = si.shampoo_id " +
+        "JOIN ingredients i on i.id = si.ingredient_id " +
+        "WHERE i.name IN (:names) " +
+        "GROUP BY s.brand", nativeQuery = true)
+     */
+    @Query("SELECT s FROM Ingredient AS i JOIN i.shampoos AS s WHERE i.name IN :names GROUP BY s.brand")
+    List<Shampoo> findAllByIngredientNames(@Param("names") Iterable<String> ingredientNames);
 
     @Query("SELECT s FROM Shampoo AS s WHERE SIZE(s.ingredients) < :count")
     List<Shampoo> findAllByIngredientsCountBefore(@Param("count") int count);
