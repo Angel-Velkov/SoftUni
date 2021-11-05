@@ -17,4 +17,6 @@ public interface AuthorService {
     List<Author> findAllAuthorsOrderedByBooksCountDesc();
 
     List<String> findAllAuthorNamesWhoseFirstNamesEndsWith(String postfix);
+
+    List<String> findAllAuthorsWithTheirTotalBookCopies();
 }

@@ -84,4 +84,28 @@ public class AuthorServiceImpl implements AuthorService {
                 .map(a -> a.getFirstName() + " " + a.getLastName())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> findAllAuthorsWithTheirTotalBookCopies() {
+        return this.authorRepository.findAllWithTheirTotalBookCopies()
+                .stream()
+                .map(o -> String.format("%s %s -> %d copies",
+                        ((Author) o[0]).getFirstName(),
+                        ((Author) o[0]).getLastName(),
+                        (long) o[1]))
+                .collect(Collectors.toList());
+        /*
+        return this.authorRepository.findAll()
+                .stream()
+                .map(author -> String.format("%s %s -> %d copies",
+                                author.getFirstName(),
+                                author.getLastName(),
+                                author.getBooks()
+                                        .stream()
+                                        .mapToLong(Book::getCopies)
+                                        .sum())
+                )
+                .collect(Collectors.toList());
+        */
+    }
 }

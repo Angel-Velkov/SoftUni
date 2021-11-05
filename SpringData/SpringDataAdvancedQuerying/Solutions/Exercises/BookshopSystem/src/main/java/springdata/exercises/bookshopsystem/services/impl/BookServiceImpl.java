@@ -2,6 +2,7 @@ package springdata.exercises.bookshopsystem.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import springdata.exercises.bookshopsystem.models.Author;
 import springdata.exercises.bookshopsystem.models.Book;
 import springdata.exercises.bookshopsystem.models.Category;
@@ -100,8 +101,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> findAllBooksByReleaseDateBefore(LocalDate releaseDate) {
-        return this.bookRepository.findAllByReleaseDateBefore(releaseDate);
+    public List<Book> findAllBooksBeforeDate(LocalDate date) {
+        return this.bookRepository.findAllByReleaseDateBefore(date);
     }
 
     @Override
@@ -110,6 +111,59 @@ public class BookServiceImpl implements BookService {
                 .stream()
                 .map(Book::getTitle)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findAllBookWithAuthorsWhoseLastnameStartsWith(String prefix) {
+        return this.bookRepository.findAllByAuthor_LastNameStartsWith(prefix)
+                .stream()
+                .map(book ->
+                        String.format("%s (%s %s)",
+                                book.getTitle(),
+                                book.getAuthor().getFirstName(),
+                                book.getAuthor().getLastName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countOfBooksWithTitleLengthLongerThan(int titleLength) {
+        return this.bookRepository.countOfBooksWithTitleLengthLongerThan(titleLength);
+    }
+
+    @Override
+    public String findBookByTitle(String title) {
+        Book book = this.bookRepository.findBookByTitle(title).orElse(null);
+
+        if (book != null) {
+            return String.format("%s {%s} %s -> %.2flv.",
+                    book.getTitle(),
+                    book.getEditionType(),
+                    book.getAgeRestriction(),
+                    book.getPrice());
+        }
+
+        return "";
+    }
+
+    @Transactional
+    @Override
+    public int increaseBookCopiesThatAreReleasedAfterADate(LocalDate date, int numberOfCopies) {
+        if (numberOfCopies < 0) {
+            throw new IllegalArgumentException("You cannot increase copies by a negative number.");
+        }
+
+        return this.bookRepository.increaseCopiesOfBooksReleasedAfterADate(date, numberOfCopies);
+    }
+
+    @Transactional
+    @Override
+    public int removeBooksWithCopiesLessThan(int numberOfCopies) {
+        return this.bookRepository.deleteAllByCopiesLessThan(numberOfCopies);
+    }
+
+    @Override
+    public List<Book> findAllBooksByAuthorNames(String firstName, String lastName) {
+        return this.bookRepository.getBooksByAuthorNames(firstName, lastName);
     }
 
     private Book createBook(String[] bookInfo) {

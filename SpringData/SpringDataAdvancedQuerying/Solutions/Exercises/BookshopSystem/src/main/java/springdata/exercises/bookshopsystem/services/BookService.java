@@ -23,9 +23,19 @@ public interface BookService {
 
     List<String> findAllBookTitlesThatHaveNotBeenReleasedInYear(int year);
 
-    List<Book> findAllBooksByReleaseDateBefore(LocalDate releaseDate);
+    List<Book> findAllBooksBeforeDate(LocalDate date);
 
     List<String> findAllBookTitlesWitchContains(String substring);
 
+    List<String> findAllBookWithAuthorsWhoseLastnameStartsWith(String prefix);
 
+    long countOfBooksWithTitleLengthLongerThan(int titleLength);
+
+    String findBookByTitle(String title);
+
+    int increaseBookCopiesThatAreReleasedAfterADate(LocalDate date, int numberOfCopies);
+
+    int removeBooksWithCopiesLessThan(int numberOfCopies);
+
+    List<Book> findAllBooksByAuthorNames(String firstName, String lastName);
 }

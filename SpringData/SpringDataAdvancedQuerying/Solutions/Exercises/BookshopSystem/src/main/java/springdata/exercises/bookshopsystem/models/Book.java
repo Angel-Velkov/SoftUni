@@ -48,6 +48,7 @@ public class Book {
 
     @NonNull
     @ManyToMany
+    @ToString.Exclude
     @JoinTable(name = "books_categories",
             joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"))

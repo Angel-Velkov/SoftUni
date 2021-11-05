@@ -45,13 +45,48 @@ public class ConsoleRunner implements CommandLineRunner {
         int exerciseNumber = Integer.parseInt(reader.readLine());
 
         switch (exerciseNumber) {
-            case 1: this.booksTitlesByAgeRestriction(); break;
-            case 2: this.goldenBooks(); break;
-            case 3: this.booksByPrice(); break;
-            case 4: this.notReleaseBooks(); break;
-            case 5: this.booksReleaseBeforeDate(); break;
-            case 6: this.authorSearch(); break;
-            case 7: this.bookSearch(); break;
+            case 1:
+                this.booksTitlesByAgeRestriction();
+                break;
+            case 2:
+                this.goldenBooks();
+                break;
+            case 3:
+                this.booksByPrice();
+                break;
+            case 4:
+                this.notReleaseBooks();
+                break;
+            case 5:
+                this.booksReleaseBeforeDate();
+                break;
+            case 6:
+                this.authorSearch();
+                break;
+            case 7:
+                this.bookSearch();
+                break;
+            case 8:
+                this.bookTitlesSearch();
+                break;
+            case 9:
+                this.countBooks();
+                break;
+            case 10:
+                this.totalBookCopies();
+                break;
+            case 11:
+                this.reduceBook();
+                break;
+            case 12:
+                this.increaseBookCopies();
+                break;
+            case 13:
+                this.removeBooks();
+                break;
+            case 14:
+                this.storedProcedure();
+                break;
         }
     }
 
@@ -96,9 +131,9 @@ public class ConsoleRunner implements CommandLineRunner {
 
         System.out.printf("Enter date in format '%s':", dateFormat);
 
-        LocalDate releaseDate = LocalDate.parse(reader.readLine(), DateTimeFormatter.ofPattern(dateFormat));
+        LocalDate date = LocalDate.parse(reader.readLine(), DateTimeFormatter.ofPattern(dateFormat));
 
-        this.bookService.findAllBooksByReleaseDateBefore(releaseDate)
+        this.bookService.findAllBooksBeforeDate(date)
                 .forEach(b -> System.out.printf("%s {%s} - %.2flv.%n",
                         b.getTitle(),
                         b.getEditionType(),
@@ -108,7 +143,7 @@ public class ConsoleRunner implements CommandLineRunner {
     // 6. Author Search
     @SneakyThrows
     private void authorSearch() {
-        System.out.println("Enter the postfix from the firstname:");
+        System.out.println("Enter the postfix from the first name:");
         String postfix = reader.readLine();
 
         this.authorService.findAllAuthorNamesWhoseFirstNamesEndsWith(postfix)
@@ -123,6 +158,88 @@ public class ConsoleRunner implements CommandLineRunner {
 
         this.bookService.findAllBookTitlesWitchContains(substring)
                 .forEach(System.out::println);
+    }
+
+    // 8. Book Titles Search
+    @SneakyThrows
+    private void bookTitlesSearch() {
+        System.out.println("Enter the prefix from the last name:");
+        String prefix = reader.readLine();
+
+        this.bookService.findAllBookWithAuthorsWhoseLastnameStartsWith(prefix)
+                .forEach(System.out::println);
+    }
+
+    // 9. Count Books
+    @SneakyThrows
+    private void countBooks() {
+        System.out.println("Enter title length:");
+        int titleLength = Integer.parseInt(reader.readLine());
+
+        long count = this.bookService.countOfBooksWithTitleLengthLongerThan(titleLength);
+
+        System.out.printf("There are %d books with longer title than %d symbols.%n",
+                count, titleLength);
+    }
+
+    // 10. Total Book Copies
+    private void totalBookCopies() {
+        this.authorService.findAllAuthorsWithTheirTotalBookCopies()
+                .forEach(System.out::println);
+    }
+
+    // 11. Reduce Book
+    @SneakyThrows
+    private void reduceBook() {
+        System.out.println("Enter book title:");
+        String title = reader.readLine();
+
+        System.out.println(this.bookService.findBookByTitle(title));
+    }
+
+    // 12. Increase Book Copies
+    @SneakyThrows
+    private void increaseBookCopies() {
+        String dateFormat = "dd MMM yyyy";
+        System.out.println("Enter the date in format '" + dateFormat + "':");
+        String dateAsString = reader.readLine();
+        LocalDate date = LocalDate.parse(dateAsString, DateTimeFormatter.ofPattern(dateFormat));
+
+        System.out.println("Enter the number of copies:");
+        int numberOfCopies = Integer.parseInt(reader.readLine());
+
+        int affectedCount = this.bookService.increaseBookCopiesThatAreReleasedAfterADate(date, numberOfCopies);
+
+        System.out.printf("%d books are released after %s, so total of %d book copies were added.%n",
+                numberOfCopies,
+                dateAsString,
+                numberOfCopies * affectedCount);
+    }
+
+    // 13. Remove Books
+    @SneakyThrows
+    private void removeBooks() {
+        System.out.println("Enter number of copies:");
+        int numberOfCopies = Integer.parseInt(reader.readLine());
+
+        int deletedBooks = this.bookService.removeBooksWithCopiesLessThan(numberOfCopies);
+
+        System.out.printf("%d books have copies less than %d, so we deleted them.%n",
+                deletedBooks,
+                numberOfCopies);
+    }
+
+    // 14. Stored Procedure
+    @SneakyThrows
+    private void storedProcedure() {
+        System.out.println("Enter the author's first name and last name:");
+        String[] names = reader.readLine().split("\\s+");
+
+        String firstName = names[0];
+        String lastName = names[1];
+
+        System.out.println(this.bookService.findAllBooksByAuthorNames(firstName, lastName)
+                .size());
     }
 
     //==================================================================================================================
