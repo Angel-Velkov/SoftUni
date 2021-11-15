@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(UserRegistrationDto userRegistrationDto) {
+    public String registerUser(UserRegistrationDto userRegistrationDto) {
         if (!userRegistrationDto.getPassword().equals(userRegistrationDto.getConfirmPassword())) {
             throw new IllegalArgumentException("The passwords you entered do not match.");
         }
@@ -41,10 +41,12 @@ public class UserServiceImpl implements UserService {
         User user = this.mapper.map(userRegistrationDto, User.class);
 
         this.userRepository.save(user);
+
+        return user.getFullName();
     }
 
     @Override
-    public void loginUser(UserLoginDto userLoginDto) {
+    public String loginUser(UserLoginDto userLoginDto) {
 
         this.validateEntity(userLoginDto);
 
@@ -53,6 +55,21 @@ public class UserServiceImpl implements UserService {
         ).orElseThrow(() -> new IllegalArgumentException("Incorrect username / password"));
 
         this.loggedInUser = user;
+
+        return user.getFullName();
+    }
+
+    @Override
+    public String logout() {
+        if (this.loggedInUser != null) {
+            String fullName = this.loggedInUser.getFullName();
+
+            this.loggedInUser = null;
+
+            return fullName;
+        } else {
+            throw new IllegalStateException("Cannot log out. No user was logged in.");
+        }
     }
 
     private <E> void validateEntity(E entity) {

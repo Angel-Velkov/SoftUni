@@ -25,27 +25,37 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
     public void run(String... args) throws Exception {
         while (true) {
             String[] commands = reader.readLine().split("\\|");
-
+            String fullName;
             try {
                 switch (commands[0]) {
-                    case "RegisterUser" -> this.userService
-                            .registerUser(
-                                    new UserRegistrationDto(
-                                            commands[1],
-                                            commands[2],
-                                            commands[3],
-                                            commands[4]
-                                    )
-                            );
-                    case "LoginUser" -> this.userService
-                            .loginUser(
-                                    new UserLoginDto(
-                                            commands[1],
-                                            commands[2]
-                                    )
-                            );
+                    case "RegisterUser" -> {
+                        fullName = this.userService
+                                .registerUser(
+                                        new UserRegistrationDto(
+                                                commands[1],
+                                                commands[2],
+                                                commands[3],
+                                                commands[4]
+                                        )
+                                );
+                        System.out.println(fullName + " was registered");
+                    }
+                    case "LoginUser" -> {
+                        fullName = this.userService
+                                .loginUser(
+                                        new UserLoginDto(
+                                                commands[1],
+                                                commands[2]
+                                        )
+                                );
+                        System.out.println("Successfully logged in " + fullName);
+                    }
+                    case "Logout" -> {
+                        fullName = this.userService.logout();
+                        System.out.println("User " + fullName + " successfully logged out");
+                    }
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | IllegalStateException e) {
                 System.out.println(e.getMessage());
             }
         }
