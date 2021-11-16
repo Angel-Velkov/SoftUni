@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ValidationImpl implements Validation {
@@ -26,5 +27,18 @@ public class ValidationImpl implements Validation {
     @Override
     public <E> Set<ConstraintViolation<E>> violation(E entity) {
         return this.validator.validate(entity);
+    }
+
+    @Override
+    public <E> void validateEntity(E entity) {
+        Set<ConstraintViolation<E>> violations = this.violation(entity);
+
+        if (!violations.isEmpty()) {
+            throw new IllegalArgumentException(violations
+                    .stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining(System.lineSeparator()))
+            );
+        }
     }
 }

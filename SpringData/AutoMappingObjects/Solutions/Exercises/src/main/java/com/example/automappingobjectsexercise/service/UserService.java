@@ -10,4 +10,6 @@ public interface UserService {
     String loginUser(UserLoginDto userLoginDto);
 
     String logout();
+
+    boolean isAdmin();
 }

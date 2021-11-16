@@ -26,7 +26,7 @@ public class Game {
     @NonNull
     private String imageThumbnail;
     @NonNull
-    private Integer size;
+    private Double size;
     @NonNull
     @Column(precision = 9, scale = 2)
     private BigDecimal price;

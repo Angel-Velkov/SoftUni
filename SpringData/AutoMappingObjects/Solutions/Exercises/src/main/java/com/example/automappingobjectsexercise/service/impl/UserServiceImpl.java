@@ -10,10 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.ConstraintViolation;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -36,7 +32,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("The passwords you entered do not match.");
         }
 
-        this.validateEntity(userRegistrationDto);
+        this.validation.validateEntity(userRegistrationDto);
 
         User user = this.mapper.map(userRegistrationDto, User.class);
 
@@ -48,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String loginUser(UserLoginDto userLoginDto) {
 
-        this.validateEntity(userLoginDto);
+        this.validation.validateEntity(userLoginDto);
 
         User user = this.userRepository.findByEmailAndPassword(
                 userLoginDto.getEmail(), userLoginDto.getPassword()
@@ -72,15 +68,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private <E> void validateEntity(E entity) {
-        Set<ConstraintViolation<E>> violations = this.validation.violation(entity);
-
-        if (!violations.isEmpty()) {
-            throw new IllegalArgumentException(violations
-                    .stream()
-                    .map(ConstraintViolation::getMessage)
-                    .collect(Collectors.joining(System.lineSeparator()))
-            );
-        }
+    @Override
+    public boolean isAdmin() {
+        return this.loggedInUser != null && this.loggedInUser.isAdministrator();
     }
 }
