@@ -1,7 +1,8 @@
 package com.example.automappingobjectsexercise.service.impl;
 
-import com.example.automappingobjectsexercise.model.dto.UserLoginDto;
-import com.example.automappingobjectsexercise.model.dto.UserRegistrationDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameTitleDto;
+import com.example.automappingobjectsexercise.model.dto.user.UserLoginDto;
+import com.example.automappingobjectsexercise.model.dto.user.UserRegistrationDto;
 import com.example.automappingobjectsexercise.model.entity.User;
 import com.example.automappingobjectsexercise.repository.UserRepository;
 import com.example.automappingobjectsexercise.service.UserService;
@@ -9,6 +10,9 @@ import com.example.automappingobjectsexercise.util.Validation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,16 +47,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String loginUser(UserLoginDto userLoginDto) {
+        if (this.loggedInUser == null) {
+            this.validation.validateEntity(userLoginDto);
 
-        this.validation.validateEntity(userLoginDto);
+            User user = this.userRepository.findByEmailAndPassword(
+                    userLoginDto.getEmail(), userLoginDto.getPassword()
+            ).orElseThrow(() -> new IllegalArgumentException("Incorrect username / password"));
 
-        User user = this.userRepository.findByEmailAndPassword(
-                userLoginDto.getEmail(), userLoginDto.getPassword()
-        ).orElseThrow(() -> new IllegalArgumentException("Incorrect username / password"));
+            this.loggedInUser = user;
 
-        this.loggedInUser = user;
-
-        return user.getFullName();
+            return user.getFullName();
+        } else {
+            throw new IllegalStateException("There is already logged in user");
+        }
     }
 
     @Override
@@ -69,7 +76,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isAdmin() {
-        return this.loggedInUser != null && this.loggedInUser.isAdministrator();
+    public User getLoggedInUser() {
+        return this.loggedInUser;
+    }
+
+    @Override
+    public boolean isUserLoggedIn() {
+        return this.loggedInUser != null;
+    }
+
+    @Override
+    public boolean isUserAdmin() {
+        if (!this.isUserLoggedIn()) {
+            throw new IllegalStateException("No user was logged in.");
+        }
+
+        return this.loggedInUser.isAdministrator();
+    }
+
+    @Override
+    public List<GameTitleDto> getOwnedGames() {
+        return this.loggedInUser
+                .getGames()
+                .stream()
+                .map(g -> this.mapper.map(g, GameTitleDto.class))
+                .collect(Collectors.toList());
     }
 }

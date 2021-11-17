@@ -1,9 +1,11 @@
 package com.example.automappingobjectsexercise;
 
-import com.example.automappingobjectsexercise.model.dto.GameDto;
-import com.example.automappingobjectsexercise.model.dto.UserLoginDto;
-import com.example.automappingobjectsexercise.model.dto.UserRegistrationDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameTitleDto;
+import com.example.automappingobjectsexercise.model.dto.user.UserLoginDto;
+import com.example.automappingobjectsexercise.model.dto.user.UserRegistrationDto;
 import com.example.automappingobjectsexercise.service.GameService;
+import com.example.automappingobjectsexercise.service.OrderService;
 import com.example.automappingobjectsexercise.service.UserService;
 import com.example.automappingobjectsexercise.util.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CommandLineRunnerImpl implements CommandLineRunner {
@@ -20,12 +24,14 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
     private final BufferedReader reader;
     private final UserService userService;
     private final GameService gameService;
+    private final OrderService orderService;
 
     @Autowired
-    public CommandLineRunnerImpl(BufferedReader reader, UserService userService, GameService gameService) {
+    public CommandLineRunnerImpl(BufferedReader reader, UserService userService, GameService gameService, OrderService orderService) {
         this.reader = reader;
         this.userService = userService;
         this.gameService = gameService;
+        this.orderService = orderService;
     }
 
     @Override
@@ -92,6 +98,40 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
                         gameTitle = this.gameService.deleteGame(Long.parseLong(commands[1]));
 
                         System.out.println("Deleted " + gameTitle);
+                    }
+                    case "AllGames" -> {
+                        this.gameService.getAllGames().forEach(System.out::println);
+                    }
+                    case "DetailGame" -> {
+                        gameTitle = commands[1];
+
+                        System.out.println(this.gameService.getGameAsDetailedView(gameTitle));
+                    }
+                    case "OwnedGames" -> {
+                        this.userService.getOwnedGames().forEach(System.out::println);
+                    }
+                    case "AddItem" -> {
+                        gameTitle = commands[1];
+
+                        this.orderService.addItem(gameTitle);
+
+                        System.out.println(gameTitle + " added to the cart.");
+                    }
+                    case "RemoveItem" -> {
+                        gameTitle = commands[1];
+
+                        this.orderService.removeItem(gameTitle);
+
+                        System.out.println(gameTitle + " removed from the cart.");
+                    }
+                    case "BuyItem" -> {
+                        List<GameTitleDto> boughtGames = this.orderService.byItems();
+
+                        System.out.println("Successfully bought games:" + System.lineSeparator() +
+                                boughtGames
+                                        .stream()
+                                        .map(GameTitleDto::getTitle)
+                                        .collect(Collectors.joining(System.lineSeparator(), " -", "")));
                     }
                 }
             } catch (IllegalArgumentException | IllegalStateException e) {

@@ -1,6 +1,8 @@
 package com.example.automappingobjectsexercise.service.impl;
 
-import com.example.automappingobjectsexercise.model.dto.GameDto;
+import com.example.automappingobjectsexercise.model.dto.game.DetailedGameDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameViewDto;
 import com.example.automappingobjectsexercise.model.entity.Game;
 import com.example.automappingobjectsexercise.repository.GameRepository;
 import com.example.automappingobjectsexercise.service.GameService;
@@ -17,7 +19,9 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -53,7 +57,7 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Override
     public String editGame(long id, Map<String, String> fieldNamesAndValues) throws NoSuchFieldException, IllegalAccessException {
-        Game game = this.findGame(id);
+        Game game = this.findGameById(id);
 
         // Validation
         this.validateGameProperties(fieldNamesAndValues, game);
@@ -70,16 +74,38 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Override
     public String deleteGame(long id) {
-        Game game = this.findGame(id);
+        Game game = this.findGameById(id);
 
         this.gameRepository.deleteById(id);
 
         return game.getTitle();
     }
 
-    private Game findGame(long id) {
+    @Override
+    public List<GameViewDto> getAllGames() {
+        List<Game> games = this.gameRepository.findAll();
+
+        return games
+                .stream()
+                .map(game -> this.mapper.map(game, GameViewDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public DetailedGameDto getGameAsDetailedView(String title) {
+        Game game = this.findGameByTitle(title);
+
+        return this.mapper.map(game, DetailedGameDto.class);
+    }
+
+    private Game findGameById(long id) {
         return this.gameRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("There is no game with such an id"));
+    }
+
+    private Game findGameByTitle(String title) {
+        return this.gameRepository.findByTitle(title)
+                .orElseThrow(() -> new IllegalArgumentException("There is no game with such a title"));
     }
 
     // It is easier to validate it through the DTO
@@ -114,7 +140,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private void ensureItIsAnAdmin() {
-        if (!this.userService.isAdmin()) {
+        if (this.userService.isUserAdmin()) {
             throw new IllegalStateException(
                     "Only a user with administrative rights can add/edit/delete games to the catalog"
             );

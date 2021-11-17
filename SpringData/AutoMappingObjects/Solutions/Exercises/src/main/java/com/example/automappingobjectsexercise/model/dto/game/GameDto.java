@@ -1,4 +1,4 @@
-package com.example.automappingobjectsexercise.model.dto;
+package com.example.automappingobjectsexercise.model.dto.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Data
 public class GameDto {
-    @Pattern(regexp = "^[A-Z].{3,100}$",
+    @Pattern(regexp = "^[A-Z].{2,99}$",
             message = "Invalid title!")
     private String title;
     @DecimalMin(value = "0",

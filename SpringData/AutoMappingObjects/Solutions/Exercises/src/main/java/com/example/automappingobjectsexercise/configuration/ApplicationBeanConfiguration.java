@@ -1,6 +1,6 @@
 package com.example.automappingobjectsexercise.configuration;
 
-import com.example.automappingobjectsexercise.model.dto.GameDto;
+import com.example.automappingobjectsexercise.model.dto.game.GameDto;
 import com.example.automappingobjectsexercise.model.entity.Game;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

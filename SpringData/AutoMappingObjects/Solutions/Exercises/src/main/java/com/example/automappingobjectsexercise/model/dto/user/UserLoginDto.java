@@ -1,4 +1,4 @@
-package com.example.automappingobjectsexercise.model.dto;
+package com.example.automappingobjectsexercise.model.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

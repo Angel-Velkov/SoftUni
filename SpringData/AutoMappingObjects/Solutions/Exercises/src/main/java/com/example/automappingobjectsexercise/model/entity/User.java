@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,9 +23,9 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String fullName;
-    @ManyToMany
     @ToString.Exclude
-    private Set<Game> games;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Game> games = new HashSet<>();
     private boolean isAdministrator;
 
     @Override
