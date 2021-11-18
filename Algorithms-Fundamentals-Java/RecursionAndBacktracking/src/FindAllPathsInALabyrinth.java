@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class FindAllPathsInALabyrinth {
 
+    //Stack
     private static final ArrayDeque<Character> path = new ArrayDeque<>();
 
     public static void main(String[] args) {
@@ -17,7 +18,7 @@ public class FindAllPathsInALabyrinth {
     }
 
     private static void findPaths(char[][] labyrinth, int row, int col, char direction) {
-        if (OutOfBounds(labyrinth, row, col)) {
+        if (outOfBounds(labyrinth, row, col)) {
             return;
         }
         if (direction != ' ') {
@@ -34,12 +35,13 @@ public class FindAllPathsInALabyrinth {
             findPaths(labyrinth, row - 1, col, 'U');
             findPaths(labyrinth, row, col - 1, 'L');
 
-            //unMark
+            //Unmark
             labyrinth[row][col] = '-';
         }
         if (!path.isEmpty())
             path.pop();
     }
+
     private static void printDirection() {
         Iterator<Character> iterator = path.descendingIterator();
         while (iterator.hasNext()) {
@@ -48,7 +50,7 @@ public class FindAllPathsInALabyrinth {
         System.out.println();
     }
 
-    private static boolean OutOfBounds(char[][] matrix, int row, int col) {
+    private static boolean outOfBounds(char[][] matrix, int row, int col) {
         return 0 > row || row >= matrix.length
                 || 0 > col || col >= matrix[row].length;
     }
