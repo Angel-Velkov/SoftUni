@@ -5,7 +5,6 @@ public class EightQueensPuzzle {
     private static final char[][] board = generateMatrix(boardSize, boardSize, '-');
 
     public static void main(String[] args) {
-
         putQueens(0);
     }
 
@@ -31,12 +30,6 @@ public class EightQueensPuzzle {
             }
         }
 
-        for (int c = 0; c < boardSize; c++) {
-            if (board[row][c] == '*') {
-                return false;
-            }
-        }
-
         int r = row;
         int c = col;
 
@@ -55,23 +48,6 @@ public class EightQueensPuzzle {
             }
         }
 
-        r = row;
-        c = col;
-
-        while (r < boardSize && c < boardSize) {
-            if (board[r++][c++] == '*') {
-                return false;
-            }
-        }
-
-        r = row;
-        c = col;
-
-        while (r < boardSize && 0 <= c) {
-            if (board[r++][c--] == '*') {
-                return false;
-            }
-        }
         return true;
     }
 

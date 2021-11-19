@@ -6,7 +6,6 @@ public class EightQueensPuzzle2 {
     private final static int boardSize = 8;
 
     private static final char[][] board = generateMatrix(boardSize, boardSize, '-');
-    private static final Set<Integer> usedRows = new HashSet<>();
     private static final Set<Integer> usedCols = new HashSet<>();
     private static final Set<Integer> usedLeftDiag = new HashSet<>();
     private static final Set<Integer> usedRightDiag = new HashSet<>();
@@ -39,19 +38,18 @@ public class EightQueensPuzzle2 {
         int leftDiagonal = row - col;
         int rightDiagonal = row + col;
 
-        return !usedRows.contains(row) && !usedCols.contains(col)
-                && !usedLeftDiag.contains(leftDiagonal) && !usedRightDiag.contains(rightDiagonal);
+        return !usedCols.contains(col)
+                && !usedLeftDiag.contains(leftDiagonal)
+                && !usedRightDiag.contains(rightDiagonal);
     }
 
     private static void addCoordinates(int row, int col) {
-        usedRows.add(row);
         usedCols.add(col);
         usedLeftDiag.add(row - col);
         usedRightDiag.add(row + col);
     }
 
     private static void removeCoordinates(int row, int col) {
-        usedRows.remove(row);
         usedCols.remove(col);
         usedLeftDiag.remove(row - col);
         usedRightDiag.remove(row + col);
