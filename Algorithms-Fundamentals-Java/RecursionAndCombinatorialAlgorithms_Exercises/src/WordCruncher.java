@@ -14,6 +14,7 @@ public class WordCruncher {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+
         List<String> substrings = Arrays.stream(reader.readLine().split(",\\s*"))
                 .collect(Collectors.toList());
 
@@ -21,14 +22,18 @@ public class WordCruncher {
         substrings.removeIf(s -> !target.contains(s));
 
         for (String substr : substrings) {
-            occurrences.putIfAbsent(substr, 0);
-            occurrences.put(substr, occurrences.get(substr) + 1);
 
-            int index = target.indexOf(substr);
-            while (index > -1) {
-                syllablesOnIndex.putIfAbsent(index, new ArrayList<>());
-                syllablesOnIndex.get(index).add(substr);
-                index = target.indexOf(substr, index + 1);
+            if (occurrences.containsKey(substr)) {
+                occurrences.put(substr, occurrences.get(substr) + 1);
+            } else {
+                occurrences.put(substr, 1);
+
+                int index = target.indexOf(substr);
+                while (index > -1) {
+                    syllablesOnIndex.putIfAbsent(index, new ArrayList<>());
+                    syllablesOnIndex.get(index).add(substr);
+                    index = target.indexOf(substr, index + 1);
+                }
             }
         }
 
@@ -48,8 +53,8 @@ public class WordCruncher {
                     occurrences.put(str, occurrences.get(str) - 1);
                     wordCombinations.add(str);
                     permute(index + str.length());
-                    wordCombinations.remove(wordCombinations.size() - 1);
                     occurrences.put(str, occurrences.get(str) + 1);
+                    wordCombinations.remove(wordCombinations.size() - 1);
                 }
             }
         }
