@@ -38,5 +38,15 @@ public class AppInitializer implements CommandLineRunner {
         SAMPLE_POSTS.forEach(this.postService::addPost);
 
         this.postService.getAllPosts();
+
+        // Add post with HTTP client
+        /*
+        {
+           "title": "GSON Post",
+           "content": "GSON post example",
+           "imageUrl": "https://www.publicdomainpictures.net/pictures/33000/somewhere/json-body.jpg",
+           "author": "Misho"
+        }
+        */
     }
 }

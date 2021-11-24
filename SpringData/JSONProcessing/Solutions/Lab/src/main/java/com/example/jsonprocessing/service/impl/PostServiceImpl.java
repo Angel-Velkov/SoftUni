@@ -37,16 +37,16 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public void addPost(Post post) {
+    public Post addPost(Post post) {
         post.setId(null);
-        this.postRepository.save(post);
+        return this.postRepository.save(post);
     }
 
     @Transactional
     @Override
-    public void updatePost(Post post) {
+    public Post updatePost(Post post) {
         this.getPostById(post.getId());
-        this.postRepository.save(post);
+        return this.postRepository.save(post);
     }
 
     @Transactional

@@ -10,9 +10,9 @@ public interface PostService {
 
     Post getPostById(long id);
 
-    void addPost(Post post);
+    Post addPost(Post post);
 
-    void updatePost(Post post);
+    Post updatePost(Post post);
 
     boolean deletePost(long id);
 
