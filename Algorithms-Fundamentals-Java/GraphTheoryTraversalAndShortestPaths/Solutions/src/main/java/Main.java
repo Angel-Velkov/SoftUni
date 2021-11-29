@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+        // Test for 'Connected Components'
         int n = Integer.parseInt(reader.readLine());
 
         List<List<Integer>> graph = new ArrayList<>(n);
@@ -25,7 +26,6 @@ public class Main {
             System.out.println("Connected component: " +
                     connectedComponent.stream().map(String::valueOf).collect(Collectors.joining(" ")));
         }
-
     }
 
     public static List<Deque<Integer>> getConnectedComponents(List<List<Integer>> graph) {
@@ -56,6 +56,53 @@ public class Main {
     }
 
     public static Collection<String> topSort(Map<String, List<String>> graph) {
-        throw new AssertionError("Not Implemented");
+        Map<String, Integer> dependenciesCount = gerDependenciesCount(graph);
+
+        List<String> sorted = new ArrayList<>();
+
+        while (!graph.isEmpty()) {
+            String nodeToRemove = graph.keySet()
+                    .stream()
+                    .filter(k -> dependenciesCount.get(k) == 0)
+                    .findFirst()
+                    .orElse(null);
+
+            if (nodeToRemove == null) {
+                break;
+            }
+
+            for (String child : graph.get(nodeToRemove)) {
+                dependenciesCount.put(child, dependenciesCount.get(child) - 1);
+            }
+
+            graph.remove(nodeToRemove);
+            sorted.add(nodeToRemove);
+        }
+
+        if (!graph.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        return sorted;
+    }
+
+    private static Map<String, Integer> gerDependenciesCount(Map<String, List<String>> graph) {
+        Map<String, Integer> dependenciesCount = new HashMap<>();
+
+        for (Map.Entry<String, List<String>> node : graph.entrySet()) {
+            dependenciesCount.putIfAbsent(node.getKey(), 0);
+
+            for (String child : node.getValue()) {
+                Integer count = dependenciesCount.get(child);
+
+                if (count == null) {
+                    count = 0;
+                }
+
+                dependenciesCount.put(child, count + 1);
+            }
+        }
+
+        return dependenciesCount;
     }
 }
