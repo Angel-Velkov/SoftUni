@@ -2,30 +2,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        // Test for 'Connected Components'
-        int n = Integer.parseInt(reader.readLine());
-
-        List<List<Integer>> graph = new ArrayList<>(n);
-
-        for (int i = 0; i < n; i++) {
-            List<Integer> nodeChildren = Arrays.stream(reader.readLine().split("\\s+"))
-                    .filter(s -> !s.isEmpty())
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
-
-            graph.add(nodeChildren);
-        }
-
-        for (Deque<Integer> connectedComponent : getConnectedComponents(graph)) {
-            System.out.println("Connected component: " +
-                    connectedComponent.stream().map(String::valueOf).collect(Collectors.joining(" ")));
-        }
     }
 
     public static List<Deque<Integer>> getConnectedComponents(List<List<Integer>> graph) {
@@ -35,26 +16,86 @@ public class Main {
 
         for (int startingPoint = 0; startingPoint < graph.size(); startingPoint++) {
             if (!visited[startingPoint]) {
-                components.add(new ArrayDeque<>());
-                dfs(startingPoint, graph, visited, components);
+                Deque<Integer> component = new ArrayDeque<>();
+                components.add(component);
+                // dfs/bfs
+                dfs(startingPoint, graph, visited, component);
             }
         }
 
         return components;
     }
 
-    private static void dfs(int node, List<List<Integer>> graph, boolean[] visited, List<Deque<Integer>> components) {
+    private static void dfs(int node, List<List<Integer>> graph, boolean[] visited, Deque<Integer> component) {
         if (!visited[node]) {
             visited[node] = true;
 
             for (Integer child : graph.get(node)) {
-                dfs(child, graph, visited, components);
+                dfs(child, graph, visited, component);
             }
 
-            components.get(components.size() - 1).offer(node);
+            component.offer(node);
         }
     }
 
+    private static void bfs(int node, List<List<Integer>> graph, boolean[] visited, Deque<Integer> component) {
+        if (!visited[node]) {
+            Queue<Integer> queue = new ArrayDeque<>();
+
+            queue.offer(node);
+            visited[node] = true;
+
+            while (!queue.isEmpty()) {
+                node = queue.poll();
+                component.offer(node);
+
+                for (Integer child : graph.get(node)) {
+                    if (!visited[child]) {
+                        queue.offer(child);
+                        visited[child] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // DFS Topological Sorting
+    public static Collection<String> topSort(Map<String, List<String>> graph) {
+        List<String> sorted = new ArrayList<>();
+
+        Set<String> visited = new HashSet<>();
+        Set<String> cycles = new HashSet<>();
+
+        for (String node : graph.keySet()) {
+            dfs(node, graph, visited, sorted, cycles);
+        }
+
+        Collections.reverse(sorted);
+
+        return sorted;
+    }
+
+    private static void dfs(String node, Map<String, List<String>> graph,
+                            Set<String> visited, List<String> sorted, Set<String> cycles) {
+        if (cycles.contains(node)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!visited.contains(node)) {
+            visited.add(node);
+            cycles.add(node);
+
+            for (String child : graph.get(node)) {
+                dfs(child, graph, visited, sorted, cycles);
+            }
+
+            cycles.remove(node);
+
+            sorted.add(node);
+        }
+    }
+
+    /*
     public static Collection<String> topSort(Map<String, List<String>> graph) {
         Map<String, Integer> dependenciesCount = gerDependenciesCount(graph);
 
@@ -95,14 +136,11 @@ public class Main {
             for (String child : node.getValue()) {
                 Integer count = dependenciesCount.get(child);
 
-                if (count == null) {
-                    count = 0;
-                }
-
-                dependenciesCount.put(child, count + 1);
+                dependenciesCount.put(child, count == null ? 1 : count + 1);
             }
         }
 
         return dependenciesCount;
     }
+    */
 }
