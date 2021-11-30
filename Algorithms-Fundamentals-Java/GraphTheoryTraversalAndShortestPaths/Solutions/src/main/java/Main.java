@@ -50,10 +50,18 @@ public class Main {
 
         Integer prevNode = predecessors[destination];
 
-        while (prevNode != null) {
+        while (prevNode == null || prevNode != source) {
+            if (prevNode == null) {
+                throw new IllegalArgumentException(
+                        String.format("There is no path from '%s' to '%s'."
+                                , source, destination));
+            }
+
             path.add(prevNode);
             prevNode = predecessors[prevNode];
         }
+
+        path.add(source);
 
         Collections.reverse(path);
 
