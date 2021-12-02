@@ -4,56 +4,72 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class CyclesInAGraph {
+    private static class Graph {
+        Map<String, List<String>> nodes;
+
+        Graph() {
+            this.nodes = new HashMap<>();
+        }
+
+        void addEdge(String a, String b) {
+            this.nodes.computeIfAbsent(a, k -> new ArrayList<>()).add(b);
+            this.nodes.computeIfAbsent(b, k -> new ArrayList<>()).add(a);
+        }
+
+        Set<String> getNodes() {
+            return nodes.keySet();
+        }
+
+        List<String> getEdges(String node) {
+            return nodes.get(node);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        Map<String, List<String>> graph = new HashMap<>();
+        Graph graph = new Graph();
 
         String line;
 
         while (!"End".equals(line = reader.readLine())) {
             String[] edge = line.split("-");
 
-            graph.computeIfAbsent(edge[0], k -> new ArrayList<>()).add(edge[1]);
+            graph.addEdge(edge[0], edge[1]);
         }
 
         System.out.println("Acyclic: " + (isAcyclic(graph) ? "Yes" : "No"));
     }
 
-    private static boolean flag = true;
-
-    private static boolean isAcyclic(Map<String, List<String>> graph) {
-        Set<String> visited = new HashSet<>();
-        Set<String> cycles = new HashSet<>();
-
-        for (String node : graph.keySet()) {
-            dfs(node, graph, visited, cycles);
-            if (!flag) {
-                return false;
-            }
-        }
-
-        return true;
+    private static boolean isAcyclic(Graph graph) {
+        return !isCyclic(graph);
     }
 
-    private static void dfs(String node, Map<String, List<String>> graph,
-                            Set<String> visited, Set<String> cycles) {
-        if (cycles.contains(node)) {
-            flag = false;
-            return;
-        }
+    private static boolean isCyclic(Graph graph) {
+        Set<String> visited = new HashSet<>();
 
-        if (!visited.contains(node)) {
-            visited.add(node);
-            cycles.add(node);
-
-            if (graph.get(node) != null) {
-                for (String child : graph.get(node)) {
-                    dfs(child, graph, visited, cycles);
+        for (String node : graph.getNodes()) {
+            if (!visited.contains(node)) {
+                if (isCyclicUtil(graph, node, null, visited)) {
+                    return true;
                 }
             }
-
-            cycles.remove(node);
         }
+        return false;
+    }
+
+    static Boolean isCyclicUtil(Graph graph, String node, String parent, Set<String> visited) {
+        visited.add(node);
+
+        for (String child : graph.getEdges(node)) {
+            if (!visited.contains(child)) {
+                if (isCyclicUtil(graph, child, node, visited)) {
+                    return true;
+                }
+            } else if (!child.equals(parent)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
