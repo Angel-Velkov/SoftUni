@@ -58,7 +58,7 @@ public class CyclesInAGraph {
         return false;
     }
 
-    static Boolean isCyclicUtil(Graph graph, String node, String parent, Set<String> visited) {
+    private static boolean isCyclicUtil(Graph graph, String node, String parent, Set<String> visited) {
         visited.add(node);
 
         for (String child : graph.getEdges(node)) {
