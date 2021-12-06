@@ -32,7 +32,7 @@ public class BreakCycles {
 
         String line;
         while (!"".equals(line = reader.readLine())) {
-            String[] tokens = line.split("\\s+->\\s+");
+            String[] tokens = line.split("\\s*->\\s*");
 
             String node = tokens[0];
             List<String> children = Arrays.stream(tokens[1].split("\\s+")).collect(Collectors.toList());

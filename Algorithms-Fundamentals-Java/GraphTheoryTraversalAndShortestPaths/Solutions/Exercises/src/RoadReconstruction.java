@@ -44,35 +44,32 @@ public class RoadReconstruction {
 
         int streets = Integer.parseInt(reader.readLine());
 
+        List<int[]> edges = new ArrayList<>();
+
         for (int i = 0; i < streets; i++) {
-            int[] edge = Arrays.stream(reader.readLine().split("\\s+-\\s+"))
+            int[] edge = Arrays.stream(reader.readLine().split("\\s*-\\s*"))
                     .mapToInt(Integer::parseInt)
                     .toArray();
 
+            edges.add(edge);
             graph.addEdge(edge[0], edge[1]);
         }
 
         int[] color = new int[buildings];
-        int[] par = new int[buildings];
-
+        int[] parents = new int[buildings];
         int[] mark = new int[buildings];
 
-        dfsMarkCycles(0, -1, color, mark, par);
+        dfsMarkCycles(0, -1, color, mark, parents);
 
         System.out.println("Important streets:");
-        printAcyclicEdges(mark);
+        printAcyclicEdges(mark, edges);
     }
 
-    private static void printAcyclicEdges(int[] mark) {
-        for (int node = 0; node < graph.getSize(); node++) {
-            if (mark[node] == 0) {
-                for (Integer child : graph.getChildren(node)) {
-                    if (child < node) {
-                        System.out.println(child + " " + node);
-                    } else {
-                        System.out.println(node + " " + child);
-                    }
-                }
+    private static void printAcyclicEdges(int[] mark, List<int[]> edges) {
+        for (int[] edge : edges) {
+            if (mark[edge[0]] == 0 || mark[edge[1]] == 0) {
+                System.out.println(edge[0] + " " + edge[1]);
+
             }
         }
     }
@@ -95,6 +92,7 @@ public class RoadReconstruction {
             }
             return;
         }
+
         parents[node] = parent;
         color[node] = 1;
 
