@@ -1,11 +1,14 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DividingPresents {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        int[] presents = Arrays.stream(scanner.nextLine().split("\\s+"))
+        int[] presents = Arrays.stream(reader.readLine().split("\\s+"))
                 .mapToInt(Integer::parseInt)
                 .toArray();
 
@@ -14,22 +17,29 @@ public class DividingPresents {
 
         Map<Integer, Integer> allPossibleSums = findAllPossibleSums(presents);
         int alanSum = findTheSumOfAlanPresents(allPossibleSums, median);
+        int bobSum = totalSum - alanSum;
         List<Integer> alanPresents = findAlanPresents(allPossibleSums, alanSum);
 
-        int bobSum = totalSum - alanSum;
+        printTheOutput(totalSum, alanSum, bobSum, alanPresents);
+    }
 
-        System.out.println("Difference: " + (bobSum - alanSum));
-        System.out.println("Alan: " + alanSum + " Bob: " + (totalSum - alanSum));
-        System.out.println("Alan takes: " +
+    private static void printTheOutput(int totalSum, int alanSum, int bobSum, List<Integer> alanPresents) {
+        System.out.printf("Difference: %d%n" +
+                        "Alan:%d Bob:%d%n" +
+                        "Alan takes: %s%n" +
+                        "Bob takes the rest.",
+                (bobSum - alanSum),
+                alanSum, (totalSum - alanSum),
                 alanPresents
-                        .stream().map(String::valueOf)
+                        .stream()
+                        .map(String::valueOf)
                         .collect(Collectors.joining(" "))
         );
-        System.out.println("Bob takes the rest.");
     }
 
     private static int findTheSumOfAlanPresents(Map<Integer, Integer> allPossibleSums, int median) {
         int alanSum = median;
+
         while (!allPossibleSums.containsKey(alanSum)) {
             alanSum--;
         }
@@ -54,7 +64,7 @@ public class DividingPresents {
         possibleSums.put(0, 0);
 
         for (int number : numbers) {
-            for (Integer sum : new ArrayList<>(possibleSums.keySet())) {
+            for (int sum : new ArrayList<>(possibleSums.keySet())) {
                 possibleSums.putIfAbsent(sum + number, number);
             }
         }
