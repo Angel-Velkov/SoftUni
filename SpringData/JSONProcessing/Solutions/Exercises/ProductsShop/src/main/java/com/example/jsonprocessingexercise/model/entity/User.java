@@ -29,8 +29,14 @@ public class User {
     private byte age;
 
     @ToString.Exclude
+    @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
+    private Set<Product> products;
+
+    @ToString.Exclude
     @ManyToMany
-    @JoinTable(inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    @JoinTable(name = "users_friends",
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
     private Set<User> friends = new HashSet<>();
 
     private void addFriend(User user) {

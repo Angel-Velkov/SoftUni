@@ -1,6 +1,6 @@
 package com.example.jsonprocessingexercise.service.impl;
 
-import com.example.jsonprocessingexercise.model.dto.ProductNameAndPriceDto;
+import com.example.jsonprocessingexercise.model.dto.ProductNamePriceAndSellerDto;
 import com.example.jsonprocessingexercise.model.dto.ProductSeedDto;
 import com.example.jsonprocessingexercise.model.entity.Category;
 import com.example.jsonprocessingexercise.model.entity.Product;
@@ -68,14 +68,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductNameAndPriceDto> productsInRange(BigDecimal lower, BigDecimal upper) {
+    public List<ProductNamePriceAndSellerDto> productsInRange(BigDecimal lower, BigDecimal upper) {
         List<Product> products = this.productRepository
                 .findAllByPriceBetweenAndBuyerIsNullOrderByPriceDesc(lower, upper);
 
-        List<ProductNameAndPriceDto> result = new ArrayList<>();
+        List<ProductNamePriceAndSellerDto> result = new ArrayList<>();
 
         for (Product product : products) {
-            ProductNameAndPriceDto productDto = mapper.map(product, ProductNameAndPriceDto.class);
+            ProductNamePriceAndSellerDto productDto = mapper.map(product, ProductNamePriceAndSellerDto.class);
             productDto.setSeller(product.getSeller().getFirstName() + " " + product.getSeller().getLastName());
             result.add(productDto);
         }

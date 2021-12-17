@@ -1,16 +1,14 @@
 package com.example.jsonprocessingexercise.model.dto;
 
 import com.google.gson.annotations.Expose;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class ProductNameAndPriceDto {
+public class ProductNamePriceAndSellerDto {
 
     @Expose
     private String name;

@@ -1,6 +1,6 @@
 package com.example.jsonprocessingexercise.service;
 
-import com.example.jsonprocessingexercise.model.dto.ProductNameAndPriceDto;
+import com.example.jsonprocessingexercise.model.dto.ProductNamePriceAndSellerDto;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,5 +10,5 @@ public interface ProductService {
 
     void seedProducts() throws IOException;
 
-    List<ProductNameAndPriceDto> productsInRange(BigDecimal lower, BigDecimal upper);
+    List<ProductNamePriceAndSellerDto> productsInRange(BigDecimal lower, BigDecimal upper);
 }

@@ -4,13 +4,21 @@ import com.google.gson.annotations.Expose;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Data
-public class CategorySeedDto {
+public class ProductsWithBuyerDto {
 
     @Expose
-    @Size(min = 3, max = 15)
     private String name;
+
+    @Expose
+    private BigDecimal price;
+
+    @Expose
+    private String buyerFirstName;
+
+    @Expose
+    private String buyerLastName;
 }

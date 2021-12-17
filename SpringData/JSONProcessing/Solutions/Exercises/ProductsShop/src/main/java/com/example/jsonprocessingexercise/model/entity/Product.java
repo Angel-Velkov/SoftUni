@@ -38,6 +38,7 @@ public class Product {
     @ToString.Exclude
     @ManyToMany
     @JoinTable(
+            name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
