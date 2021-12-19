@@ -1,6 +1,7 @@
 package com.example.cardealer.service;
 
-import com.example.cardealer.model.dto.CarDto;
+import com.example.cardealer.model.dto.CarWithIdDto;
+import com.example.cardealer.model.dto.CarWithPartsDto;
 import com.example.cardealer.model.entity.Car;
 
 import java.io.IOException;
@@ -12,5 +13,7 @@ public interface CarService {
 
     Car getRandomCar();
 
-    List<CarDto> findAllByMake(String make);
+    List<CarWithIdDto> findAllByMake(String make);
+
+    List<CarWithPartsDto> findAllCarsWithTheirParts();
 }

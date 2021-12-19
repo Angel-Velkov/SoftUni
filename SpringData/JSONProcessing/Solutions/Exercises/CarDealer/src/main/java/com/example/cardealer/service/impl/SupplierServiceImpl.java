@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -24,7 +23,7 @@ import static com.example.cardealer.constatnt.GlobalConstant.RESOURCES_FILE_PATH
 @Service
 public class SupplierServiceImpl implements SupplierService {
 
-    private static final String SUPPLIERS_FILE_NAME = "suppliers.json";
+    private static final String SUPPLIERS_FILE_NAME = "files/suppliers.json";
 
     private final SupplierRepository supplierRepository;
     private final ModelMapper mapper;
@@ -61,7 +60,7 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public List<SupplierWithCountOfPartsDto> findAllLocalSuppliers() {
-         return this.supplierRepository
+        return this.supplierRepository
                 .findAllLocalSupplierWithTheNumberOfPartsTheySupply()
                 .stream()
                 .map(objects -> {

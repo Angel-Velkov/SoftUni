@@ -4,16 +4,15 @@ import com.google.gson.annotations.Expose;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @Data
-public class CarDto {
+public class PartDto {
 
     @Expose
-    private String Make;
+    private String Name;
 
     @Expose
-    private String Model;
-
-    @Expose
-    private long TravelledDistance;
+    private BigDecimal Price;
 }

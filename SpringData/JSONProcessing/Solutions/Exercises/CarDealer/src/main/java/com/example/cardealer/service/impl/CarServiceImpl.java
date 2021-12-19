@@ -1,6 +1,7 @@
 package com.example.cardealer.service.impl;
 
-import com.example.cardealer.model.dto.CarDto;
+import com.example.cardealer.model.dto.CarWithIdDto;
+import com.example.cardealer.model.dto.CarWithPartsDto;
 import com.example.cardealer.model.dto.seed.CarSeedDto;
 import com.example.cardealer.model.entity.Car;
 import com.example.cardealer.model.entity.Part;
@@ -26,7 +27,7 @@ import static com.example.cardealer.constatnt.GlobalConstant.RESOURCES_FILE_PATH
 @Service
 public class CarServiceImpl implements CarService {
 
-    private static final String CARS_FILE_NAME = "cars.json";
+    private static final String CARS_FILE_NAME = "files/cars.json";
 
     private static final int LOWER_BOUND = 3;
     private static final int UPPER_BOUND = 5;
@@ -74,11 +75,20 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarDto> findAllByMake(String make) {
+    public List<CarWithIdDto> findAllByMake(String make) {
         return this.carRepository
                 .findAllByMakeOrderByModelAscTravelledDistanceDesc(make)
                 .stream()
-                .map(car -> mapper.map(car, CarDto.class))
+                .map(car -> mapper.map(car, CarWithIdDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CarWithPartsDto> findAllCarsWithTheirParts() {
+        return this.carRepository
+                .findAll()
+                .stream()
+                .map(car -> mapper.map(car, CarWithPartsDto.class))
                 .collect(Collectors.toList());
     }
 }

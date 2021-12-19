@@ -25,7 +25,7 @@ import static com.example.cardealer.constatnt.GlobalConstant.RESOURCES_FILE_PATH
 @Service
 public class PartServiceImpl implements PartService {
 
-    private static final String PARTS_FILE_NAME = "parts.json";
+    private static final String PARTS_FILE_NAME = "files/parts.json";
 
     private final PartRepository partRepository;
     private final SupplierService supplierService;

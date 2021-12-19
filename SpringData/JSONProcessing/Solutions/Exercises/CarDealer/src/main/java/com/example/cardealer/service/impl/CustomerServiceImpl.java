@@ -1,5 +1,6 @@
 package com.example.cardealer.service.impl;
 
+import com.example.cardealer.model.dto.CustomerPurchasesInfoDto;
 import com.example.cardealer.model.dto.CustomerWithSalesDto;
 import com.example.cardealer.model.dto.seed.CustomerSeedDto;
 import com.example.cardealer.model.entity.Customer;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -23,7 +25,7 @@ import static com.example.cardealer.constatnt.GlobalConstant.RESOURCES_FILE_PATH
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private static final String CUSTOMER_FILE_NAME = "customers.json";
+    private static final String CUSTOMER_FILE_NAME = "files/customers.json";
 
     private final CustomerRepository customerRepository;
     private final ModelMapper mapper;
@@ -66,6 +68,24 @@ public class CustomerServiceImpl implements CustomerService {
         return customers
                 .stream()
                 .map(customer -> mapper.map(customer, CustomerWithSalesDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CustomerPurchasesInfoDto> findAllCustomersWithAtLeastOneCar() {
+        return this.customerRepository
+                .findAllCustomersWithTheCountOfCarsTheyBoughtAndTheMoneySpent()
+                .stream()
+                .map(objects -> {
+                    CustomerPurchasesInfoDto customerInfo =
+                            new CustomerPurchasesInfoDto();
+
+                    customerInfo.setFullName((String) objects[0]);
+                    customerInfo.setBoughtCars(Integer.parseInt(String.valueOf(objects[1])));
+                    customerInfo.setSpentMoney(new BigDecimal(String.valueOf(objects[2])));
+
+                    return customerInfo;
+                })
                 .collect(Collectors.toList());
     }
 }

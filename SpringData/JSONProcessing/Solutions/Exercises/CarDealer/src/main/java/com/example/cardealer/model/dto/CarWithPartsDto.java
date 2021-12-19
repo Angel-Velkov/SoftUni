@@ -4,9 +4,11 @@ import com.google.gson.annotations.Expose;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Data
-public class CarDto {
+public class CarWithPartsDto {
 
     @Expose
     private String Make;
@@ -16,4 +18,7 @@ public class CarDto {
 
     @Expose
     private long TravelledDistance;
+
+    @Expose
+    private List<PartDto> parts;
 }

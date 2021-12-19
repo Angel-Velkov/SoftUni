@@ -1,8 +1,6 @@
 package com.example.cardealer;
 
-import com.example.cardealer.model.dto.CarDto;
-import com.example.cardealer.model.dto.CustomerWithSalesDto;
-import com.example.cardealer.model.dto.SupplierWithCountOfPartsDto;
+import com.example.cardealer.model.dto.*;
 import com.example.cardealer.service.*;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,9 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
     private static final String ORDERED_CUSTOMERS = "ordered-customers.json";
     private static final String TOYOTA_CARS = "toyota-cars.json";
     private static final String LOCAL_SUPPLIERS = "local-suppliers.json";
+    private static final String CARS_AND_PARTS = "cars-and-parts.json";
+    private static final String CUSTOMERS_TOTAL_SALES = "customers-total-sales.json";
+    private static final String SALES_DISCOUNTS = "sales-discounts.json";
 
     private final static int COUNT_OF_SALES = 15;
     private final static String TOYOTA = "Toyota";
@@ -53,6 +54,9 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
         this.orderedCustomers();
         this.carsFromMakeToyota();
         this.localSuppliers();
+        this.carsWithTheirListOfParts();
+        this.totalSalesByCustomer();
+        this.salesWithAppliedDiscount();
     }
 
     private void seedData() throws IOException {
@@ -63,27 +67,53 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
         this.saleService.generateRandomSales(COUNT_OF_SALES);
     }
 
+    private void orderedCustomers() throws IOException {
+        List<CustomerWithSalesDto> orderedCustomers = this.customerService.getOrderedCustomers();
+        String json = gson.toJson(orderedCustomers);
+
+        this.write(OUTPUT_PATH + ORDERED_CUSTOMERS, json);
+    }
+
+    private void carsFromMakeToyota() throws IOException {
+        List<CarWithIdDto> carDtos = this.carService.findAllByMake(TOYOTA);
+        String json = gson.toJson(carDtos);
+
+        this.write(OUTPUT_PATH + TOYOTA_CARS, json);
+    }
+
     private void localSuppliers() throws IOException {
         List<SupplierWithCountOfPartsDto> localSuppliers =
                 this.supplierService.findAllLocalSuppliers();
 
         String json = gson.toJson(localSuppliers);
 
-        write(OUTPUT_PATH + LOCAL_SUPPLIERS, json);
+        this.write(OUTPUT_PATH + LOCAL_SUPPLIERS, json);
     }
 
-    private void carsFromMakeToyota() throws IOException {
-        List<CarDto> carDtos = this.carService.findAllByMake(TOYOTA);
-        String json = gson.toJson(carDtos);
+    private void carsWithTheirListOfParts() throws IOException {
+        List<CarWithPartsDto> carsWithPartsDtos =
+                this.carService.findAllCarsWithTheirParts();
 
-        write(OUTPUT_PATH + TOYOTA_CARS, json);
+        String json = gson.toJson(carsWithPartsDtos);
+
+        this.write(OUTPUT_PATH + CARS_AND_PARTS, json);
     }
 
-    private void orderedCustomers() throws IOException {
-        List<CustomerWithSalesDto> orderedCustomers = this.customerService.getOrderedCustomers();
-        String json = gson.toJson(orderedCustomers);
+    private void totalSalesByCustomer() throws IOException {
+        List<CustomerPurchasesInfoDto> customersInfoDto =
+                this.customerService.findAllCustomersWithAtLeastOneCar();
 
-        write(OUTPUT_PATH + ORDERED_CUSTOMERS, json);
+        String json = gson.toJson(customersInfoDto);
+
+        this.write(OUTPUT_PATH + CUSTOMERS_TOTAL_SALES, json);
+    }
+
+    private void salesWithAppliedDiscount() throws IOException {
+        List<SaleInfoDto> saleInfoDtos = this.saleService.getSalesInfo();
+
+        String json = gson.toJson(saleInfoDtos);
+
+        this.write(OUTPUT_PATH + SALES_DISCOUNTS, json);
     }
 
     private void write(String path, String content) throws IOException {

@@ -1,6 +1,9 @@
 package com.example.cardealer.model.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.GeneratedValue;
@@ -30,6 +33,6 @@ public abstract class BaseEntity {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return id.hashCode();
     }
 }

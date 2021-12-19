@@ -1,6 +1,8 @@
 package com.example.cardealer.service.impl;
 
-import com.example.cardealer.constatnt.Percentage;
+import com.example.cardealer.constatnt.Discounts;
+import com.example.cardealer.model.dto.CarDto;
+import com.example.cardealer.model.dto.SaleInfoDto;
 import com.example.cardealer.model.entity.Car;
 import com.example.cardealer.model.entity.Customer;
 import com.example.cardealer.model.entity.Sale;
@@ -11,7 +13,10 @@ import com.example.cardealer.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class SaleServiceImpl implements SaleService {
@@ -32,7 +37,7 @@ public class SaleServiceImpl implements SaleService {
         for (int i = 0; i < countOfSales; i++) {
             Car randomCar = carService.getRandomCar();
             Customer randomCustomer = customerService.getRandomCustomer();
-            double discount = this.getRandomPercentage();
+            BigDecimal discount = this.getRandomPercentage();
 
             Sale sale = new Sale(randomCar, randomCustomer, discount);
 
@@ -40,12 +45,39 @@ public class SaleServiceImpl implements SaleService {
         }
     }
 
-    private double getRandomPercentage() {
-        int countOfValues = Percentage.getSize();
+    @Override
+    public List<SaleInfoDto> getSalesInfo() {
+        return this.saleRepository
+                .findAllSalesAsInfo()
+                .stream()
+                .map(this::mapToSaleInfoDto)
+                .collect(Collectors.toList());
+    }
+
+    private SaleInfoDto mapToSaleInfoDto(Object[] objects) {
+        CarDto car = new CarDto();
+
+        car.setMake((String) objects[0]);
+        car.setModel((String) objects[1]);
+        car.setTravelledDistance(Long.parseLong(String.valueOf(objects[2])));
+
+        SaleInfoDto sale = new SaleInfoDto();
+        sale.setCar(car);
+
+        sale.setCustomerName((String) objects[3]);
+        sale.setDiscount(new BigDecimal(String.valueOf(objects[4])));
+        sale.setPrice(new BigDecimal(String.valueOf(objects[5])));
+        sale.setPriceWithDiscount(new BigDecimal(String.valueOf(objects[6])));
+
+        return sale;
+    }
+
+    private BigDecimal getRandomPercentage() {
+        int countOfValues = Discounts.getSize();
 
         int randomIndex = ThreadLocalRandom.current().nextInt(countOfValues);
-        Percentage[] percentages = Percentage.values();
+        Discounts[] percentages = Discounts.values();
 
-        return percentages[randomIndex].getAsDouble();
+        return percentages[randomIndex].getDecimal();
     }
 }

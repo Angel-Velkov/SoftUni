@@ -1,5 +1,6 @@
 package com.example.cardealer.service;
 
+import com.example.cardealer.model.dto.CustomerPurchasesInfoDto;
 import com.example.cardealer.model.dto.CustomerWithSalesDto;
 import com.example.cardealer.model.entity.Customer;
 
@@ -13,4 +14,6 @@ public interface CustomerService {
     Customer getRandomCustomer();
 
     List<CustomerWithSalesDto> getOrderedCustomers();
+
+    List<CustomerPurchasesInfoDto> findAllCustomersWithAtLeastOneCar();
 }

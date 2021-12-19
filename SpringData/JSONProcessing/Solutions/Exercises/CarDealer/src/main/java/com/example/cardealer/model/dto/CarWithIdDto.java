@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class CarDto {
+public class CarWithIdDto {
+
+    @Expose
+    private long Id;
 
     @Expose
     private String Make;
