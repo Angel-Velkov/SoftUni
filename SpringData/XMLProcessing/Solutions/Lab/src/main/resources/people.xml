@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <people>
     <person>
-        <name>George</name>
         <address>
             <country>England</country>
             <city>Liverpool</city>
         </address>
         <phone-numbers>
-            <phone>
-                <number>0888 888 888</number>
-            </phone>
+            <phone number="0888 888 888"/>
+            <phone number="0111 222 333"/>
         </phone-numbers>
     </person>
     <person>
@@ -19,9 +17,7 @@
             <city>Paris</city>
         </address>
         <phone-numbers>
-            <phone>
-                <number>0123 456 789</number>
-            </phone>
+            <phone number="0123 456 789"/>
         </phone-numbers>
     </person>
     <person>

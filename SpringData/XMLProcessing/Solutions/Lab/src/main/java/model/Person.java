@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 public class Person {
 
-    @NonNull
+    @XmlElement(required = true)
     private String name;
 
     @NonNull
@@ -22,4 +22,9 @@ public class Person {
     @XmlElementWrapper(name = "phone-numbers")
     @XmlElement(name = "phone")
     private Set<PhoneNumber> phoneNumbers = new HashSet<>();
+
+    public Person(String name, Address address) {
+        this.name = name;
+        this.address = address;
+    }
 }

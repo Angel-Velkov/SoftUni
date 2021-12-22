@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
-@Data
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@NoArgsConstructor
+@Data
 public class People {
 
     @XmlElement(name = "person")
