@@ -1,6 +1,7 @@
 package com.example.xmlproductshop.service.impl;
 
-import com.example.xmlproductshop.model.dto.ProductSeedDto;
+import com.example.xmlproductshop.model.dto.ProductWithSellerDto;
+import com.example.xmlproductshop.model.dto.seed.ProductSeedDto;
 import com.example.xmlproductshop.model.entity.Category;
 import com.example.xmlproductshop.model.entity.Product;
 import com.example.xmlproductshop.model.entity.User;
@@ -13,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,6 +51,17 @@ public class ProductServiceImpl implements ProductService {
         setRandomCategories(products);
 
         this.productRepository.saveAll(products);
+    }
+
+    @Override
+    public List<ProductWithSellerDto> productsInRangeWithoutBuyers(BigDecimal lower, BigDecimal upper) {
+        List<Product> products = this.productRepository
+                .findAllByPriceBetweenAndBuyerIsNullOrderByPrice(lower, upper);
+
+        return products
+                .stream()
+                .map(product -> mapper.map(product, ProductWithSellerDto.class))
+                .collect(Collectors.toList());
     }
 
     private void setRandomSellerAndBuyer(List<Product> products) {

@@ -1,6 +1,7 @@
 package com.example.xmlproductshop.service.impl;
 
-import com.example.xmlproductshop.model.dto.CategorySeedDto;
+import com.example.xmlproductshop.model.dto.CategoryInfoDto;
+import com.example.xmlproductshop.model.dto.seed.CategorySeedDto;
 import com.example.xmlproductshop.model.entity.Category;
 import com.example.xmlproductshop.repository.CategoryRepository;
 import com.example.xmlproductshop.service.CategoryService;
@@ -8,10 +9,12 @@ import com.example.xmlproductshop.util.ValidationUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -52,5 +55,23 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return categories;
+    }
+
+    @Override
+    public List<CategoryInfoDto> findAllCategoriesInfo() {
+        return this.categoryRepository
+                .findAllOrderedByNumberOfProducts()
+                .stream()
+                .map(objects -> {
+                    CategoryInfoDto categoryInfoDto = new CategoryInfoDto();
+
+                    categoryInfoDto.setName((String) objects[0]);
+                    categoryInfoDto.setProductsCount(Integer.parseInt(String.valueOf(objects[1])));
+                    categoryInfoDto.setAveragePrice(new BigDecimal(String.valueOf(objects[2])));
+                    categoryInfoDto.setTotalRevenue(new BigDecimal(String.valueOf(objects[3])));
+
+                    return categoryInfoDto;
+                })
+                .collect(Collectors.toList());
     }
 }

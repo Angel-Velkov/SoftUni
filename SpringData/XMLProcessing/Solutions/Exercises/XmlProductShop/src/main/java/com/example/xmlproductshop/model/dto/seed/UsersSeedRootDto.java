@@ -1,4 +1,4 @@
-package com.example.xmlproductshop.model.dto;
+package com.example.xmlproductshop.model.dto.seed;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @XmlRootElement(name = "users")
 @XmlAccessorType(XmlAccessType.NONE)
-public class UserSeedRootDto {
+public class UsersSeedRootDto {
 
     @XmlElement(name = "user")
     private List<UserSeedDto> users;

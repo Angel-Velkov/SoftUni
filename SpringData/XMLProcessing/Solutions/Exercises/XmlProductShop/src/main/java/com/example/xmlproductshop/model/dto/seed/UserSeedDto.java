@@ -1,4 +1,4 @@
-package com.example.xmlproductshop.model.dto;
+package com.example.xmlproductshop.model.dto.seed;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

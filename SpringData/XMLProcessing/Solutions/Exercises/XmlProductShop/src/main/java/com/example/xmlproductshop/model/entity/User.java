@@ -25,7 +25,7 @@ public class User extends BaseEntity {
     private byte age;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "seller")
     private Set<Product> products;
 
     @ToString.Exclude

@@ -3,21 +3,22 @@ package com.example.xmlproductshop.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProductSeedDto {
-    @Size(min = 3)
+public class ProductWithSellerDto {
+
+    @XmlAttribute
     private String name;
 
-    @NotNull
-    @Positive
+    @XmlAttribute
     private BigDecimal price;
+
+    @XmlAttribute(name = "seller")
+    private String sellerNames;
 }

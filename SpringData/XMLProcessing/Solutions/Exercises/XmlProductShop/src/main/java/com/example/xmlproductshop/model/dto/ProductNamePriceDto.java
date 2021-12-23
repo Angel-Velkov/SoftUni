@@ -3,15 +3,19 @@ package com.example.xmlproductshop.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CategorySeedDto {
+public class ProductNamePriceDto {
 
-    @Size(min = 3, max = 15)
+    @XmlAttribute
     private String name;
+
+    @XmlAttribute
+    private BigDecimal price;
 }
