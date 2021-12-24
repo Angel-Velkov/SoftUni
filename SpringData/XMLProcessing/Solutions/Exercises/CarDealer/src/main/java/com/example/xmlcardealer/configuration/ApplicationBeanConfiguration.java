@@ -1,6 +1,6 @@
 package com.example.xmlcardealer.configuration;
 
-import com.example.xmlcardealer.model.dto.CustomerSeedDto;
+import com.example.xmlcardealer.model.dto.seed.CustomerSeedDto;
 import com.example.xmlcardealer.model.entity.Customer;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

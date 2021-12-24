@@ -7,20 +7,22 @@ import lombok.Setter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PartSeedDto {
+public class CarWithIdDto {
 
     @XmlAttribute
-    private String name;
+    private long id;
 
     @XmlAttribute
-    private BigDecimal price;
+    private String make;
 
     @XmlAttribute
-    private int quality;
+    private String model;
+
+    @XmlAttribute(name = "travelled-distance")
+    private long travelledDistance;
 }

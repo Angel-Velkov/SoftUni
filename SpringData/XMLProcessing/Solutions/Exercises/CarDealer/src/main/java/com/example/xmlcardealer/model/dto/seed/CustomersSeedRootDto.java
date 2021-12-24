@@ -1,4 +1,4 @@
-package com.example.xmlcardealer.model.dto;
+package com.example.xmlcardealer.model.dto.seed;
 
 import lombok.*;
 
@@ -12,11 +12,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@XmlRootElement(name = "suppliers")
+@XmlRootElement(name = "customers")
 @XmlAccessorType(XmlAccessType.NONE)
-public class SuppliersSeedRootDto {
+public class CustomersSeedRootDto {
 
     @NonNull
-    @XmlElement(name = "supplier")
-    private List<SupplierSeedDto> suppliers;
+    @XmlElement(name = "customer")
+    private List<CustomerSeedDto> customers;
 }

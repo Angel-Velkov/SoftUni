@@ -1,6 +1,8 @@
 package com.example.xmlcardealer.service.impl;
 
-import com.example.xmlcardealer.model.dto.CarSeedDto;
+import com.example.xmlcardealer.model.dto.CarWithIdDto;
+import com.example.xmlcardealer.model.dto.CarWithPartsDto;
+import com.example.xmlcardealer.model.dto.seed.CarSeedDto;
 import com.example.xmlcardealer.model.entity.Car;
 import com.example.xmlcardealer.model.entity.Part;
 import com.example.xmlcardealer.repository.CarRepository;
@@ -12,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -57,5 +61,23 @@ public class CarServiceImpl implements CarService {
         long randomId = ThreadLocalRandom.current().nextLong(1, count + 1);
 
         return this.carRepository.findById(randomId).orElse(null);
+    }
+
+    @Override
+    public List<CarWithIdDto> findAllByMake(String make) {
+        return carRepository
+                .findAllByMakeOrderByModelAscTravelledDistanceDesc(make)
+                .stream()
+                .map(car -> mapper.map(car, CarWithIdDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CarWithPartsDto> findAllCarsWithTheirParts() {
+        return this.carRepository
+                .findAll()
+                .stream()
+                .map(car -> mapper.map(car, CarWithPartsDto.class))
+                .collect(Collectors.toList());
     }
 }

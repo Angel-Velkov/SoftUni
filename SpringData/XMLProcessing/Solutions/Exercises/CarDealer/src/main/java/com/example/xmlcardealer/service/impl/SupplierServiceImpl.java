@@ -1,6 +1,7 @@
 package com.example.xmlcardealer.service.impl;
 
-import com.example.xmlcardealer.model.dto.SupplierSeedDto;
+import com.example.xmlcardealer.model.dto.SupplierWithCountOfPartsDto;
+import com.example.xmlcardealer.model.dto.seed.SupplierSeedDto;
 import com.example.xmlcardealer.model.entity.Supplier;
 import com.example.xmlcardealer.repository.SupplierRepository;
 import com.example.xmlcardealer.service.SupplierService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class SupplierServiceImpl implements SupplierService {
@@ -42,5 +44,22 @@ public class SupplierServiceImpl implements SupplierService {
         long randomId = ThreadLocalRandom.current().nextLong(1, count + 1);
 
         return this.supplierRepository.findById(randomId).orElse(null);
+    }
+
+    @Override
+    public List<SupplierWithCountOfPartsDto> findAllLocalSuppliers() {
+        return this.supplierRepository
+                .findAllLocalSupplierWithTheNumberOfPartsTheySupply()
+                .stream()
+                .map(objects -> {
+                    SupplierWithCountOfPartsDto supplier = new SupplierWithCountOfPartsDto();
+
+                    supplier.setId(Long.parseLong(String.valueOf(objects[0])));
+                    supplier.setName((String) objects[1]);
+                    supplier.setPartsCount(Integer.parseInt(String.valueOf(objects[2])));
+
+                    return supplier;
+                })
+                .collect(Collectors.toList());
     }
 }

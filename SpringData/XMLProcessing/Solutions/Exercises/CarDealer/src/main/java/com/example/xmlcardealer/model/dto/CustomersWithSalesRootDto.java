@@ -14,9 +14,9 @@ import java.util.List;
 @Setter
 @XmlRootElement(name = "customers")
 @XmlAccessorType(XmlAccessType.NONE)
-public class CustomersSeedRootDto {
+public class CustomersWithSalesRootDto {
 
     @NonNull
     @XmlElement(name = "customer")
-    private List<CustomerSeedDto> customers;
+    private List<CustomerWithSalesDto> customers;
 }

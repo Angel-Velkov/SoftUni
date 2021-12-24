@@ -1,4 +1,4 @@
-package com.example.xmlcardealer.model.dto;
+package com.example.xmlcardealer.model.dto.seed;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

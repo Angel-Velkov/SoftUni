@@ -1,6 +1,6 @@
 package com.example.xmlcardealer.service;
 
-import com.example.xmlcardealer.model.dto.PartSeedDto;
+import com.example.xmlcardealer.model.dto.seed.PartSeedDto;
 import com.example.xmlcardealer.model.entity.Part;
 
 import java.util.Collection;

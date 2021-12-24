@@ -3,6 +3,7 @@ package com.example.xmlcardealer.model.entity;
 import lombok.*;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "cars")
-public class Car extends BaseEntity{
+public class Car extends BaseEntity {
 
     private String make;
 
@@ -23,6 +24,6 @@ public class Car extends BaseEntity{
     private long travelledDistance;
 
     @ToString.Exclude
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Part> parts;
 }

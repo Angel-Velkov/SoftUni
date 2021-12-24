@@ -6,21 +6,24 @@ import lombok.Setter;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CustomerSeedDto {
+public class SaleInfoDto {
 
-    @XmlAttribute
-    private String name;
+    private CarDto car;
 
-    @XmlElement(name = "birth-date")
-    private String birthDate;
+    @XmlElement(name = "customer-name")
+    private String customerName;
 
-    @XmlElement(name = "is-young-driver")
-    private boolean isYoungDriver;
+    private BigDecimal discount;
+
+    private BigDecimal price;
+
+    @XmlElement(name = "price-with-discount")
+    private BigDecimal priceWithDiscount;
 }

@@ -12,11 +12,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@XmlRootElement(name = "parts")
+@XmlRootElement(name = "cars")
 @XmlAccessorType(XmlAccessType.NONE)
-public class PartsSeedRootDto {
+public class CarsWithIdRootDto {
 
     @NonNull
-    @XmlElement(name = "part")
-    private List<PartSeedDto> parts;
+    @XmlElement(name = "car")
+    private List<CarWithIdDto> cars;
 }

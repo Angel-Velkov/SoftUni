@@ -7,16 +7,17 @@ import lombok.Setter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SupplierSeedDto {
+public class PartDto {
 
     @XmlAttribute
     private String name;
 
-    @XmlAttribute(name = "is-importer")
-    private boolean isImporter;
+    @XmlAttribute
+    private BigDecimal price;
 }

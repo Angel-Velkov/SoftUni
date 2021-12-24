@@ -1,6 +1,7 @@
 package com.example.xmlcardealer.model.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

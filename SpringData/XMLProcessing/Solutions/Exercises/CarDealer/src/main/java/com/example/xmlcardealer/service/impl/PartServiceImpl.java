@@ -1,6 +1,6 @@
 package com.example.xmlcardealer.service.impl;
 
-import com.example.xmlcardealer.model.dto.PartSeedDto;
+import com.example.xmlcardealer.model.dto.seed.PartSeedDto;
 import com.example.xmlcardealer.model.entity.Part;
 import com.example.xmlcardealer.repository.PartRepository;
 import com.example.xmlcardealer.service.PartService;
