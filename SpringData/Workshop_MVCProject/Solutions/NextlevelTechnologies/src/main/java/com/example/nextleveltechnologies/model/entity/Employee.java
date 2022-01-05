@@ -23,7 +23,7 @@ public class Employee extends BaseEntity {
     private String lastName;
 
     @Column(nullable = false)
-    private int age;
+    private Byte age;
 
     @ManyToOne(optional = false)
     private Project project;
