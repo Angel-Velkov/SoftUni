@@ -30,8 +30,8 @@ public class BreakCycles {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        String line;
-        while (!"".equals(line = reader.readLine())) {
+        String line = reader.readLine();
+        while (line != null && !line.equals("")) {
             String[] tokens = line.split("\\s*->\\s*");
 
             String node = tokens[0];
@@ -43,6 +43,8 @@ public class BreakCycles {
             }
 
             graph.put(node, children);
+
+            line = reader.readLine();
         }
 
         edges.sort(Comparator.comparing(Edge::getFirst).thenComparing(Edge::getSecond));
@@ -72,6 +74,7 @@ public class BreakCycles {
                 }
             }
         }
+        
         return removedEdges;
     }
 
@@ -98,6 +101,7 @@ public class BreakCycles {
                 }
             }
         }
+
         return false;
     }
 }
