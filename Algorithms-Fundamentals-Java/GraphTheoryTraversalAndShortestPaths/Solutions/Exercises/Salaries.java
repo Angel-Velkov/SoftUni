@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Salaries {
     private static char[][] graph;
-    private static int[] salaries;
+    private static long[] salaries;
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -15,13 +15,14 @@ public class Salaries {
         graph = new char[n][n];
 
         for (int r = 0; r < n; r++) {
+            
             String line = reader.readLine();
             for (int c = 0; c < n; c++) {
                 graph[r][c] = line.charAt(c);
             }
         }
 
-        salaries = new int[n];
+        salaries = new long[n];
 
         for (int i = 0; i < n; i++) {
             boolean hasAManager = false;
@@ -34,7 +35,7 @@ public class Salaries {
             }
 
             if (!hasAManager) {
-                calculateTheSalaryOtEmployees(i);
+                calculateSalary(i);
             }
         }
 
@@ -47,14 +48,14 @@ public class Salaries {
         System.out.println(Arrays.stream(salaries).sum());
     }
 
-    private static int calculateTheSalaryOtEmployees(int employee) {
+    private static long calculateSalary(int employee) {
         if (salaries[employee] != 0) {
             return salaries[employee];
         }
 
         for (int i = 0; i < graph[employee].length; i++) {
             if (employee != i && graph[employee][i] == 'Y') {
-                salaries[employee] += calculateTheSalaryOtEmployees(i);
+                salaries[employee] += calculateSalary(i);
             }
         }
 
