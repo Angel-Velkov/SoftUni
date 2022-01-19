@@ -27,8 +27,12 @@ public class Main {
         int destination = Integer.parseInt(scanner.nextLine());
 
         try {
-            List<Integer> shortestPath = BellmanFord.findShortestPath(graph, source, destination);
-            BellmanFord.printPathInfo(graph, shortestPath);
+            // 1. Bellman-Ford
+//            List<Integer> shortestPath = BellmanFord.findShortestPath(graph, source, destination);
+//            BellmanFord.printPathInfo(graph, shortestPath);
+
+            // 2. Longest Path
+//            System.out.println(LongestPath.getWeightOfLongestPath(graph, source, destination));
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }

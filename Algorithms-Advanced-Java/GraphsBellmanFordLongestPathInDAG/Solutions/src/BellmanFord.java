@@ -1,7 +1,11 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class BellmanFord {
+
     public static List<Integer> findShortestPath(Integer[][] graph, int source, int destination) {
         int[] distance = new int[graph.length];
         Arrays.fill(distance, Integer.MAX_VALUE);
@@ -21,6 +25,7 @@ public class BellmanFord {
 
                         int newWeight = distance[r] + weight;
                         if (newWeight < distance[c]) {
+
                             distance[c] = newWeight;
                             previous[c] = r;
                             hasChanged = true;
@@ -77,6 +82,7 @@ public class BellmanFord {
             if (prevStep != -1) {
                 sum += graph[prevStep][step];
             }
+
             prevStep = step;
         }
 
