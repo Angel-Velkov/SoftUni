@@ -1,9 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.PriorityQueue;
 
-public class ModifiedKruskalAlgorithm {
+public class CheapTownTour {
 
     private static class Edge implements Comparable<Edge> {
         private int from;
@@ -25,13 +26,13 @@ public class ModifiedKruskalAlgorithm {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        int nodesCount = Integer.parseInt(reader.readLine().split("\\s+")[1]);
-        int edgesCount = Integer.parseInt(reader.readLine().split("\\s+")[1]);
+        int nodesCount = Integer.parseInt(reader.readLine());
+        int edgesCount = Integer.parseInt(reader.readLine());
 
-        List<Edge> edges = new ArrayList<>();
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
 
         for (int i = 0; i < edgesCount; i++) {
-            int[] tokens = Arrays.stream(reader.readLine().split("\\s+"))
+            int[] tokens = Arrays.stream(reader.readLine().split("\\s*-\\s*"))
                     .mapToInt(Integer::parseInt)
                     .toArray();
 
@@ -40,44 +41,37 @@ public class ModifiedKruskalAlgorithm {
             int weight = tokens[2];
 
             Edge edge = new Edge(from, to, weight);
-            edges.add(edge);
+
+            queue.offer(edge);
         }
-
-        LinkedList<Edge> soredEdges = new LinkedList<>(edges);
-        Collections.sort(soredEdges);
-
-        int forestWeight = 0;
 
         int[] parent = new int[nodesCount];
         for (int i = 0; i < parent.length; i++) {
             parent[i] = i;
         }
 
-        while (!soredEdges.isEmpty()) {
-            Edge edge = soredEdges.pollFirst();
+        int totalCost = 0;
+
+        while (!queue.isEmpty()) {
+            Edge edge = queue.poll();
 
             int firstRoot = findRoot(edge.from, parent);
             int secondRoot = findRoot(edge.to, parent);
 
             if (firstRoot != secondRoot) {
-                forestWeight += edge.weight;
+                totalCost += edge.weight;
                 parent[firstRoot] = secondRoot;
             }
         }
 
-        System.out.println("Minimum spanning forest weight: " + forestWeight);
+        System.out.println("Total cost: " + totalCost);
     }
 
     private static int findRoot(int node, int[] parent) {
         int root = node;
+
         while (root != parent[root]) {
             root = parent[root];
-        }
-
-        while (node != root) {
-            int oldParent = parent[node];
-            parent[node] = root;
-            node = oldParent;
         }
 
         return root;

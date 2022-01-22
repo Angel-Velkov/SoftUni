@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class CableNetwork {
+
     private static class Edge implements Comparable<Edge> {
         private int from;
         private int to;
