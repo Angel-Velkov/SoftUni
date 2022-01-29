@@ -44,9 +44,7 @@ public class ArticulationPoints {
                 if (lowpoint[child] >= depth[node]) {
                     isArticulation = true;
                 }
-
                 lowpoint[node] = Math.min(lowpoint[node], lowpoint[child]);
-
             } else if (parent[node] != child) {
                 lowpoint[node] = Math.min(lowpoint[node], depth[child]);
             }
