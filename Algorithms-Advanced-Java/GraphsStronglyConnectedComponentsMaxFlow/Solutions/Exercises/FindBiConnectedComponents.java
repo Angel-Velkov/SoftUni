@@ -6,7 +6,7 @@ import java.util.*;
 public class FindBiConnectedComponents {
 
     private static class Graph {
-        LinkedList<Integer>[] adjacency;
+        List<Integer>[] adjacency;
 
         public Graph(int vertices) {
             this.setAdjacencyList(vertices);
@@ -25,7 +25,7 @@ public class FindBiConnectedComponents {
             this.adjacency[v].add(u);
         }
 
-        LinkedList<Integer> getChildren(int node) {
+        List<Integer> getChildren(int node) {
             return adjacency[node];
         }
 
@@ -34,12 +34,28 @@ public class FindBiConnectedComponents {
         }
     }
 
+    private static class Edge {
+        int from;
+        int to;
+
+        public Edge(int from, int to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public String toString() {
+            return from + "-" + to;
+        }
+    }
+
     private static Graph graph;
     private static boolean[] visited;
     private static int[] parent;
     private static int[] depth;
     private static int[] lowpoint;
-    private static Deque<Integer> stack;
+
+    private static Deque<Edge> stack;
     private static int componentsCount;
 
     public static void main(String[] args) throws IOException {
@@ -69,7 +85,10 @@ public class FindBiConnectedComponents {
 
                 findArticulationPoints(node, 1);
                 if (!stack.isEmpty()) {
-                    stack.clear();
+                    while (!stack.isEmpty()) {
+                        System.out.print(stack.pop() + " ");
+                    }
+                    System.out.println();
                     componentsCount++;
                 }
             }
@@ -83,31 +102,34 @@ public class FindBiConnectedComponents {
         depth[node] = level;
         lowpoint[node] = level;
 
-        int childCount = 0;
+        int childrenCount = 0;
 
         for (int child : graph.getChildren(node)) {
             if (!visited[child]) {
                 parent[child] = node;
-                childCount++;
+                childrenCount++;
 
-                stack.push(node);
+                stack.push(new Edge(node, child));
                 findArticulationPoints(child, level + 1);
 
                 lowpoint[node] = Math.min(lowpoint[node], lowpoint[child]);
 
                 if ((parent[node] != -1 && lowpoint[child] >= depth[node])
-                        || (parent[node] == -1 && childCount > 1)) {
+                        || (parent[node] == -1 && childrenCount > 1)) {
 
-                    while (!stack.isEmpty() && stack.peek() != node) {
-                        stack.pop();
-                    }
+                    Edge edge;
+                    do {
+                        edge = stack.pop();
+                        System.out.print(edge + " ");
+                    } while (!stack.isEmpty() && (edge.from != node || edge.to != child));
+                    System.out.println();
 
                     componentsCount++;
                 }
 
-            } else if (parent[node] != child) {
+            } else if (parent[node] != child && depth[child] < depth[node]) {
                 lowpoint[node] = Math.min(lowpoint[node], depth[child]);
-                stack.push(node);
+                stack.push(new Edge(node, child));
             }
         }
     }
