@@ -35,7 +35,6 @@ public class SupplementGraphToMakeItStronglyConnected {
     private static boolean[] visited;
     private static Deque<Integer> stack;
 
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -75,6 +74,110 @@ public class SupplementGraphToMakeItStronglyConnected {
                                 Arrays.stream(outDegrees).filter(Set::isEmpty).count()
                         )
         );
+
+        for (int[] edge : dagToScc(outDegrees, inDegrees)) {
+            System.out.println(edge[0] + "->" + edge[1]);
+        }
+    }
+
+    private static int currentGraph = 0;
+    // Stores foreach graph which nodes are without in/out degrees
+    private static Map<Integer, LinkedList<Integer>> componentsWithoutOutDeg = new HashMap<>();
+    private static Map<Integer, LinkedList<Integer>> componentsWithoutInDeg = new HashMap<>();
+
+    private static List<int[]> dagToScc(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
+        List<int[]> addedEdges = new ArrayList<>();
+
+        List<Set<Integer>> subGraphs = findAllSubGraphs(outDegrees, inDegrees);
+        connectSubGraphs(outDegrees, inDegrees);
+
+        return null;
+    }
+
+    private static void connectSubGraphs(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
+        LinkedList<Integer> outComponents = componentsWithoutOutDeg.get(0);
+        LinkedList<Integer> inComponents;
+        for (int component = 1; component < componentsWithoutOutDeg.size(); component++) {
+            inComponents = componentsWithoutInDeg.get(component);
+            connectComponentsOfSubgraph(outDegrees, inDegrees, outComponents, inComponents, component);
+
+            outComponents = componentsWithoutOutDeg.get(component);
+        }
+
+        inComponents = componentsWithoutInDeg.get(0);
+        connectComponentsOfSubgraph(outDegrees, inDegrees, outComponents, inComponents, currentGraph);
+    }
+
+    private static void connectComponentsOfSubgraph(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees,
+                                                    LinkedList<Integer> outComponents, LinkedList<Integer> inComponents,
+                                                    int component) {
+
+        int out = outComponents.removeFirst();
+        if (outComponents.isEmpty()) {
+            componentsWithoutOutDeg.remove(component - 1);
+        }
+
+        int in = inComponents.removeFirst();
+        if (inComponents.isEmpty()) {
+            componentsWithoutInDeg.remove(component);
+        }
+
+        outDegrees[out].add(in);
+        inDegrees[in].add(out);
+    }
+
+    private static List<Set<Integer>> findAllSubGraphs(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
+        List<Set<Integer>> subGraphs = new ArrayList<>();
+        boolean[] visited = new boolean[outDegrees.length];
+
+        for (int node = 0; node < outDegrees.length; node++) {
+            if (!visited[node]) {
+                componentsWithoutOutDeg.put(currentGraph, new LinkedList<>());
+                componentsWithoutInDeg.put(currentGraph, new LinkedList<>());
+                subGraphs.add(bfs(node, outDegrees, inDegrees, visited));
+
+                currentGraph++;
+            }
+        }
+
+        return subGraphs;
+    }
+
+    private static Set<Integer> bfs(int node, Set<Integer>[] outDegrees, Set<Integer>[] inDegrees, boolean[] visited) {
+        Set<Integer> result = new HashSet<>();
+
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.offer(node);
+        visited[node] = true;
+
+        while (!queue.isEmpty()) {
+            node = queue.poll();
+            result.add(node);
+
+            if (outDegrees[node].isEmpty()) {
+                componentsWithoutOutDeg.get(currentGraph).add(node);
+            }
+
+            if (inDegrees[node].isEmpty()) {
+                componentsWithoutInDeg.get(currentGraph).add(node);
+            }
+
+            for (int child : outDegrees[node]) {
+                if (!visited[child]) {
+                    visited[child] = true;
+                    queue.offer(child);
+                }
+            }
+
+            for (int child : inDegrees[node]) {
+                if (!visited[child]) {
+                    visited[child] = true;
+                    queue.offer(child);
+                }
+            }
+        }
+
+        return result;
     }
 
     private static void findAllDegrees(List<Set<Integer>> scc, Set<Integer>[] inDegrees, Set<Integer>[] outDegrees) {
