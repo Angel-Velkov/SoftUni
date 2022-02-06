@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SupplementGraphToMakeItStronglyConnected {
 
@@ -34,6 +35,8 @@ public class SupplementGraphToMakeItStronglyConnected {
     private static Graph reversedGraph;
     private static boolean[] visited;
     private static Deque<Integer> stack;
+
+    private static List<int[]> result = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -75,7 +78,9 @@ public class SupplementGraphToMakeItStronglyConnected {
                         )
         );
 
-        for (int[] edge : dagToScc(outDegrees, inDegrees)) {
+        dagToScc(outDegrees, inDegrees);
+
+        for (int[] edge : result) {
             System.out.println(edge[0] + "->" + edge[1]);
         }
     }
@@ -85,13 +90,57 @@ public class SupplementGraphToMakeItStronglyConnected {
     private static Map<Integer, LinkedList<Integer>> componentsWithoutOutDeg = new HashMap<>();
     private static Map<Integer, LinkedList<Integer>> componentsWithoutInDeg = new HashMap<>();
 
-    private static List<int[]> dagToScc(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
-        List<int[]> addedEdges = new ArrayList<>();
-
+    private static void dagToScc(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
         List<Set<Integer>> subGraphs = findAllSubGraphs(outDegrees, inDegrees);
         connectSubGraphs(outDegrees, inDegrees);
+        connectComponents(outDegrees, inDegrees);
 
-        return null;
+    }
+
+    private static void connectComponents(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
+        Deque<Integer> freeOuts = componentsWithoutOutDeg.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(ArrayDeque::new));
+
+        Deque<Integer> freeIns = componentsWithoutInDeg.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(ArrayDeque::new));
+
+        while (!freeIns.isEmpty() && !freeOuts.isEmpty()) {
+            int out = freeOuts.poll();
+            int in = freeIns.poll();
+
+            outDegrees[out].add(in);
+            inDegrees[in].add(out);
+            result.add(new int[]{out, in});
+        }
+
+        while (!freeOuts.isEmpty()) {
+            int out = freeOuts.poll();
+
+            int in = inDegrees[out]
+                    .stream()
+                    .findFirst()
+                    .get();
+
+            outDegrees[out].add(in);
+            inDegrees[in].add(out);
+            result.add(new int[]{out, in});
+        }
+
+        while (!freeIns.isEmpty()) {
+            int in = freeIns.poll();
+            int out = outDegrees[in]
+                    .stream()
+                    .findFirst()
+                    .get();
+
+            outDegrees[out].add(in);
+            inDegrees[in].add(out);
+            result.add(new int[]{out, in});
+        }
     }
 
     private static void connectSubGraphs(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
@@ -124,6 +173,7 @@ public class SupplementGraphToMakeItStronglyConnected {
 
         outDegrees[out].add(in);
         inDegrees[in].add(out);
+        result.add(new int[]{out, in});
     }
 
     private static List<Set<Integer>> findAllSubGraphs(Set<Integer>[] outDegrees, Set<Integer>[] inDegrees) {
