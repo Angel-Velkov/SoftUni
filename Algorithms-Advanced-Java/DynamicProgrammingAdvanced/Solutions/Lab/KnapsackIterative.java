@@ -1,9 +1,9 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 public class KnapsackIterative {
+
     private static class Item implements Comparable<Item> {
         String name;
         int weight;
@@ -46,19 +46,25 @@ public class KnapsackIterative {
         table = new int[items.size() + 1][capacity + 1];
         List<Item> takenItems = fillKnapsack(items, capacity);
 
-        int bestValue = table[items.size()][capacity];
-        int weight = capacity;
-        while (table[items.size()][weight - 1] == bestValue) {
-            weight--;
-        }
+        int totalValue = table[items.size()][capacity];
+        int totalWeight = getKnapsackWeight(capacity, totalValue);
 
-        System.out.println("Total Weight: " + weight);
-        System.out.println("Total Value: " + bestValue);
+        System.out.println("Total Weight: " + totalWeight);
+        System.out.println("Total Value: " + totalValue);
         takenItems
                 .stream()
                 .sorted(Item::compareTo)
                 .map(item -> item.name)
                 .forEach(System.out::println);
+    }
+
+    private static int getKnapsackWeight(int capacity, int bestValue) {
+        int weight = capacity;
+        while (table[table.length - 1][weight - 1] == bestValue) {
+            weight--;
+        }
+
+        return weight;
     }
 
     private static List<Item> fillKnapsack(List<Item> items, int capacity) {
