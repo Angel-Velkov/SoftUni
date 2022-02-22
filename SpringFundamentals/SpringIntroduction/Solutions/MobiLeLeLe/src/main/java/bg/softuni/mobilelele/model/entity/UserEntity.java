@@ -4,10 +4,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Set;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -16,7 +14,7 @@ import javax.persistence.Table;
 public class UserEntity extends LifecycleEventEntity {
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @NonNull
@@ -32,8 +30,8 @@ public class UserEntity extends LifecycleEventEntity {
     private boolean isActive;
 
     @NonNull
-    @ManyToOne(optional = false)
-    private UserRoleEntity role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<UserRoleEntity> role;
 
     private String imageUrl;
 }

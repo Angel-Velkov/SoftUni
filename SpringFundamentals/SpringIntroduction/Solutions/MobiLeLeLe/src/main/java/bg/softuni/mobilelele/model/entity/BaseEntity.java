@@ -3,6 +3,7 @@ package bg.softuni.mobilelele.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public abstract class BaseEntity {
 
     @Id
+    @Type(type = "uuid-char")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",

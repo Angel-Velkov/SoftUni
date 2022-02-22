@@ -1,5 +1,7 @@
 package bg.softuni.mobilelele.model.entity;
 
+import bg.softuni.mobilelele.model.entity.BaseEntity;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
@@ -8,6 +10,7 @@ import java.time.Instant;
 
 @MappedSuperclass
 public abstract class LifecycleEventEntity extends BaseEntity {
+
     @Column(nullable = false)
     private Instant created;
 
