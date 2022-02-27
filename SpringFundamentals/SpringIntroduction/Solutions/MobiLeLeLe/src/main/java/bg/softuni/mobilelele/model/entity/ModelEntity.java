@@ -1,15 +1,15 @@
 package bg.softuni.mobilelele.model.entity;
 
 import bg.softuni.mobilelele.model.enums.CategoryEnum;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@Getter
+@Setter
 @Table(name = "models")
 public class ModelEntity extends LifecycleEventEntity {
 
@@ -28,9 +28,9 @@ public class ModelEntity extends LifecycleEventEntity {
 
     @NonNull
     @Column(nullable = false)
-    private int startYear;
+    private Integer startYear;
 
-    private int endYear;
+    private Integer endYear;
 
     @NonNull
     @ManyToOne(optional = false)

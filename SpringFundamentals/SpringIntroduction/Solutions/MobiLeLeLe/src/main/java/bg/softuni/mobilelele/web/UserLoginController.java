@@ -1,7 +1,7 @@
 package bg.softuni.mobilelele.web;
 
-import bg.softuni.mobilelele.model.dto.UserLoginDto;
-import bg.softuni.mobilelele.model.service.UserLoginServiceModel;
+import bg.softuni.mobilelele.model.dto.binding.UserLoginBindingModel;
+import bg.softuni.mobilelele.model.dto.service.UserLoginServiceModel;
 import bg.softuni.mobilelele.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +31,7 @@ public class UserLoginController {
     }
 
     @PostMapping
-    public String login(UserLoginDto userLoginDto) {
-
-        LOGGER.info("User tried to login. Username {}", userLoginDto.getUsername());
+    public String login(UserLoginBindingModel userLoginDto) {
 
         boolean isLogged = this.userService.login(
                 new UserLoginServiceModel(
@@ -41,6 +39,13 @@ public class UserLoginController {
                         userLoginDto.getPassword()
                 )
         );
+
+        LOGGER.info("User tried to login. Username = {}. Success = {}",
+                userLoginDto.getUsername(), isLogged);
+
+        if (isLogged) {
+            return "redirect:/index";
+        }
 
         return "redirect:/users/login";
     }

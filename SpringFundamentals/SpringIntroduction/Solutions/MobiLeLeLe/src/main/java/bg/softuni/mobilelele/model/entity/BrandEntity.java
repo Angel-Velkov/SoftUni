@@ -2,9 +2,9 @@ package bg.softuni.mobilelele.model.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -17,4 +17,12 @@ public class BrandEntity extends LifecycleEventEntity {
     @NonNull
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL)
+    private Set<ModelEntity> models = new HashSet<>();
+
+    public void addModel(ModelEntity model) {
+        this.getModels().add(model);
+        model.setBrand(this);
+    }
 }

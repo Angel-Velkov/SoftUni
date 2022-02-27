@@ -28,17 +28,17 @@ public class OfferEntity extends LifecycleEventEntity {
     private String imageUrl;
 
     @NonNull
-    private int mileage;
+    private Integer mileage;
 
     @NonNull
-    @Column(nullable = false,precision = 9, scale = 2)
+    @Column(nullable = false, precision = 9, scale = 2)
     private BigDecimal price;
 
     @NonNull
     @Enumerated(value = EnumType.STRING)
     private TransmissionEnum transmission;
 
-    private int year;
+    private Integer year;
 
     @NonNull
     @ManyToOne(optional = false)

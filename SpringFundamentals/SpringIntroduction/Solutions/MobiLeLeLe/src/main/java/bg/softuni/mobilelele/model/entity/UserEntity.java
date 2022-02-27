@@ -1,14 +1,14 @@
 package bg.softuni.mobilelele.model.entity;
 
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class UserEntity extends LifecycleEventEntity {
@@ -27,9 +27,10 @@ public class UserEntity extends LifecycleEventEntity {
 
     private String lastName;
 
-    private boolean isActive;
+    private Boolean isActive;
 
     @NonNull
+    @Column(nullable = false)
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<UserRoleEntity> role;
 
