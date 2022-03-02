@@ -1,7 +1,7 @@
 package bg.softuni.mobilelele.web;
 
-import bg.softuni.mobilelele.model.dto.binding.UserLoginBindingModel;
-import bg.softuni.mobilelele.model.dto.service.UserLoginServiceModel;
+import bg.softuni.mobilelele.model.binding.UserLoginBindingModel;
+import bg.softuni.mobilelele.model.service.UserLoginServiceModel;
 import bg.softuni.mobilelele.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/users/login")
+@RequestMapping("users/")
 public class UserLoginController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserLoginController.class);
@@ -25,12 +25,12 @@ public class UserLoginController {
     }
 
 
-    @GetMapping
+    @GetMapping("/login")
     public String login() {
         return "auth-login";
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public String login(UserLoginBindingModel userLoginDto) {
 
         boolean isLogged = this.userService.login(
@@ -44,9 +44,15 @@ public class UserLoginController {
                 userLoginDto.getUsername(), isLogged);
 
         if (isLogged) {
-            return "redirect:/index";
+            return "redirect:/";
         }
 
-        return "redirect:/users/login";
+        return "redirect:/login";
+    }
+
+    @GetMapping("/logout")
+    private String logout() {
+        this.userService.logout();
+        return "redirect:/";
     }
 }

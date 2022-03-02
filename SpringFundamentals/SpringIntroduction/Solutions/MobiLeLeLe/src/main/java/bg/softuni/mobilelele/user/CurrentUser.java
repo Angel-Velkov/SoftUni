@@ -48,8 +48,7 @@ public class CurrentUser {
     }
 
     public void clean() {
-        this
-                .setLoggedIn(false)
+        this.setLoggedIn(false)
                 .setFirstName(null)
                 .setLastName(null)
                 .setUsername(null);

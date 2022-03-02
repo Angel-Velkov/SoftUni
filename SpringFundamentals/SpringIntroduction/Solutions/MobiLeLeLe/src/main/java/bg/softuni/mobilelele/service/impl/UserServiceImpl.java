@@ -1,8 +1,12 @@
 package bg.softuni.mobilelele.service.impl;
 
 import bg.softuni.mobilelele.model.entity.UserEntity;
-import bg.softuni.mobilelele.model.dto.service.UserLoginServiceModel;
+import bg.softuni.mobilelele.model.entity.UserRoleEntity;
+import bg.softuni.mobilelele.model.entity.enums.RoleEnum;
+import bg.softuni.mobilelele.model.service.UserLoginServiceModel;
+import bg.softuni.mobilelele.model.service.UserRegisterServiceModel;
 import bg.softuni.mobilelele.repository.UserRepository;
+import bg.softuni.mobilelele.repository.UserRoleRepository;
 import bg.softuni.mobilelele.service.UserService;
 import bg.softuni.mobilelele.user.CurrentUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,24 +18,25 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final CurrentUser currentUser;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CurrentUser currentUser) {
+    public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository,
+                           PasswordEncoder passwordEncoder, CurrentUser currentUser) {
+
         this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.currentUser = currentUser;
     }
 
     @Override
-    public UserEntity createUser(UserEntity user) {
-        user.setIsActive(true);
-        this.userRepository.save(user);
-        return user;
-    }
-
-    @Override
     public boolean login(UserLoginServiceModel loginServiceModel) {
+        if (currentUser.isLoggedIn()){
+            return true;
+        }
+
         Optional<UserEntity> userEntity =
                 this.userRepository.findByUsername(loginServiceModel.getUsername());
 
@@ -47,11 +52,7 @@ public class UserServiceImpl implements UserService {
             if (success) {
                 UserEntity loggedInUser = userEntity.get();
 
-                currentUser
-                        .setLoggedIn(true)
-                        .setFirstName(loggedInUser.getFirstName())
-                        .setLastName(loggedInUser.getLastName())
-                        .setUsername(loggedInUser.getUsername());
+                login(loggedInUser);
             }
 
             return success;
@@ -59,7 +60,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void registerAndLoginUser(UserRegisterServiceModel userRegistrationModel) {
+
+        UserEntity newUser = new UserEntity(
+                userRegistrationModel.getUsername(),
+                this.passwordEncoder.encode(userRegistrationModel.getPassword()),
+                userRegistrationModel.getFirstName(),
+                userRegistrationModel.getLastName()
+        );
+
+        UserRoleEntity userRole = this.userRoleRepository.findByRole(RoleEnum.USER);
+        newUser.getRole().add(userRole);
+
+        this.userRepository.save(newUser);
+
+        login(newUser);
+    }
+
+    private void login(UserEntity user) {
+        this.currentUser
+                .setLoggedIn(true)
+                .setFirstName(user.getFirstName())
+                .setLastName(user.getLastName())
+                .setUsername(user.getUsername());
+    }
+
+    @Override
     public void logout() {
-        currentUser.clean();
+        this.currentUser.clean();
     }
 }

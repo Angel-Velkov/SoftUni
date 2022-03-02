@@ -1,4 +1,4 @@
-package bg.softuni.mobilelele.model.dto.service;
+package bg.softuni.mobilelele.model.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserLoginServiceModel {
+public class UserRegisterServiceModel {
+    private String firstName;
+    private String lastName;
     private String username;
-    private String rawPassword;
+    private String password;
 }

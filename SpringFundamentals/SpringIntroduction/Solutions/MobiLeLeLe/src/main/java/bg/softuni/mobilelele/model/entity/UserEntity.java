@@ -3,6 +3,7 @@ package bg.softuni.mobilelele.model.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -25,14 +26,15 @@ public class UserEntity extends LifecycleEventEntity {
     @Column(nullable = false)
     private String firstName;
 
+    @NonNull
+    @Column(nullable = false)
     private String lastName;
 
     private Boolean isActive;
 
-    @NonNull
     @Column(nullable = false)
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<UserRoleEntity> role;
+    @ManyToMany
+    private Set<UserRoleEntity> role = new HashSet<>();
 
     private String imageUrl;
 }
