@@ -31,7 +31,7 @@ public class OfferEntity extends LifecycleEventEntity {
     private Integer mileage;
 
     @NonNull
-    @Column(nullable = false, precision = 9, scale = 2)
+    @Column(precision = 9, scale = 2)
     private BigDecimal price;
 
     @NonNull
