@@ -1,6 +1,6 @@
 package com.example.pathfinder.model.entity;
 
-import com.example.pathfinder.model.enums.LevelEnum;
+import com.example.pathfinder.model.entity.enums.LevelEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

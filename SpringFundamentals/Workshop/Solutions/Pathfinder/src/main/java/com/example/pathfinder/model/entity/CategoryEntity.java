@@ -1,6 +1,6 @@
 package com.example.pathfinder.model.entity;
 
-import com.example.pathfinder.model.enums.CategoryNameEnum;
+import com.example.pathfinder.model.entity.enums.CategoryNameEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
