@@ -29,11 +29,11 @@ public class UserEntity extends BaseEntity {
     @Column(unique = true)
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
-    private Set<RoleEntity> role;
+    private Set<RoleEntity> roles;
 
     @Enumerated(EnumType.STRING)
     private LevelEnum level;

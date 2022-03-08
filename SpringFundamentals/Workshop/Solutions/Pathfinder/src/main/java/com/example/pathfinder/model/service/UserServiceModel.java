@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -15,9 +16,11 @@ public class UserServiceModel {
 
     private Long id;
 
+    private String fullName;
+
     private String username;
 
-    private String fullName;
+    private String password;
 
     private String email;
 
@@ -25,6 +28,5 @@ public class UserServiceModel {
 
     private LevelEnum level;
 
-    private Set<RoleEntity> roles;
-
+    private Set<RoleEntity> roles = new HashSet<>();
 }
