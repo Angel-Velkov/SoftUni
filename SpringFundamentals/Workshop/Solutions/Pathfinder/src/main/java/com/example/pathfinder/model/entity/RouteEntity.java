@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -32,6 +33,9 @@ public class RouteEntity extends BaseEntity {
 
     private String videoUrl;
 
-    @ManyToMany
-    private Set<CategoryEntity> categories;
+    @OneToMany(mappedBy = "route", fetch = FetchType.EAGER)
+    private Set<PictureEntity> pictures = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<CategoryEntity> categories = new HashSet<>();
 }
