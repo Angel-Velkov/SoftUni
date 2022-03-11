@@ -3,16 +3,20 @@ package bg.softuni.mobilelele.service.impl;
 import bg.softuni.mobilelele.model.entity.UserEntity;
 import bg.softuni.mobilelele.model.entity.UserRoleEntity;
 import bg.softuni.mobilelele.model.entity.enums.RoleEnum;
-import bg.softuni.mobilelele.model.service.UserLoginServiceModel;
-import bg.softuni.mobilelele.model.service.UserRegisterServiceModel;
+import bg.softuni.mobilelele.model.service.UserServiceModel;
 import bg.softuni.mobilelele.repository.UserRepository;
 import bg.softuni.mobilelele.repository.UserRoleRepository;
 import bg.softuni.mobilelele.service.UserService;
 import bg.softuni.mobilelele.user.CurrentUser;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,72 +25,64 @@ public class UserServiceImpl implements UserService {
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final CurrentUser currentUser;
+    private final ModelMapper mapper;
 
     public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository,
-                           PasswordEncoder passwordEncoder, CurrentUser currentUser) {
+                           PasswordEncoder passwordEncoder, CurrentUser currentUser, ModelMapper mapper) {
 
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.currentUser = currentUser;
+        this.mapper = mapper;
+    }
+
+    @Transactional
+    @Override
+    public UserServiceModel register(UserServiceModel userServiceModel) {
+        UserEntity user = this.mapper.map(userServiceModel, UserEntity.class);
+        String encode = this.passwordEncoder.encode(userServiceModel.getPassword().trim());
+        user.setPassword(encode);
+        user.setIsActive(false);
+
+        RoleEnum roleEnum = userServiceModel.getRole();
+        Set<UserRoleEntity> roles = new HashSet<>();
+
+        switch (roleEnum) {
+            case ADMIN:
+                roles.add(this.userRoleRepository.findByRole(RoleEnum.ADMIN));
+            case USER:
+                roles.add(this.userRoleRepository.findByRole(RoleEnum.USER));
+        }
+
+        user.setRoles(roles);
+        this.userRepository.save(user);
+
+        return userServiceModel;
     }
 
     @Override
-    public boolean login(UserLoginServiceModel loginServiceModel) {
-        if (currentUser.isLoggedIn()){
-            return true;
-        }
+    public boolean containsUser(String username, String password) {
+        UserEntity user = this.userRepository.findByUsername(username).orElse(null);
 
-        Optional<UserEntity> userEntity =
-                this.userRepository.findByUsername(loginServiceModel.getUsername());
-
-        if (userEntity.isEmpty()) {
-            logout();
+        if (user == null) {
             return false;
         } else {
-            boolean success = passwordEncoder.matches(
-                    loginServiceModel.getRawPassword(),
-                    userEntity.get().getPassword()
-            );
-
-            if (success) {
-                UserEntity loggedInUser = userEntity.get();
-
-                login(loggedInUser);
-            }
-
-            return success;
+            return this.passwordEncoder.matches(password, user.getPassword());
         }
     }
 
+    @Modifying
     @Override
-    public void registerAndLoginUser(UserRegisterServiceModel userRegistrationModel) {
+    public void login(UserServiceModel userServiceModel) {
+        UserEntity user = this.userRepository
+                .findByUsername(userServiceModel.getUsername())
+                .orElseThrow(() -> new IllegalStateException("There is no such username"));
 
-        UserEntity newUser = new UserEntity(
-                userRegistrationModel.getUsername(),
-                this.passwordEncoder.encode(userRegistrationModel.getPassword()),
-                userRegistrationModel.getFirstName(),
-                userRegistrationModel.getLastName()
-        );
+        user.setIsActive(true);
+        this.userRepository.save(user);
 
-        UserRoleEntity userRole = this.userRoleRepository.findByRole(RoleEnum.USER);
-        newUser.getRole().add(userRole);
-
-        this.userRepository.save(newUser);
-
-        login(newUser);
-    }
-
-    private void login(UserEntity user) {
-        this.currentUser
-                .setLoggedIn(true)
-                .setFirstName(user.getFirstName())
-                .setLastName(user.getLastName())
-                .setUsername(user.getUsername());
-    }
-
-    @Override
-    public void logout() {
-        this.currentUser.clean();
+        this.currentUser.setId(user.getId());
+        this.currentUser.setUsername(user.getUsername());
     }
 }

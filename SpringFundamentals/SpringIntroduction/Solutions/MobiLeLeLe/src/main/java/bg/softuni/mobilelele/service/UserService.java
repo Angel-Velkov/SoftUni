@@ -1,13 +1,12 @@
 package bg.softuni.mobilelele.service;
 
-import bg.softuni.mobilelele.model.service.UserLoginServiceModel;
-import bg.softuni.mobilelele.model.service.UserRegisterServiceModel;
+import bg.softuni.mobilelele.model.service.UserServiceModel;
 
 public interface UserService {
 
-    boolean login(UserLoginServiceModel loginServiceModel);
+    UserServiceModel register(UserServiceModel userServiceModel);
 
-    void registerAndLoginUser(UserRegisterServiceModel registerServiceModel);
+    boolean containsUser(String username, String password);
 
-    void logout();
+    void login(UserServiceModel userServiceModel);
 }

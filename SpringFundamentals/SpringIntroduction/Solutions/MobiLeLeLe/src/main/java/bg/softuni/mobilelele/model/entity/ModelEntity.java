@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class ModelEntity extends LifecycleEventEntity {
 
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @NonNull

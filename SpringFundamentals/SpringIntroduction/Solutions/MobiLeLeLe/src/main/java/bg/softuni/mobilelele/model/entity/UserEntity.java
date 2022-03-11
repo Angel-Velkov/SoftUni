@@ -34,7 +34,7 @@ public class UserEntity extends LifecycleEventEntity {
 
     @Column(nullable = false)
     @ManyToMany
-    private Set<UserRoleEntity> role = new HashSet<>();
+    private Set<UserRoleEntity> roles = new HashSet<>();
 
     private String imageUrl;
 }
