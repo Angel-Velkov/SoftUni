@@ -18,9 +18,7 @@ public class BrandController {
     }
 
     @GetMapping("/all")
-    public String gerBrands(Model model) {
-//        model.addAttribute("brands", this.brandService.getBrands());
-
+    public String gerBrands() {
         return "brands";
     }
 }

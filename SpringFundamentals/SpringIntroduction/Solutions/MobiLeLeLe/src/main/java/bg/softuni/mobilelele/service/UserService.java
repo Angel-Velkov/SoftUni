@@ -9,4 +9,6 @@ public interface UserService {
     boolean containsUser(String username, String password);
 
     void login(UserServiceModel userServiceModel);
+
+    void logout();
 }

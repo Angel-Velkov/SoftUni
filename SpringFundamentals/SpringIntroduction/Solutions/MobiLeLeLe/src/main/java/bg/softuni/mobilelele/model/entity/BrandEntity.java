@@ -18,11 +18,6 @@ public class BrandEntity extends LifecycleEventEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Set<ModelEntity> models = new HashSet<>();
-
-    public void addModel(ModelEntity model) {
-        this.getModels().add(model);
-        model.setBrand(this);
-    }
 }

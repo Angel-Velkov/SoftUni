@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -84,5 +83,18 @@ public class UserServiceImpl implements UserService {
 
         this.currentUser.setId(user.getId());
         this.currentUser.setUsername(user.getUsername());
+    }
+
+    @Modifying
+    @Override
+    public void logout() {
+        UserEntity user = this.userRepository
+                .findById(this.currentUser.getId())
+                .orElseThrow(() -> new IllegalStateException("There is no such logged in user"));
+
+        user.setIsActive(false);
+        this.userRepository.saveAndFlush(user);
+
+        this.currentUser.clean();
     }
 }

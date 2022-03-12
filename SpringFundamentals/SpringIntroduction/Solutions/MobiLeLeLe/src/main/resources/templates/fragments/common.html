@@ -21,13 +21,13 @@
         <ul class="navbar-nav mr-auto col-12 justify-content-between">
             <th:block th:unless="${@currentUser.id == null}" >
                 <li class="nav-item">
-                    <a class="nav-link" href="/brands/all">All Brands</a>
+                    <a class="nav-link" th:href="@{/brands/all}">All Brands</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/offers/add">Add Offer</a>
+                    <a class="nav-link" th:href="@{/offers/add}">Add Offer</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/offers/all">All Offers</a>
+                    <a class="nav-link" th:href="@{/offers/all}">All Offers</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button"

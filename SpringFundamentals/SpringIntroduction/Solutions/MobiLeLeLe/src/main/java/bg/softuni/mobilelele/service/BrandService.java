@@ -1,5 +1,9 @@
 package bg.softuni.mobilelele.service;
 
-public interface BrandService {
+import bg.softuni.mobilelele.model.view.BrandWithModelsViewModel;
 
+import java.util.List;
+
+public interface BrandService {
+    List<BrandWithModelsViewModel> getAllBrandsWithModels();
 }

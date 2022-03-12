@@ -6,34 +6,45 @@ import lombok.*;
 import javax.persistence.*;
 
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Getter
 @Setter
 @Table(name = "models")
 public class ModelEntity extends LifecycleEventEntity {
 
-    @NonNull
     @Column(nullable = false, unique = true)
     private String name;
 
-    @NonNull
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum category;
 
-    @NonNull
     @Column(nullable = false, length = 512)
     private String imageUrl;
 
-    @NonNull
     @Column(nullable = false)
     private Integer startYear;
 
     private Integer endYear;
 
-    @NonNull
     @ManyToOne(optional = false)
     private BrandEntity brand;
 
+    public ModelEntity(String name, CategoryEnum category, String imageUrl, Integer startYear, BrandEntity brand) {
+        this.name = name;
+        this.category = category;
+        this.imageUrl = imageUrl;
+        this.startYear = startYear;
+        this.setBrand(brand);
+    }
+
+    public ModelEntity(String name, CategoryEnum category, String imageUrl, Integer startYear, Integer endYear, BrandEntity brand) {
+        this(name,category,imageUrl,startYear,brand);
+        this.endYear = endYear;
+    }
+
+    public void setBrand(BrandEntity brand) {
+        this.brand = brand;
+        brand.getModels().add(this);
+    }
 }

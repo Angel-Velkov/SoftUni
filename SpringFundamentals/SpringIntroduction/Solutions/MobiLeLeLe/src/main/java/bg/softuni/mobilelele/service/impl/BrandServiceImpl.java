@@ -1,10 +1,15 @@
 package bg.softuni.mobilelele.service.impl;
 
+import bg.softuni.mobilelele.model.entity.ModelEntity;
+import bg.softuni.mobilelele.model.view.BrandWithModelsViewModel;
 import bg.softuni.mobilelele.repository.BrandRepository;
 import bg.softuni.mobilelele.service.BrandService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BrandServiceImpl implements BrandService {
@@ -16,5 +21,19 @@ public class BrandServiceImpl implements BrandService {
     public BrandServiceImpl(BrandRepository brandRepository, ModelMapper mapper) {
         this.brandRepository = brandRepository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public List<BrandWithModelsViewModel> getAllBrandsWithModels() {
+        return this.brandRepository.findAll()
+                .stream()
+                .map(brand ->
+                        new BrandWithModelsViewModel(brand.getName(), brand
+                                .getModels()
+                                .stream()
+                                .map(ModelEntity::getName)
+                                .collect(Collectors.toSet()))
+                )
+                .collect(Collectors.toList());
     }
 }
