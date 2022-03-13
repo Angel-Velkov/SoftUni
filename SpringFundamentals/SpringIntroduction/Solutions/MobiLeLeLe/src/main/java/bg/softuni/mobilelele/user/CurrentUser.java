@@ -16,9 +16,11 @@ import org.springframework.web.context.annotation.SessionScope;
 public class CurrentUser {
     private Long id;
     private String username;
+    private Boolean isAdmin;
 
     public void clean() {
         this.id = null;
         this.username = null;
+        this.isAdmin = null;
     }
 }

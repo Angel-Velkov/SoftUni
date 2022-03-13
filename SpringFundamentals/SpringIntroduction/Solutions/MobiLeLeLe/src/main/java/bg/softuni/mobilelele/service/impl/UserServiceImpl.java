@@ -81,8 +81,15 @@ public class UserServiceImpl implements UserService {
         user.setIsActive(true);
         this.userRepository.save(user);
 
+        boolean isAdmin = user
+                .getRoles()
+                .stream()
+                .map(UserRoleEntity::getRole)
+                .anyMatch(role -> role == RoleEnum.ADMIN);
+
         this.currentUser.setId(user.getId());
         this.currentUser.setUsername(user.getUsername());
+        this.currentUser.setIsAdmin(isAdmin);
     }
 
     @Modifying
@@ -96,5 +103,10 @@ public class UserServiceImpl implements UserService {
         this.userRepository.saveAndFlush(user);
 
         this.currentUser.clean();
+    }
+
+    @Override
+    public UserEntity findUserBy(Long id) {
+        return this.userRepository.findById(id).orElse(null);
     }
 }

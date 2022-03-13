@@ -18,7 +18,7 @@ public class BrandController {
     }
 
     @GetMapping("/all")
-    public String gerBrands() {
+    public String gerBrands(Model model) {
         return "brands";
     }
 }

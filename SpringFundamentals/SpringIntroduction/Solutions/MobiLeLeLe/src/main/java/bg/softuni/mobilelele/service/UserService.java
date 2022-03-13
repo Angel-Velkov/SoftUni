@@ -1,5 +1,6 @@
 package bg.softuni.mobilelele.service;
 
+import bg.softuni.mobilelele.model.entity.UserEntity;
 import bg.softuni.mobilelele.model.service.UserServiceModel;
 
 public interface UserService {
@@ -11,4 +12,6 @@ public interface UserService {
     void login(UserServiceModel userServiceModel);
 
     void logout();
+
+    UserEntity findUserBy(Long id);
 }

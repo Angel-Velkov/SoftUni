@@ -31,8 +31,8 @@ public class OfferEntity extends LifecycleEventEntity {
     private Integer mileage;
 
     @NonNull
-    @Column(precision = 9, scale = 2)
-    private BigDecimal price;
+    @Column()
+    private Integer price;
 
     @NonNull
     @Enumerated(value = EnumType.STRING)

@@ -33,7 +33,7 @@ public class UserEntity extends LifecycleEventEntity {
     private Boolean isActive;
 
     @Column(nullable = false)
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<UserRoleEntity> roles = new HashSet<>();
 
     private String imageUrl;

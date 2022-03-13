@@ -11,7 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-public class BrandWithModelsViewModel {
+public class BrandWithModelNamesViewModel {
     String name;
     Set<String> models;
 }

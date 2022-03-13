@@ -1,7 +1,7 @@
 package bg.softuni.mobilelele.service.impl;
 
 import bg.softuni.mobilelele.model.entity.ModelEntity;
-import bg.softuni.mobilelele.model.view.BrandWithModelsViewModel;
+import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import bg.softuni.mobilelele.repository.BrandRepository;
 import bg.softuni.mobilelele.service.BrandService;
 import org.modelmapper.ModelMapper;
@@ -24,11 +24,11 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public List<BrandWithModelsViewModel> getAllBrandsWithModels() {
+    public List<BrandWithModelNamesViewModel> getAllBrandsWithModels() {
         return this.brandRepository.findAll()
                 .stream()
                 .map(brand ->
-                        new BrandWithModelsViewModel(brand.getName(), brand
+                        new BrandWithModelNamesViewModel(brand.getName(), brand
                                 .getModels()
                                 .stream()
                                 .map(ModelEntity::getName)
