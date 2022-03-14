@@ -1,21 +1,23 @@
 package bg.softuni.mobilelele.model.service;
 
-import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
-import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
 @Setter
 public class OfferServiceModel {
 
-    private Long sellerId;
+    private Long id;
+
+    private UserServiceModel seller;
 
     private String description;
 
-    private EngineEnum engine;
+    private String engineType;
 
     private String imageUrl;
 
@@ -23,9 +25,15 @@ public class OfferServiceModel {
 
     private Integer price;
 
-    private TransmissionEnum transmission;
+    private String transmissionType;
 
     private Integer year;
 
-    private String model;
+    private String modelName;
+
+    private String modelBrandName;
+
+    private LocalDateTime created;
+
+    private LocalDateTime modified;
 }

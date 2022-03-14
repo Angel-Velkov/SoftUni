@@ -5,6 +5,8 @@ import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
 import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
 import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
+import bg.softuni.mobilelele.model.view.OfferDetailedViewModel;
+import bg.softuni.mobilelele.model.view.OfferSummaryViewModel;
 import bg.softuni.mobilelele.service.BrandService;
 import bg.softuni.mobilelele.service.OfferService;
 import bg.softuni.mobilelele.user.CurrentUser;
@@ -14,14 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -47,8 +47,31 @@ public class OfferController {
     }
 
     @GetMapping("/all")
-    public String getOffers() {
+    public String getOffers(Model model) {
+
+        List<OfferServiceModel> allOffers = this.offerService.findAllOffers();
+
+        List<OfferSummaryViewModel> collect = allOffers
+                .stream()
+                .map(offer -> this.mapper.map(offer, OfferSummaryViewModel.class))
+                .collect(Collectors.toList());
+
+        model.addAttribute("offers", collect);
+
         return "offers";
+    }
+
+    @GetMapping("/{id}/details")
+    public String offerDetails(@PathVariable Long id, Model model) {
+
+        OfferDetailedViewModel map = this.mapper.map(this.offerService.findById(id), OfferDetailedViewModel.class);
+
+        model.addAttribute(
+                "offer",
+                map
+        );
+
+        return "details";
     }
 
     @GetMapping("/add")

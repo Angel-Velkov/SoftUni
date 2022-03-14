@@ -1,28 +1,29 @@
 package bg.softuni.mobilelele.model.entity;
 
-import bg.softuni.mobilelele.model.entity.BaseEntity;
+import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
+@Getter
 @MappedSuperclass
 public abstract class LifecycleEventEntity extends BaseEntity {
 
     @Column(nullable = false)
-    private Instant created;
+    private LocalDateTime created;
 
-    private Instant modified;
+    private LocalDateTime modified;
 
     @PrePersist
     private void beforeCreate() {
-        this.created = Instant.now();
+        this.created = LocalDateTime.now();
     }
 
     @PreUpdate
     private void beforeModify() {
-        this.modified = Instant.now();
+        this.modified = LocalDateTime.now();
     }
 }

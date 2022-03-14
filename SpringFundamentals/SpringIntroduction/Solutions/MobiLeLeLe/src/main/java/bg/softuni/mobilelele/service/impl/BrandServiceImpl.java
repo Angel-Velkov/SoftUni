@@ -28,11 +28,12 @@ public class BrandServiceImpl implements BrandService {
         return this.brandRepository.findAll()
                 .stream()
                 .map(brand ->
-                        new BrandWithModelNamesViewModel(brand.getName(), brand
-                                .getModels()
-                                .stream()
-                                .map(ModelEntity::getName)
-                                .collect(Collectors.toSet()))
+                        new BrandWithModelNamesViewModel(brand.getName(),
+                                brand
+                                        .getModels()
+                                        .stream()
+                                        .map(ModelEntity::getName)
+                                        .collect(Collectors.toSet()))
                 )
                 .collect(Collectors.toList());
     }

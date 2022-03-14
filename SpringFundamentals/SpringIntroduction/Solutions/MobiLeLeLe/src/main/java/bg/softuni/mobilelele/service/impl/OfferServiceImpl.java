@@ -13,6 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class OfferServiceImpl implements OfferService {
 
@@ -37,12 +40,30 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public void saveOffer(OfferServiceModel offerServiceModel) {
         UserEntity seller = this.userService.findUserBy(this.currentUser.getId());
-        ModelEntity model = this.modelService.findModelByName(offerServiceModel.getModel());
+        ModelEntity model = this.modelService.findModelByName(offerServiceModel.getModelName());
 
         OfferEntity offer = this.mapper.map(offerServiceModel, OfferEntity.class);
         offer.setSeller(seller);
         offer.setModel(model);
 
         this.offerRepository.save(offer);
+    }
+
+    @Override
+    public List<OfferServiceModel> findAllOffers() {
+        return this.offerRepository.findAll()
+                .stream()
+                .map(offer -> this.mapper.map(offer, OfferServiceModel.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public OfferServiceModel findById(Long id) {
+        OfferServiceModel map = this.mapper.map(
+                this.offerRepository.findById(id).orElse(null),
+                OfferServiceModel.class
+        );
+
+        return map;
     }
 }
