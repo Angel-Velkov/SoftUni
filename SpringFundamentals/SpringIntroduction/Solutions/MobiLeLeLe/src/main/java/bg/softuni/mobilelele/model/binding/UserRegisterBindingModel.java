@@ -1,5 +1,6 @@
 package bg.softuni.mobilelele.model.binding;
 
+import bg.softuni.mobilelele.validator.UniqueUsername;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,14 +17,13 @@ public class UserRegisterBindingModel {
     @Size(min = 3, max = 20)
     private String firstName;
 
-    @NotNull
     @NotBlank
     @Size(min = 3, max = 20)
     private String lastName;
 
-    @NotNull
     @NotBlank
     @Size(min = 3, max = 20)
+    @UniqueUsername
     private String username;
 
     @NotNull

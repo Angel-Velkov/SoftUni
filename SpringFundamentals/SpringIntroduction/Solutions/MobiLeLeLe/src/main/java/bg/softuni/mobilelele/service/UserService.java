@@ -7,6 +7,8 @@ public interface UserService {
 
     UserServiceModel register(UserServiceModel userServiceModel);
 
+    boolean isUsernameFree(String username);
+
     boolean containsUser(String username, String password);
 
     void login(UserServiceModel userServiceModel);

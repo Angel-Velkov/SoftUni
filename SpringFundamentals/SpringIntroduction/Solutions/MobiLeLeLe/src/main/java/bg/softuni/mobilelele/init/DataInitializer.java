@@ -45,8 +45,6 @@ public class DataInitializer implements CommandLineRunner {
             this.userRoleRepository.save(admin);
         }
 
-        List<BrandWithModelNamesViewModel> allBrandsWithTheirModels = brandService.findAllBrandsWithTheirModels();
-
         if (this.brandRepository.count() == 0) {
             BrandEntity tesla = new BrandEntity("Tesla");
             BrandEntity bmw = new BrandEntity("BMW");

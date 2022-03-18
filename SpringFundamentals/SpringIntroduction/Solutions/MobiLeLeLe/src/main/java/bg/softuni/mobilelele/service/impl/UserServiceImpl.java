@@ -61,6 +61,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean isUsernameFree(String username) {
+        return !this.userRepository.existsByUsername(username);
+    }
+
+    @Override
     public boolean containsUser(String username, String password) {
         UserEntity user = this.userRepository.findByUsername(username).orElse(null);
 
