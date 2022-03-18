@@ -11,4 +11,8 @@ public interface OfferService {
     List<OfferServiceModel> findAllOffers();
 
     OfferServiceModel findById(Long id);
+
+    void deleteOffer(Long id);
+
+    void updateOffer(OfferServiceModel offerServiceModel);
 }

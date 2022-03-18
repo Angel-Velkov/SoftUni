@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class BrandWithModelNamesViewModel {
-    String name;
-    Set<String> models;
+    private String name;
+    private List<String> modelNames;
 }

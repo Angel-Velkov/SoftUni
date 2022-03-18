@@ -19,19 +19,24 @@
                 <li class="list-group-item">
                     <div class="card-text"><span th:text="|• Mileage: *{mileage}|"></span></div>
                     <div class="card-text"><span th:text="|• Price: *{price}|"></span></div>
-                    <div class="card-text"><span th:text="|• Engine type: *{engineType}|"></span></div>
-                    <div class="card-text"><span th:text="|• Transmission type: *{transmissionType}|"></span></div>
+                    <div class="card-text"><span th:text="|• Engine type: *{engine.getAsString()}|"></span></div>
+                    <div class="card-text"><span th:text="|• Transmission type: *{transmission.getAsString()}|"></span></div>
                     <div class="card-text"><span th:text="|• Offer created: ${#temporals.format(offer.created, 'dd-MM-yyyy')}|"></span></div>
                     <div class="card-text"><span th:text="|• Offer modified: *{modified}|"></span></div>
-                    <div class="card-text"><span th:text="|• Seller: *{sellerFirstName} *{sellerLastName}|"></span></div>
+                    <div class="card-text"><span th:text="|• Seller: *{sellerFirstName} *{sellerLastName}|"></span>
+                    </div>
                 </li>
             </ul>
             <div class="card-body">
-                <a class="card-link" href="/">Update</a>
-                <a class="card-link" href="/">Delete</a>
+                <div class="row">
+                    <a class="btn btn-light" th:href="@{/offers/{id}/edit(id=*{id})}">Update</a>
+                    <form th:action="@{/offers/{id}(id=*{id})}" th:method="DELETE">
+                        <input type="submit" class="btn btn-light" value="Delete">
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="offer card col-sm-2 col-md-3  col-lg-4 m-1 p-0">
+        <div class="offer card col-sm-2 col-md-3  col-lg-4 m-1 p-0">5
             <img th:src="*{imageUrl}" class="card-img-top" alt="Car image">
         </div>
     </div>

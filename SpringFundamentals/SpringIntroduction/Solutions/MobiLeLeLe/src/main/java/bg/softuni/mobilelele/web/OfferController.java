@@ -1,10 +1,7 @@
 package bg.softuni.mobilelele.web;
 
-import bg.softuni.mobilelele.model.binding.OfferUploadBindingModel;
-import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
-import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
+import bg.softuni.mobilelele.model.binding.OfferPersistBindingModel;
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
-import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import bg.softuni.mobilelele.model.view.OfferDetailedViewModel;
 import bg.softuni.mobilelele.model.view.OfferSummaryViewModel;
 import bg.softuni.mobilelele.service.BrandService;
@@ -42,10 +39,11 @@ public class OfferController {
     }
 
     @ModelAttribute("offerUpload")
-    private OfferUploadBindingModel offerUploadBindingModel() {
-        return new OfferUploadBindingModel();
+    private OfferPersistBindingModel offerUploadBindingModel() {
+        return new OfferPersistBindingModel();
     }
 
+    // GET
     @GetMapping("/all")
     public String getOffers(Model model) {
 
@@ -74,35 +72,82 @@ public class OfferController {
         return "details";
     }
 
+    // POST
     @GetMapping("/add")
-    public String uploadOffer(Model model) {
+    public String addOffer(Model model) {
         if (this.currentUser.getId() == null) {
             return "redirect:/users/login";
         }
 
-        List<BrandWithModelNamesViewModel> allBrandsWithModels = this.brandService.getAllBrandsWithModels();
-        model.addAttribute("brands", allBrandsWithModels);
-        model.addAttribute("engines", EngineEnum.values());
-        model.addAttribute("transmissions", TransmissionEnum.values());
+        model.addAttribute("brands", this.brandService.findAllBrandsWithTheirModels());
 
         return "offer-add";
     }
 
     @PostMapping("/add")
-    public String addOfferConfirm(@Valid OfferUploadBindingModel offerUploadBindingModel,
+    public String addOfferConfirm(@Valid OfferPersistBindingModel offerPersistBindingModel,
                                   BindingResult bindingResult,
                                   RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes
-                    .addFlashAttribute("offerUpload", offerUploadBindingModel)
+                    .addFlashAttribute("offerUpload", offerPersistBindingModel)
                     .addFlashAttribute(
                             "org.springframework.validation.BindingResult.offerUpload",
                             bindingResult
                     );
+
+            return "redirect:add";
         }
 
-        this.offerService.saveOffer(this.mapper.map(offerUploadBindingModel, OfferServiceModel.class));
+        this.offerService.saveOffer(this.mapper.map(offerPersistBindingModel, OfferServiceModel.class));
+
+        return "redirect:all";
+    }
+
+    // PATCH
+    @GetMapping("/{id}/edit")
+    public String editOffer(@PathVariable Long id, Model model) {
+
+        model
+                .addAttribute("brands", this.brandService.findAllBrandsWithTheirModels())
+                .addAttribute(
+                        "offerEdit",
+                        this.mapper.map(this.offerService.findById(id), OfferPersistBindingModel.class)
+                );
+
+        return "update";
+    }
+
+    @PatchMapping("{id}/edit")
+    private String editOfferConfirm(@PathVariable Long id,
+                                    @Valid OfferPersistBindingModel offerPersistBindingModel,
+                                    BindingResult bindingResult,
+                                    RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes
+                    .addFlashAttribute("offerEdit", offerPersistBindingModel)
+                    .addFlashAttribute(
+                            "org.springframework.validation.BindingResult.offerPersistBindingModel",
+                            bindingResult
+                    );
+
+            return "redirect:edit";
+        }
+
+        OfferServiceModel offerServiceModel = this.mapper.map(offerPersistBindingModel, OfferServiceModel.class);
+        offerServiceModel.setId(id);
+
+        this.offerService.updateOffer(offerServiceModel);
+
+        return "redirect:details";
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public String deleteOffer(@PathVariable Long id) {
+        this.offerService.deleteOffer(id);
 
         return "redirect:all";
     }

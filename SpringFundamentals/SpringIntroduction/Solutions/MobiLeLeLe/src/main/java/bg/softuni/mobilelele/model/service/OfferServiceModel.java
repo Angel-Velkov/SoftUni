@@ -1,5 +1,7 @@
 package bg.softuni.mobilelele.model.service;
 
+import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
+import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,15 +19,15 @@ public class OfferServiceModel {
 
     private String description;
 
-    private String engineType;
-
     private String imageUrl;
 
     private Integer mileage;
 
     private Integer price;
 
-    private String transmissionType;
+    private EngineEnum engine;
+
+    private TransmissionEnum transmission;
 
     private Integer year;
 

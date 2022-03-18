@@ -4,7 +4,6 @@ import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import bg.softuni.mobilelele.repository.BrandRepository;
 import bg.softuni.mobilelele.service.BrandService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +14,14 @@ import java.util.stream.Collectors;
 public class BrandServiceImpl implements BrandService {
 
     private final BrandRepository brandRepository;
-    private final ModelMapper mapper;
 
     @Autowired
-    public BrandServiceImpl(BrandRepository brandRepository, ModelMapper mapper) {
+    public BrandServiceImpl(BrandRepository brandRepository) {
         this.brandRepository = brandRepository;
-        this.mapper = mapper;
     }
 
     @Override
-    public List<BrandWithModelNamesViewModel> getAllBrandsWithModels() {
+    public List<BrandWithModelNamesViewModel> findAllBrandsWithTheirModels() {
         return this.brandRepository.findAll()
                 .stream()
                 .map(brand ->
@@ -33,7 +30,7 @@ public class BrandServiceImpl implements BrandService {
                                         .getModels()
                                         .stream()
                                         .map(ModelEntity::getName)
-                                        .collect(Collectors.toSet()))
+                                        .collect(Collectors.toList()))
                 )
                 .collect(Collectors.toList());
     }

@@ -2,7 +2,6 @@ package bg.softuni.mobilelele.model.binding;
 
 import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
 import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
-import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,10 +11,10 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class OfferUploadBindingModel {
+public class OfferPersistBindingModel {
 
     @NotBlank
-    private String model;
+    private String modelName;
 
     @NotNull
     @PositiveOrZero
@@ -40,6 +39,6 @@ public class OfferUploadBindingModel {
     @NotBlank
     private String description;
 
-    @NotNull
+    @NotBlank
     private String imageUrl;
 }

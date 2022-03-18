@@ -1,5 +1,7 @@
 package bg.softuni.mobilelele.model.view;
 
+import bg.softuni.mobilelele.model.entity.enums.EngineEnum;
+import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +17,6 @@ public class OfferSummaryViewModel {
     private String modelName;
     private Integer mileage;
     private Integer price;
-    private String engineType;
-    private String transmissionType;
+    private EngineEnum engine;
+    private TransmissionEnum transmission;
 }

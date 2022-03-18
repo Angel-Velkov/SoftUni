@@ -1,5 +1,6 @@
 package bg.softuni.mobilelele.service.impl;
 
+import bg.softuni.mobilelele.exception.ObjectNotFoundException;
 import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.entity.OfferEntity;
 import bg.softuni.mobilelele.model.entity.UserEntity;
@@ -11,7 +12,9 @@ import bg.softuni.mobilelele.service.UserService;
 import bg.softuni.mobilelele.user.CurrentUser;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,11 +62,36 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     public OfferServiceModel findById(Long id) {
-        OfferServiceModel map = this.mapper.map(
+        return this.mapper.map(
                 this.offerRepository.findById(id).orElse(null),
                 OfferServiceModel.class
         );
+    }
 
-        return map;
+    @Override
+    public void deleteOffer(Long id) {
+        this.offerRepository.deleteById(id);
+    }
+
+    @Modifying
+    @Transactional
+    @Override
+    public void updateOffer(OfferServiceModel offerServiceModel) {
+        OfferEntity offerEntity =
+                this.offerRepository.findById(offerServiceModel.getId())
+                        .orElseThrow(
+                                () -> new ObjectNotFoundException("There is no offer with ID: " + offerServiceModel.getId())
+                        );
+
+        offerEntity.setModel(this.modelService.findModelByName(offerServiceModel.getModelName()));
+        offerEntity.setPrice(offerServiceModel.getPrice());
+        offerEntity.setEngine(offerServiceModel.getEngine());
+        offerEntity.setTransmission(offerServiceModel.getTransmission());
+        offerEntity.setYear(offerServiceModel.getYear());
+        offerEntity.setMileage(offerServiceModel.getMileage());
+        offerEntity.setDescription(offerServiceModel.getDescription());
+        offerEntity.setImageUrl(offerServiceModel.getImageUrl());
+
+        this.offerRepository.save(offerEntity);
     }
 }

@@ -9,8 +9,10 @@ import java.math.BigDecimal;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "offers")
 public class OfferEntity extends LifecycleEventEntity {

@@ -5,9 +5,11 @@ import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.entity.UserRoleEntity;
 import bg.softuni.mobilelele.model.entity.enums.CategoryEnum;
 import bg.softuni.mobilelele.model.entity.enums.RoleEnum;
+import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import bg.softuni.mobilelele.repository.BrandRepository;
 import bg.softuni.mobilelele.repository.ModelRepository;
 import bg.softuni.mobilelele.repository.UserRoleRepository;
+import bg.softuni.mobilelele.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -21,13 +23,16 @@ public class DataInitializer implements CommandLineRunner {
     private final BrandRepository brandRepository;
     private final ModelRepository modelRepository;
 
+    private final BrandService brandService;
+
     @Autowired
     public DataInitializer(UserRoleRepository userRoleRepository, BrandRepository brandRepository,
-                           ModelRepository modelRepository) {
+                           ModelRepository modelRepository, BrandService brandService) {
 
         this.userRoleRepository = userRoleRepository;
         this.brandRepository = brandRepository;
         this.modelRepository = modelRepository;
+        this.brandService = brandService;
     }
 
     @Override
@@ -39,6 +44,8 @@ public class DataInitializer implements CommandLineRunner {
             this.userRoleRepository.save(user);
             this.userRoleRepository.save(admin);
         }
+
+        List<BrandWithModelNamesViewModel> allBrandsWithTheirModels = brandService.findAllBrandsWithTheirModels();
 
         if (this.brandRepository.count() == 0) {
             BrandEntity tesla = new BrandEntity("Tesla");
