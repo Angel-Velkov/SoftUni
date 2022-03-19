@@ -1,7 +1,11 @@
 package bg.softuni.mobilelele.web;
 
 import bg.softuni.mobilelele.model.binding.OfferPersistBindingModel;
+import bg.softuni.mobilelele.model.entity.ModelEntity;
+import bg.softuni.mobilelele.model.service.ModelServiceModel;
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
+import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
+import bg.softuni.mobilelele.model.view.ModelViewModel;
 import bg.softuni.mobilelele.model.view.OfferDetailedViewModel;
 import bg.softuni.mobilelele.model.view.OfferSummaryViewModel;
 import bg.softuni.mobilelele.service.BrandService;
@@ -79,7 +83,18 @@ public class OfferController {
             return "redirect:/users/login";
         }
 
-        model.addAttribute("brands", this.brandService.findAllBrandsWithTheirModels());
+        model.addAttribute("brands", this.brandService
+                .findAllBrandsWithTheirModels()
+                .stream()
+                .map(brand ->
+                        new BrandWithModelNamesViewModel(brand.getName(),
+                                brand
+                                        .getModels()
+                                        .stream()
+                                        .map(ModelServiceModel::getName)
+                                        .collect(Collectors.toList()))
+                )
+                .collect(Collectors.toList()));
 
         return "offer-add";
     }
@@ -110,7 +125,18 @@ public class OfferController {
     public String editOffer(@PathVariable Long id, Model model) {
 
         model
-                .addAttribute("brands", this.brandService.findAllBrandsWithTheirModels())
+                .addAttribute("brands", this.brandService
+                        .findAllBrandsWithTheirModels()
+                        .stream()
+                        .map(brand ->
+                                new BrandWithModelNamesViewModel(brand.getName(),
+                                        brand
+                                                .getModels()
+                                                .stream()
+                                                .map(ModelServiceModel::getName)
+                                                .collect(Collectors.toList()))
+                        )
+                        .collect(Collectors.toList()))
                 .addAttribute(
                         "offerEdit",
                         this.mapper.map(this.offerService.findById(id), OfferPersistBindingModel.class)

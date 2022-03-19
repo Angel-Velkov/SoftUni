@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserNames {
-    private String firstName;
-    private String lastName;
+public class BrandWithModelsViewModel {
+    private String name;
+    private List<ModelViewModel> models;
 }
