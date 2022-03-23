@@ -1,6 +1,5 @@
-package com.example.pathfinder.model.service;
+package com.example.pathfinder.model.view;
 
-import com.example.pathfinder.model.entity.enums.CategoryNameEnum;
 import com.example.pathfinder.model.entity.enums.LevelEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +10,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RouteServiceModel {
+public class RouteDetailedViewModel {
     private String name;
-    private String description;
-    private String gpxCoordinates;
+    private String authorName;
     private LevelEnum level;
     private String videoUrl;
-    private Set<CategoryNameEnum> categories;
+    private String description;
+    private Set<String> pictureUrls;
 }

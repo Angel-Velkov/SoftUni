@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group">
                     <input type="file"
-                           th:filed="*{gpxCoordinates}"
+                           th:field="*{gpxCoordinates}"
                            required
                            id="inputGpx"
                            class="form-control-file"
@@ -73,7 +73,7 @@
                         <option value="" selected>Select level</option>
                         <option th:each="level : ${T(com.example.pathfinder.model.entity.enums.LevelEnum).values()}"
                                 th:value="${level}"
-                                th:text="${level}">
+                                th:text="${level.getAsString()}">
                         </option>
                     </select>
                 </div>
@@ -82,7 +82,7 @@
 
                 <div class="form-group">
                     <label for="videoUrl">Video Url (only last eleven characters from Youtube)</label>
-                    <input th:filed="*{videoUrl}"
+                    <input th:field="*{videoUrl}"
                            id="videoUrl" type="text"
                            class="form-control" placeholder="Video url">
                 </div>
@@ -94,7 +94,7 @@
                     <input th:field="*{categories}"
                            th:each="category : ${T(com.example.pathfinder.model.entity.enums.CategoryNameEnum).values()}"
                            th:value="${category}"
-                           th:text="${category}"
+                           th:text="${category.getAsString()}"
                            class="m-3" type="checkbox" name="categories" id="categories">
                     <br>
                 </div>

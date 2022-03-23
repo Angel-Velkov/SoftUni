@@ -61,6 +61,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity getCurrentLoggedInUser() {
+        return this.userRepository.findById(this.currentUser.getId())
+                .orElseThrow(() -> new IllegalStateException("There is no logged in user"));
+    }
+
+    @Override
     public UserServiceModel findById(Long id) {
         return this.userRepository.findById(id)
                 .map(user -> this.mapper.map(user, UserServiceModel.class))

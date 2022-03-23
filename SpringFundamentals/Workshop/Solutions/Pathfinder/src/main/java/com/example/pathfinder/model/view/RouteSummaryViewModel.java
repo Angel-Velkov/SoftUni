@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RouteViewModel {
+public class RouteSummaryViewModel {
     private Long id;
     private String name;
     private String description;
