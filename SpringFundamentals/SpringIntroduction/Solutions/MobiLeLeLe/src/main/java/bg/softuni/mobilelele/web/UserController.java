@@ -20,15 +20,6 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
-    private final ModelMapper mapper;
-
-    @Autowired
-    public UserController(UserService userService, ModelMapper mapper) {
-        this.userService = userService;
-        this.mapper = mapper;
-    }
-
     @ModelAttribute
     private UserRegisterBindingModel userRegisterBindingModel() {
         return new UserRegisterBindingModel();
@@ -44,66 +35,13 @@ public class UserController {
         return "auth-register";
     }
 
-    @PostMapping("/register")
-    public String registerConfirm(@Valid UserRegisterBindingModel userRegisterBindingModel,
-                                  BindingResult bindingResult,
-                                  RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes
-                    .addFlashAttribute("userRegisterBindingModel", userRegisterBindingModel)
-                    .addFlashAttribute(
-                            "org.springframework.validation.BindingResult.userRegisterBindingModel",
-                            bindingResult
-                    );
-
-            return "redirect:register";
-        }
-
-        this.userService.register(
-                this.mapper.map(userRegisterBindingModel, UserServiceModel.class)
-        );
-
-        return "redirect:login";
-    }
-
     @GetMapping("/login")
     public String login() {
         return "auth-login";
     }
 
-    @PostMapping("/login")
-    public String loginConfirm(@Valid UserLoginBindingModel userLoginBindingModel,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes
-                    .addFlashAttribute("userLoginBindingModel", userLoginBindingModel);
-
-            return "redirect:login?error";
-        }
-
-        boolean userExists = this.userService
-                .containsUser(userLoginBindingModel.getUsername(), userLoginBindingModel.getPassword());
-
-        if (userExists) {
-            this.userService.login(this.mapper.map(userLoginBindingModel, UserServiceModel.class));
-        } else {
-            redirectAttributes
-                    .addFlashAttribute("userLoginBindingModel", userLoginBindingModel);
-
-            return "redirect:login?error";
-        }
-
-        return "redirect:/";
-    }
-
     @GetMapping("/logout")
     public String logout() {
-
-        this.userService.logout();
-
         return "redirect:/";
     }
 }

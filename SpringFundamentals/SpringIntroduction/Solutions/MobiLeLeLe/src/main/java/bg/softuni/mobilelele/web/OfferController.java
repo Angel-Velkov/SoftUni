@@ -1,16 +1,13 @@
 package bg.softuni.mobilelele.web;
 
 import bg.softuni.mobilelele.model.binding.OfferPersistBindingModel;
-import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.service.ModelServiceModel;
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
 import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
-import bg.softuni.mobilelele.model.view.ModelViewModel;
 import bg.softuni.mobilelele.model.view.OfferDetailedViewModel;
 import bg.softuni.mobilelele.model.view.OfferSummaryViewModel;
 import bg.softuni.mobilelele.service.BrandService;
 import bg.softuni.mobilelele.service.OfferService;
-import bg.softuni.mobilelele.user.CurrentUser;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +28,14 @@ public class OfferController {
 
     private final OfferService offerService;
     private final BrandService brandService;
-    private final CurrentUser currentUser;
     private final ModelMapper mapper;
 
     @Autowired
-    public OfferController(OfferService offerService, BrandService brandService, CurrentUser currentUser, ModelMapper mapper) {
+    public OfferController(OfferService offerService, BrandService brandService,
+                           ModelMapper mapper) {
+
         this.offerService = offerService;
         this.brandService = brandService;
-        this.currentUser = currentUser;
         this.mapper = mapper;
     }
 
@@ -79,9 +76,7 @@ public class OfferController {
     // POST
     @GetMapping("/add")
     public String addOffer(Model model) {
-        if (this.currentUser.getId() == null) {
-            return "redirect:/users/login";
-        }
+        // TODO: Check if there is logged in user
 
         model.addAttribute("brands", this.brandService
                 .findAllBrandsWithTheirModels()

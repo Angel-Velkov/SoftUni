@@ -9,7 +9,6 @@ import bg.softuni.mobilelele.repository.OfferRepository;
 import bg.softuni.mobilelele.service.ModelService;
 import bg.softuni.mobilelele.service.OfferService;
 import bg.softuni.mobilelele.service.UserService;
-import bg.softuni.mobilelele.user.CurrentUser;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,18 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class OfferServiceImpl implements OfferService {
 
-    private final CurrentUser currentUser;
     private final UserService userService;
     private final ModelService modelService;
     private final ModelMapper mapper;
     private final OfferRepository offerRepository;
 
     @Autowired
-    public OfferServiceImpl(CurrentUser currentUser, UserService userService,
-                            ModelService modelService, ModelMapper mapper,
-                            OfferRepository offerRepository) {
+    public OfferServiceImpl(UserService userService, ModelService modelService,
+                            ModelMapper mapper, OfferRepository offerRepository) {
 
-        this.currentUser = currentUser;
         this.userService = userService;
         this.modelService = modelService;
         this.mapper = mapper;
@@ -42,11 +38,12 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     public void saveOffer(OfferServiceModel offerServiceModel) {
-        UserEntity seller = this.userService.findUserBy(this.currentUser.getId());
+        // TODO: Current User
+        // UserEntity seller = this.userService.findUserBy();
         ModelEntity model = this.modelService.findModelByName(offerServiceModel.getModelName());
 
         OfferEntity offer = this.mapper.map(offerServiceModel, OfferEntity.class);
-        offer.setSeller(seller);
+        // offer.setSeller(seller);
         offer.setModel(model);
 
         this.offerRepository.save(offer);
