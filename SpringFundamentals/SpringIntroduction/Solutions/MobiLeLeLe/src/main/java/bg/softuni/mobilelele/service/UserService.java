@@ -8,5 +8,5 @@ public interface UserService {
 
     boolean containsUser(String username, String password);
 
-    UserEntity findUserBy(Long id);
+    UserEntity findUserByUsername(String username);
 }

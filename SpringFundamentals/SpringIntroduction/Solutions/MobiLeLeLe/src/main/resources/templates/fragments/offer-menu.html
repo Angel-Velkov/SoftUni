@@ -3,9 +3,10 @@
 
 <header></header>
 <body>
-<form th:fragment="properties(offerObj, method, buttonValue)"
+<form th:fragment="properties(offerObj, method, buttonValue, action)"
       th:object="${__${offerObj}__}"
       th:method="${method}"
+      th:action="@{__${action}__}"
       class="main-form mx-auto col-md-8 d-flex flex-column justify-content-center">
     <div class="row">
 

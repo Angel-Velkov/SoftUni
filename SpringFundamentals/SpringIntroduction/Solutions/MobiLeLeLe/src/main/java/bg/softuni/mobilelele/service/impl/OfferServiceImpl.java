@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,9 +38,8 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public void saveOffer(OfferServiceModel offerServiceModel) {
-        // TODO: Current User
-        // UserEntity seller = this.userService.findUserBy();
+    public void saveOffer(OfferServiceModel offerServiceModel, Principal principal) {
+        UserEntity seller = this.userService.findUserByUsername(principal.getName());
         ModelEntity model = this.modelService.findModelByName(offerServiceModel.getModelName());
 
         OfferEntity offer = this.mapper.map(offerServiceModel, OfferEntity.class);

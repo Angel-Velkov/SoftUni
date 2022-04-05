@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>MobiLeLeLe</title>
@@ -23,15 +26,14 @@
                 <a class="nav-link" th:href="@{/brands/all}">All Brands</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/offers/add}">Add Offer</a>
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/offers/add}">Add Offer</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/offers/all}">All Offers</a>
             </li>
-            <!-- TODO -->
-            <th:block>
-                <li
-                        class="nav-item dropdown">
+            <th:block sec:authorize="isAuthenticated()">
+                <li sec:authorize="hasRole('ADMIN')"
+                    class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Admin
@@ -44,21 +46,18 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <div class="form-inline my-2 my-lg-0 border px-3">
-                        <a class="nav-link" href="/users/logout">Logout</a>
-                    </div>
-                </li>
-            </th:block>
-            <!-- TODO -->
-            <th:block>
-                <li class="nav-item">
-                    <a class="nav-link" href="/users/register">Register</a>
-                </li>
-                <li class="nav-item">
                     <form th:action="@{/users/logout}"
                           th:method="POST">
-                        <a class="nav-link" href="/users/login">Login</a>
+                        <input class="nav" type="submit" value="Logout">
                     </form>
+                </li>
+            </th:block>
+            <th:block sec:authorize="!isAuthenticated()">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/users/register}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/users/login}">Login</a>
                 </li>
             </th:block>
         </ul>

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,6 @@ public class OfferController {
     // POST
     @GetMapping("/add")
     public String addOffer(Model model) {
-        // TODO: Check if there is logged in user
 
         model.addAttribute("brands", this.brandService
                 .findAllBrandsWithTheirModels()
@@ -97,7 +97,8 @@ public class OfferController {
     @PostMapping("/add")
     public String addOfferConfirm(@Valid OfferPersistBindingModel offerPersistBindingModel,
                                   BindingResult bindingResult,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes
@@ -110,7 +111,7 @@ public class OfferController {
             return "redirect:add";
         }
 
-        this.offerService.saveOffer(this.mapper.map(offerPersistBindingModel, OfferServiceModel.class));
+        this.offerService.saveOffer(this.mapper.map(offerPersistBindingModel, OfferServiceModel.class), principal);
 
         return "redirect:all";
     }
