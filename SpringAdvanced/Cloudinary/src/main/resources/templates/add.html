@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All pictures</title>
+</head>
+<body
+<h3>Choose picture:</h3>
+<form th:method="POST"
+      enctype="multipart/form-data">
+    <label>
+        <input type="text" name="title">
+    </label>
+    <br>
+    <input type="file" name="picture">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>
