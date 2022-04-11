@@ -1,5 +1,6 @@
 package bg.softuni.mobilelele.config;
 
+import bg.softuni.mobilelele.model.entity.enums.RoleEnum;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static bg.softuni.mobilelele.model.entity.enums.RoleEnum.*;
 
 @Configuration
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -33,6 +36,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .antMatchers("/", "/users/register", "/users/login", "/offers/all", "/brands/all").permitAll()
+                .antMatchers("/statistics").hasRole(ADMIN.name())
                 .antMatchers("/**").authenticated()
                 .and()
                 .formLogin()

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OfferService {
 
-    void saveOffer(OfferServiceModel offerServiceModel, Principal principal);
+    void saveOffer(OfferServiceModel offerServiceModel, String username);
 
     List<OfferServiceModel> findAllOffers();
 

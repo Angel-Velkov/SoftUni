@@ -3,7 +3,6 @@ package bg.softuni.mobilelele.service.impl;
 import bg.softuni.mobilelele.exception.ObjectNotFoundException;
 import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.entity.OfferEntity;
-import bg.softuni.mobilelele.model.entity.UserEntity;
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
 import bg.softuni.mobilelele.repository.OfferRepository;
 import bg.softuni.mobilelele.service.ModelService;
@@ -15,7 +14,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,13 +36,12 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public void saveOffer(OfferServiceModel offerServiceModel, Principal principal) {
-        UserEntity seller = this.userService.findUserByUsername(principal.getName());
+    public void saveOffer(OfferServiceModel offerServiceModel, String username) {
         ModelEntity model = this.modelService.findModelByName(offerServiceModel.getModelName());
 
         OfferEntity offer = this.mapper.map(offerServiceModel, OfferEntity.class);
-        // offer.setSeller(seller);
         offer.setModel(model);
+        offer.setSeller(this.userService.findUserByUsername(username));
 
         this.offerRepository.save(offer);
     }

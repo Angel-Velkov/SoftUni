@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class LifecycleEventEntity extends BaseEntity {
 
-    @Column(nullable = false)
     private LocalDateTime created;
 
     private LocalDateTime modified;

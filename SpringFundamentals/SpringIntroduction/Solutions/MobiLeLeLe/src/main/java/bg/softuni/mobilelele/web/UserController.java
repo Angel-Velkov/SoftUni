@@ -21,6 +21,15 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
 
+    private final UserService userService;
+    private final ModelMapper mapper;
+
+    @Autowired
+    public UserController(UserService userService, ModelMapper mapper) {
+        this.userService = userService;
+        this.mapper = mapper;
+    }
+
     @ModelAttribute
     private UserRegisterBindingModel userRegisterBindingModel() {
         return new UserRegisterBindingModel();
@@ -32,8 +41,26 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String register() {
+    public String getRegister() {
         return "auth-register";
+    }
+
+    @PostMapping("/register")
+    public String postRegister(@Valid UserRegisterBindingModel userRegisterBindingModel,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes
+                    .addFlashAttribute("userRegisterBindingModel", userRegisterBindingModel)
+                    .addFlashAttribute("org.springframework.validation.BindingResult.userRegisterBindingModel", userRegisterBindingModel);
+
+            return "redirect:register";
+        }
+
+        userService.registerUser(mapper.map(userRegisterBindingModel, UserServiceModel.class));
+
+        return "redirect:/";
     }
 
     @GetMapping("/login")
@@ -47,7 +74,8 @@ public class UserController {
             RedirectAttributes redirectAttributes
     ) {
 
-        redirectAttributes.addFlashAttribute("bad_credentials", true)
+        redirectAttributes
+                .addFlashAttribute("bad_credentials", true)
                 .addFlashAttribute("name", username);
 
         return "redirect:/users/login";

@@ -46,6 +46,6 @@ public class OfferEntity extends LifecycleEventEntity {
     @ManyToOne(optional = false)
     private ModelEntity model;
 
-    @ManyToOne()
+    @ManyToOne(optional = false)
     private UserEntity seller;
 }

@@ -111,7 +111,10 @@ public class OfferController {
             return "redirect:add";
         }
 
-        this.offerService.saveOffer(this.mapper.map(offerPersistBindingModel, OfferServiceModel.class), principal);
+        this.offerService.saveOffer(
+                this.mapper.map(offerPersistBindingModel, OfferServiceModel.class),
+                principal.getName()
+        );
 
         return "redirect:all";
     }
