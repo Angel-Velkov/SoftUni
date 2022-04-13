@@ -4,6 +4,7 @@ import com.example.books.model.dto.BookDto;
 import com.example.books.service.BookService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,16 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("books")
+@RequestMapping("/books")
 public class BookController {
 
     private final BookService bookService;
-    private final ModelMapper mapper;
 
     @Autowired
-    public BookController(BookService bookService, ModelMapper mapper) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.mapper = mapper;
     }
 
     @GetMapping
@@ -31,6 +30,16 @@ public class BookController {
 
         return ResponseEntity
                 .ok(allBooks);
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<BookDto>> getAllBooks(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "3") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+        return ResponseEntity
+                .ok(bookService.getBooks(pageNo, pageSize, sortBy));
     }
 
     @GetMapping("/{id}")
@@ -45,7 +54,7 @@ public class BookController {
                 );
     }
 
-    @PutMapping
+    @PostMapping
     public ResponseEntity<BookDto> createBook(@RequestBody BookDto bookDto, UriComponentsBuilder builder) {
 
         long bookId = this.bookService.createBook(bookDto);
