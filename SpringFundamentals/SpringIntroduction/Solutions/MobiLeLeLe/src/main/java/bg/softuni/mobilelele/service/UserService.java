@@ -9,6 +9,8 @@ public interface UserService {
 
     boolean containsUser(String username, String password);
 
+    boolean isAdmin(String username);
+
     UserEntity findUserByUsername(String username);
 
     void registerUser(UserServiceModel userServiceModel);

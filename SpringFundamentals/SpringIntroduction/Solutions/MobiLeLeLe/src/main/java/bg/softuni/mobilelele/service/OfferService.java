@@ -2,7 +2,6 @@ package bg.softuni.mobilelele.service;
 
 import bg.softuni.mobilelele.model.service.OfferServiceModel;
 
-import java.security.Principal;
 import java.util.List;
 
 public interface OfferService {
@@ -16,4 +15,6 @@ public interface OfferService {
     void deleteOffer(Long id);
 
     void updateOffer(OfferServiceModel offerServiceModel);
+
+    boolean hasAccess(String username, Long offerId);
 }

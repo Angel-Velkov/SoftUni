@@ -11,6 +11,7 @@ import bg.softuni.mobilelele.service.OfferService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -170,8 +171,9 @@ public class OfferController {
     }
 
     // DELETE
+    @PreAuthorize("@offerServiceImpl.hasAccess(#principal.name, #id)")
     @DeleteMapping("/{id}")
-    public String deleteOffer(@PathVariable Long id) {
+    public String deleteOffer(@PathVariable Long id, Principal principal) {
         this.offerService.deleteOffer(id);
 
         return "redirect:all";

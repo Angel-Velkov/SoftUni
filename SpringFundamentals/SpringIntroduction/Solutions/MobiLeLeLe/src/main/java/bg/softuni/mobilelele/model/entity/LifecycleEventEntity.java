@@ -2,7 +2,6 @@ package bg.softuni.mobilelele.model.entity;
 
 import lombok.Getter;
 
-import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;

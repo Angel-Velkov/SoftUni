@@ -62,6 +62,7 @@ public class OfferServiceImpl implements OfferService {
         );
     }
 
+    @Transactional
     @Override
     public void deleteOffer(Long id) {
         this.offerRepository.deleteById(id);
@@ -87,5 +88,14 @@ public class OfferServiceImpl implements OfferService {
         offerEntity.setImageUrl(offerServiceModel.getImageUrl());
 
         this.offerRepository.save(offerEntity);
+    }
+
+    @Override
+    public boolean hasAccess(String username, Long offerId) {
+        if (!offerRepository.areRelated(username, offerId)) {
+            return userService.isAdmin(username);
+        }
+
+        return true;
     }
 }

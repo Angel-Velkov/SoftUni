@@ -5,7 +5,6 @@ import bg.softuni.mobilelele.model.entity.enums.TransmissionEnum;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class OfferEntity extends LifecycleEventEntity {
     private Integer mileage;
 
     @NonNull
-    @Column()
+    @Column
     private Integer price;
 
     @NonNull

@@ -5,7 +5,6 @@ import bg.softuni.mobilelele.model.entity.ModelEntity;
 import bg.softuni.mobilelele.model.entity.UserRoleEntity;
 import bg.softuni.mobilelele.model.entity.enums.CategoryEnum;
 import bg.softuni.mobilelele.model.entity.enums.RoleEnum;
-import bg.softuni.mobilelele.model.view.BrandWithModelNamesViewModel;
 import bg.softuni.mobilelele.repository.BrandRepository;
 import bg.softuni.mobilelele.repository.ModelRepository;
 import bg.softuni.mobilelele.repository.UserRoleRepository;

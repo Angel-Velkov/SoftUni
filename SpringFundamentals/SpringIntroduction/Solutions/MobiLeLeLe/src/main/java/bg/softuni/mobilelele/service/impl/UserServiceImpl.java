@@ -7,7 +7,6 @@ import bg.softuni.mobilelele.model.service.UserServiceModel;
 import bg.softuni.mobilelele.repository.UserRepository;
 import bg.softuni.mobilelele.repository.UserRoleRepository;
 import bg.softuni.mobilelele.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,19 +24,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper mapper;
     private final UserDetailsService userDetailsService;
 
     public UserServiceImpl(UserRepository userRepository,
                            UserRoleRepository userRoleRepository,
                            PasswordEncoder passwordEncoder,
-                           ModelMapper mapper,
                            UserDetailsService userDetailsService) {
 
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.mapper = mapper;
         this.userDetailsService = userDetailsService;
     }
 
@@ -55,6 +51,11 @@ public class UserServiceImpl implements UserService {
         } else {
             return this.passwordEncoder.matches(password, user.getPassword());
         }
+    }
+
+    @Override
+    public boolean isAdmin(String username) {
+        return userRepository.isAdmin(username);
     }
 
     @Override

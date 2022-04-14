@@ -1,7 +1,9 @@
 package bg.softuni.mobilelele.model.entity;
 
 import bg.softuni.mobilelele.model.entity.enums.CategoryEnum;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
