@@ -75,48 +75,8 @@ public class UserController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String loginConfirm(@Valid UserLoginBindingModel userLoginBindingModel,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes
-                    .addFlashAttribute("userLoginBindingModel", userLoginBindingModel)
-                    .addFlashAttribute(
-                            "org.springframework.validation.BindingResult.userLoginBindingModel"
-                            , bindingResult
-                    );
-
-            return "redirect:login";
-        }
-
-        UserServiceModel user = this.userService.findUserByUsernameAndPassword(
-                userLoginBindingModel.getUsername(), userLoginBindingModel.getPassword()
-        );
-
-        if (user == null) {
-            redirectAttributes
-                    .addFlashAttribute("isExist", false)
-                    .addFlashAttribute("userLoginBindingModel", userLoginBindingModel)
-                    .addFlashAttribute(
-                            "org.springframework.validation.BindingResult.userLoginBindingModel"
-                            , bindingResult
-                    );
-
-            return "redirect:login";
-        }
-
-        this.userService.loginUser(user.getId(), user.getUsername());
-
-        return "redirect:/";
-    }
-
     @GetMapping("/logout")
     public String logout() {
-
-        this.userService.logout();
-
         return "redirect:/";
     }
 

@@ -17,7 +17,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (this.roleRepository.count() == 0) {
             RoleEntity user = new RoleEntity(RoleNameEnum.USER);
             RoleEntity admin = new RoleEntity(RoleNameEnum.ADMIN);

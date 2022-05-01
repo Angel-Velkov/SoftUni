@@ -2,7 +2,6 @@ package com.example.pathfinder.service.impl;
 
 import com.example.pathfinder.model.entity.PictureEntity;
 import com.example.pathfinder.model.entity.RouteEntity;
-import com.example.pathfinder.model.entity.UserEntity;
 import com.example.pathfinder.model.service.RouteServiceModel;
 import com.example.pathfinder.model.view.RouteDetailedViewModel;
 import com.example.pathfinder.model.view.RouteSummaryViewModel;
@@ -20,16 +19,15 @@ import java.util.stream.Collectors;
 @Service
 public class RouteServiceImpl implements RouteService {
 
-    private final UserService userService;
     private final CategoryService categoryService;
     private final RouteRepository routeRepository;
     private final ModelMapper mapper;
 
     @Autowired
-    public RouteServiceImpl(UserService userService, CategoryService categoryService,
-                            RouteRepository routeRepository, ModelMapper mapper) {
+    public RouteServiceImpl(CategoryService categoryService,
+                            RouteRepository routeRepository,
+                            ModelMapper mapper) {
 
-        this.userService = userService;
         this.categoryService = categoryService;
         this.routeRepository = routeRepository;
         this.mapper = mapper;
@@ -58,8 +56,7 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public void addRoute(RouteServiceModel routeServiceModel) {
         RouteEntity routeEntity = this.mapper.map(routeServiceModel, RouteEntity.class);
-        UserEntity user = this.userService.getCurrentLoggedInUser();
-        routeEntity.setAuthor(user);
+        // TODO: Set current user
 
         routeEntity.setCategories(
                 this.categoryService

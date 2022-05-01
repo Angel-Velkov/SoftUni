@@ -11,15 +11,15 @@
                   th:action="@{/users/login}"
                   th:method="POST">
                 <div>
-                    <h5 th:unless="${isExist}" class="bg-danger">Incorrect username or password</h5>
+                    <h5 th:unless="${isExist}" class="bg-danger">Incorrect email or password</h5>
                     <div class="col-auto">
-                        <label for="inputUsername" class="col-form-label ">Username</label>
+                        <label for="inputEmail" class="col-form-label ">Email</label>
                     </div>
                     <div class="col-auto">
-                        <input type="text"
-                               th:field="*{username}"
+                        <input type="email"
+                               th:field="*{email}"
                                required minlength="4" maxlength="20"
-                               id="inputUsername"
+                               id="inputEmail"
                                class="form-control"
                                aria-describedby="usernameHelpInline">
                     </div>

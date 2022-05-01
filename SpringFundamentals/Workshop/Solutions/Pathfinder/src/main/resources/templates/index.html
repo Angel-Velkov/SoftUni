@@ -1,5 +1,6 @@
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">>
 
 <head th:replace="fragments/common::head"></head>
 <body>
@@ -73,7 +74,7 @@
         <img th:each="pic : ${pictures}" th:src="${pic}" width="200px" height="200px" alt="">
     </section>
 
-     <script th:src="@{/js/weather.js}"></script>
+    <script th:src="@{/js/weather.js}"></script>
 </div>
 <!-- Wrapper Ends -->
 

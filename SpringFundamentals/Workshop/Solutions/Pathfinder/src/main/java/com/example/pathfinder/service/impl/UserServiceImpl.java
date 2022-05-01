@@ -6,27 +6,29 @@ import com.example.pathfinder.model.entity.enums.RoleNameEnum;
 import com.example.pathfinder.model.service.UserServiceModel;
 import com.example.pathfinder.repository.RoleRepository;
 import com.example.pathfinder.repository.UserRepository;
-import com.example.pathfinder.secutity.CurrentUser;
 import com.example.pathfinder.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final CurrentUser currentUser;
     private final ModelMapper mapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-                           CurrentUser currentUser, ModelMapper mapper) {
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           RoleRepository roleRepository,
+                           ModelMapper mapper) {
 
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
-        this.currentUser = currentUser;
         this.mapper = mapper;
     }
 
@@ -35,35 +37,11 @@ public class UserServiceImpl implements UserService {
         userModel.setLevel(LevelEnum.BEGINNER);
         userModel.getRoles().add(roleRepository.findByRole(RoleNameEnum.USER));
 
-        UserEntity user = this.mapper.map(userModel, UserEntity.class);
-        this.userRepository.save(user);
+        UserEntity userEntity = this.mapper.map(userModel, UserEntity.class);
+        userEntity.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
+        this.userRepository.save(userEntity);
 
         return userModel;
-    }
-
-    @Override
-    public UserServiceModel findUserByUsernameAndPassword(String username, String password) {
-        return this.userRepository.findByUsernameAndPassword(username, password)
-                .map(user -> mapper.map(user, UserServiceModel.class))
-                .orElse(null);
-    }
-
-    @Override
-    public void loginUser(Long id, String username) {
-        this.currentUser.setId(id);
-        this.currentUser.setUsername(username);
-    }
-
-    @Override
-    public void logout() {
-        this.currentUser.setId(null);
-        this.currentUser.setUsername(null);
-    }
-
-    @Override
-    public UserEntity getCurrentLoggedInUser() {
-        return this.userRepository.findById(this.currentUser.getId())
-                .orElseThrow(() -> new IllegalStateException("There is no logged in user"));
     }
 
     @Override
